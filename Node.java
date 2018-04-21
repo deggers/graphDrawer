@@ -4,8 +4,7 @@ public class Node {
     private double y;
     private int id;
 
-
-    public Node (String label){
+    public Node(String label) {
         this.label = label;
     }
 }

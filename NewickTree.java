@@ -8,6 +8,8 @@ import java.util.ArrayList;
  * from https://stackoverflow.com/questions/3891041/java-library-or-code-to-parse-newick-format
  */
 
+
+
 public class NewickTree {
 
     private static int node_uuid = 0;
@@ -39,6 +41,7 @@ public class NewickTree {
                     break;
             }
         }
+
 
         int numSplits = splitIndices.size() + 1;
         String[] splits = new String[numSplits];
@@ -87,6 +90,11 @@ public class NewickTree {
             return node;
 
         } else throw new RuntimeException("unbalanced ()'s");
+    }
+
+    @Override
+    public String toString() {
+        return root.toString() + ";";
     }
 
     static class Node {
@@ -155,11 +163,6 @@ public class NewickTree {
             else
                 return "";
         }
-    }
-
-    @Override
-    public String toString() {
-        return root.toString() + ";";
     }
 
 }
