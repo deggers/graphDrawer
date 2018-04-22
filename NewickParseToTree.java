@@ -1,42 +1,43 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class NewickParserTry {
+public class NewickParseToTree {
 
     private static int node_uuid = 0;
     private Node root;
-    public  ArrayList<Node> nodeList = new ArrayList<>();
+    public ArrayList<Node> nodeList = new ArrayList<>();
+    MutableTree<String> tree = new MappedTreeStructure<String>();
 
-    static NewickParserTry readNewickFormat(String newick) {
-        return new NewickParserTry().innerReadNewickFormat(newick);
+    static NewickParseToTree readNewickFormat(String newick) {
+        return new NewickParseToTree().innerReadNewickFormat(newick);
     }
 
-    private NewickParserTry innerReadNewickFormat(String newick) {
+    private NewickParseToTree innerReadNewickFormat(String newick) {
         this.root = readSubtree(newick.substring(0, newick.length() - 1));
-//        System.out.println("root = " + root);
-//        System.out.println("nodeList = " + Arrays.toString(nodeList.toArray()));
+        System.out.println(tree);
         return this;
     }
 
     private Node readSubtree(String s) {
-//        System.out.println("s = " + s);
+        System.out.println("readSubtree for = " + s);
         int leftBracket = s.indexOf('(');
         int rightBracket = s.lastIndexOf(')');
-
+        int i = getClosingParenthesis(s);
+        System.out.println("i = " + i);
+        System.exit(1);
         if (leftBracket != -1 && rightBracket != -1) {  // means, found two brackets
             Node node = new Node(s.substring(rightBracket + 1));
             node.children = new ArrayList<>();
-
             String[] childrenString = split(s.substring(leftBracket + 1, rightBracket));
-//            System.out.println("Arrays.toString(childrenString = " + Arrays.toString(childrenString));
+            System.out.println("Arrays.toString(childrenString) = " + Arrays.toString(childrenString));
             for (String sub : childrenString) {
                 Node child = readSubtree(sub);
+                System.out.println("child = " + child);
+                tree.add("root", child.toString());
                 node.children.add(child);
                 child.parent = node;
-//                System.out.println("child.parent = " + child.parent);
             }
             nodeList.add(node);
-//            System.out.println("node = " + node);
             return node;
         } else if (leftBracket == rightBracket) {
             Node node = new Node(s);
@@ -60,16 +61,12 @@ public class NewickParserTry {
                     rightParenCount++;
                     break;
                 case ',':
-//                    System.out.println("comma at position = " + i);
-//                    System.out.println("leftParenCount = " + leftParenCount);
-//                    System.out.println("rightParenCount = " + rightParenCount);
                     if (leftParenCount == rightParenCount) {
                         splitIndices.add(i);
                     }
                     break;
             }
         }
-//        System.out.println("splitIndices = " + splitIndices);
         int numSplits = splitIndices.size() + 1;
         String[] splits = new String[numSplits];
 
@@ -94,16 +91,12 @@ public class NewickParserTry {
         final String name;
         final float weight;
         boolean realName;
+
         ArrayList<Node> children;
         Node parent;
 
-        /**
-         * @param name name in "actualName:weight" format, weight defaults to zero if colon absent
-         */
         Node(String name) {
-
-            /* check if node have own name */
-            int colonIndex = name.indexOf(':');
+            int colonIndex = name.indexOf(':');  /* check if node have own name */
             String actualNameText;
             if (colonIndex == -1) {
                 actualNameText = name;
@@ -160,5 +153,22 @@ public class NewickParserTry {
                 return "";
         }
     }
+
+    public static int getClosingParenthesis(final String strng) {
+        if (!strng.trim().startsWith("(")) {
+            throw new IllegalArgumentException(String.format("Illegal Argument [%s] does not start with an opening parenthesis", strng));
+        }
+        int depth = 0;
+        for (int i = 0; i < strng.length(); i++) {
+            if (strng.charAt(i) == '(') {
+                depth++;
+            } else if (strng.charAt(i) == ')' && (--depth == 0)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+
 }
 
