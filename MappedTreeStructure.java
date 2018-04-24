@@ -3,7 +3,7 @@ import java.util.*;
 
 // copied from https://stackoverflow.com/questions/3522454/java-tree-data-structure
 
-public class MappedTreeStructure<Node extends Serializable> implements MutableTree<Node> {
+public class MappedTreeStructure<Node> implements MutableTree<Node> {
     private final Map<Node, Node> nodeParent = new HashMap<Node, Node>();
     private final LinkedHashSet<Node> nodeList = new LinkedHashSet<Node>();
 

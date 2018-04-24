@@ -6,11 +6,16 @@ public class finalParserNewick {
     public static MutableTree<String> parseStringToTree(String string) {
 
         // check if string is valid format
-
-        // process it
-        MutableTree<String> tree = new MappedTreeStructure<String>();
-        callMyselfRecursively(string, tree);
-        return tree;
+        if ( isValidFormat(string)) {
+            // process it
+            MutableTree<String> tree = new MappedTreeStructure<String>();
+            callMyselfRecursively(string, tree);
+            return tree;
+        }
+        else {
+            System.out.println("format for newick seems to be wrong, daaamn");
+            return null;
+        }
     }
 
     public static String callMyselfRecursively(String string, MutableTree tree) {
@@ -79,6 +84,33 @@ public class finalParserNewick {
             splits[numSplits - 1] = s.substring(splitIndices.get(splitIndices.size() - 1) + 1);
         }
         return splits;
+    }
+
+    private static boolean isValidFormat(String inputCleaned) {
+        if (inputCleaned.isEmpty()) {
+            return false;
+        }
+        long countSemicolons = inputCleaned.chars().filter(num -> num == ';').count();
+
+        if (!inputCleaned.endsWith(";") || countSemicolons != 1) {
+            return false;
+        }
+        int brackets = 0;
+        for (char c : inputCleaned.toCharArray()) {
+            if (c == '(') {
+                brackets += 1;
+            }
+            if (c == ')') {
+                brackets -= 1;
+            }
+            if (brackets < 0) {
+                return false;
+            }
+        }
+        if (brackets != 0) {
+            return false;
+        }
+        return true;
     }
 
 }
