@@ -14,3 +14,4 @@ public final class DirectedEdge extends Edge {
         return _to;
     }
 }
+ // durch Tree Struktur (nodeList + parentList) scheinbar unbenutzt

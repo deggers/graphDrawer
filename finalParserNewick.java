@@ -18,12 +18,12 @@ public class finalParserNewick {
         }
     }
 
-    public static String callMyselfRecursively(String string, MutableTree tree) {
+    private static String callMyselfRecursively(String string, MutableTree tree) {
         try {  // try to find branch
             int rightPar = getClosingParenthesis(string);
             int nodeName = pseudoNode_uuid++;
             String toProcess = string.substring(1, rightPar);
-            String[] splitArray = split(toProcess);
+            String[] splitArray = splitToBranches(toProcess);
             for (String branch : splitArray) {
                 String child = callMyselfRecursively(branch, tree);
                 tree.add(Integer.toString(nodeName), child);
@@ -35,7 +35,7 @@ public class finalParserNewick {
         }
     }
 
-    public static int getClosingParenthesis(final String strng) {
+    private static int getClosingParenthesis(final String strng) {
         if (!strng.trim().startsWith("(")) {
             throw new IllegalArgumentException(String.format("Illegal Argument [%s] does not start with an opening parenthesis", strng));
         }
@@ -51,7 +51,7 @@ public class finalParserNewick {
         return -1;
     }
 
-    public static String[] split(String s) {
+    private static String[] splitToBranches(String s) {
         ArrayList<Integer> splitIndices = new ArrayList<>();
         int rightParenCount = 0;
         int leftParenCount = 0;

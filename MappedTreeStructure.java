@@ -26,7 +26,7 @@ public class MappedTreeStructure<Node> implements MutableTree<Node> {
             }
         } while ((current = getParent(current)) != null);
 
-        boolean added = nodeList.add(node);
+        boolean added = nodeList.add(node); //nötig?
 //        System.out.println("added = " + added);
         nodeList.add(parent);
         nodeParent.put(node, parent);
@@ -34,7 +34,7 @@ public class MappedTreeStructure<Node> implements MutableTree<Node> {
     }
 
     @Override
-    public boolean remove(Node node, boolean cascade) {
+    public boolean remove(Node node, boolean cascade) { //nötig bei uns? 
         checkNotNull(node, "node");
 
         if (!nodeList.contains(node)) {
@@ -42,7 +42,7 @@ public class MappedTreeStructure<Node> implements MutableTree<Node> {
         }
         if (cascade) {
             for (Node child : getChildren(node)) {
-                remove(child, true);
+                remove(child, true);					//löscht keine Einträge aus nodeParent!
             }
         } else {
             for (Node child : getChildren(node)) {
@@ -71,7 +71,7 @@ public class MappedTreeStructure<Node> implements MutableTree<Node> {
             Node parent = nodeParent.get(n);
             if (node == null && parent == null) {
                 children.add(n);
-            } else if (node != null && parent != null && parent.equals(node)) {
+            } else if (node != null && parent != null && parent.equals(node)) { //parent != 0 redundant für node != 0 && parent.equals(node) ???
                 children.add(n);
             }
         }
