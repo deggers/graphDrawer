@@ -31,7 +31,7 @@ public class Controller {
 //    }
 
     private void clickMe(ActionEvent event) {
-        System.out.println("xou changed something here, right? ");
+        System.out.println("you changed something here, right? ");
     }
 
     public Controller() {

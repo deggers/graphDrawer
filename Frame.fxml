@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import java.lang.*?>
+<SplitPane dividerPositions="0.12561576354679804" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+           minWidth="-Infinity" prefHeight="572.0" prefWidth="814.0" xmlns="http://javafx.com/javafx/8.0.141"
+           xmlns:fx="http://javafx.com/fxml/1" fx:controller="FrameController">
+    <items>
+        <AnchorPane minHeight="100.0" prefHeight="570.0" prefWidth="330.0">
+            <children>
+                <Button fx:id="loadBtn" onAction="#locateFile"  layoutX="15.0" layoutY="14.0" mnemonicParsing="false" text="load data"/>
+
+                <Label layoutX="13.0" layoutY="52.0" prefHeight="17.0" prefWidth="70.0" text="nodeSize">
+                    <font>
+                        <Font name="System Bold" size="14.0"/>
+                    </font>
+                </Label>
+
+                <Slider fx:id="sizeSlider" blockIncrement="0.5" layoutX="21.0" layoutY="72.0" majorTickUnit="4"
+                        max="36.0" min="8" minorTickCount="1" orientation="VERTICAL" showTickLabels="true"
+                        showTickMarks="true"/>
+
+                <Label layoutX="13.0" layoutY="224.0" prefHeight="17.0" prefWidth="70.0" text="drawAlgo">
+                    <font>
+                        <Font name="System Bold" size="14.0"/>
+                    </font>
+                </Label>
+                <ChoiceBox fx:id="choiceAlgo" onAction="#choiceAlgoChanged" value="Naive" layoutX="7.0" layoutY="244.0" prefHeight="25.0" prefWidth="86.0">
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+                            <String fx:value="Naive"/>
+                            <String fx:value="RT-Tree"/>
+                            <String fx:value="Walker"/>
+                            <String fx:value="Radial"/>
+                            <String fx:value="TreeMap"/>
+                        </FXCollections>
+                    </items>
+                </ChoiceBox>
+
+            </children>
+        </AnchorPane>
+        <ScrollPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="150.0"/>
+    </items>
+</SplitPane>
