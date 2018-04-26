@@ -72,7 +72,7 @@
               </textFill>
             </Label>
                   <Slider id="nodeSizeSlider" layoutX="14.0" layoutY="41.0" />
-                  <ChoiceBox fx:id="chooseAlgo" layoutX="14.0" layoutY="93.0" onMouseClicked="#clickMe" prefHeight="25.0" prefWidth="194.0" />
+                  <ChoiceBox fx:id="chooseAlgo" layoutX="14.0" layoutY="93.0" prefHeight="25.0" prefWidth="194.0" />
                   <Label alignment="CENTER" layoutX="14.0" layoutY="66.0" minWidth="60.0" prefWidth="-1.0" style="&#10;" text="choose Algorithm" textAlignment="CENTER" wrapText="false">
                      <font>
                         <Font size="18.0" fx:id="x11" />
@@ -81,6 +81,7 @@
                         <Color blue="0.624" green="0.624" red="0.624" fx:id="x21" />
                      </textFill>
                   </Label>
+                  <Slider layoutX="22.0" layoutY="136.0" orientation="VERTICAL" />
           </children>
         </AnchorPane>
             <ScrollPane fx:id="scrollPane">
