@@ -3,8 +3,8 @@ import java.util.List;
 
 // necessary ?
 
-interface Tree <Node> extends Serializable {
-    public List<Node> getRoots ();
-    public Node getParent (Node node);
-    public List<Node> getChildren (Node node);
+interface Tree<T> extends Serializable {
+    public List<T> getRoots ();
+    public T getParent (T node);
+    public List<T> getChildren (T node);
 }

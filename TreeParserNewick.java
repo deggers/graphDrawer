@@ -1,16 +1,14 @@
 import java.util.ArrayList;
 
-public class finalParserNewick {
+public class TreeParserNewick {
     private static int pseudoNode_id = 0;
 
-    public static MutableTree<String> parseStringToTree(String string) {
+    public static Node parseStringToTree(String newickString) {
 
         // check if string is valid format
-        if ( isValidFormat(string)) {
+        if ( isValidFormat(newickString)) {
             // process it
-            MutableTree<String> tree = new MappedTreeStructure<String>();
-            callMyselfRecursively(string, tree);
-            return tree;
+            return buildTreeStructure(newickString);
         }
         else {
             System.out.println("format for newick seems to be wrong, daaamn");
@@ -18,20 +16,25 @@ public class finalParserNewick {
         }
     }
 
-    private static String callMyselfRecursively(String string, MutableTree tree) {
+
+    private static Node buildTreeStructure(String string){
         try {  // try to find branch
             int rightPar = getClosingParenthesis(string);
-            int nodeName = pseudoNode_id++;
+            int nodeId = pseudoNode_id++;
             String toProcess = string.substring(1, rightPar);
             String[] splitArray = splitToBranches(toProcess);
+            Node currentNode = new Node();
+            currentNode.label = Integer.toString(nodeId);
             for (String branch : splitArray) {
-                String child = callMyselfRecursively(branch, tree);
-                tree.add(Integer.toString(nodeName), child);
+                Node child = buildTreeStructure(branch);
+                currentNode.addChild(child);
             }
-            return Integer.toString(nodeName);
+            return currentNode;
         } catch (IllegalArgumentException e) {
 //            System.out.println("i guess we have a leaf here");
-            return string;
+            Node node = new Node();
+            node.label = string;
+            return node;
         }
     }
 
