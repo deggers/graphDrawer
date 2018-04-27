@@ -125,7 +125,7 @@ public class FrameController {
                 this.selectedTreeAlgorithm = "Radial";
                break;
             default:
-                throw new IllegalArgumentException("The algo: " + selectedAlgo + " is not implemented");
+                throw new IllegalArgumentException("The algo: " + selectedAlgo + " is not yet implemented");
         }
         paneController.draw();
     }
