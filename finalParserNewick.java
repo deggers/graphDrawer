@@ -4,18 +4,20 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+
 public class finalParserNewick {
-    private static int pseudoNode_uuid = 0;
+    static int pseudoNode_uuid = 0;
 
     public boolean parseFileToTree(File file) {
         try {
             Stream<String> lines = Files.lines(file.toPath());
-            String newickString = lines.map(line -> line.replaceAll("\\s+", " ")).collect(Collectors.joining()).trim();
-            System.out.println("newickString = " + newickString);
+            String newickString = lines.map(line -> line.replaceAll("\\s+", "")).collect(Collectors.joining()).trim();
+
             if (isValidFormat(newickString)) {
                 MutableTree<String> tree = new MappedTreeStructure<String>();
                 callMyselfRecursively(newickString, tree);
                 ParseController.getInstance().setTree(tree);
+                pseudoNode_uuid = 0; // count from new
                 return true;
             } else {
                 System.out.println("format for newick seems to be wrong, daaamn");
@@ -27,21 +29,27 @@ public class finalParserNewick {
         }
     }
 
+
     private static String callMyselfRecursively(String string, MutableTree tree) {
         try {  // try to find branch
             int rightPar = getClosingParenthesis(string);
             int nodeName = pseudoNode_uuid++;
-            System.out.println("stringToProcess = " + string);
             try {
                 String toProcess = string.substring(1, rightPar);
-                String[] splitArray = splitToBranches(toProcess);
-                for (String branch : splitArray) {
-                    String child = callMyselfRecursively(branch, tree);
-                    tree.add(Integer.toString(nodeName), child);
+                try {
+                    String[] splitArray = splitToBranches(toProcess);
+                    for (String branch : splitArray) {
+                        String child = callMyselfRecursively(branch, tree);
+                        tree.add(Integer.toString(nodeName), child);
+                    }
+                    return Integer.toString(nodeName);
+                } catch (Exception e) {
+                    System.out.println("splitToBranches not possible");
+
                 }
-                return Integer.toString(nodeName);
             } catch (Exception e) {
-                System.out.println("Substring or split not possible ?");
+                System.out.println("Substring not possible ?");
+                System.out.println("string = " + string);
             }
         } catch (IllegalArgumentException e) {
 //            System.out.println("i guess we have a leaf here");
