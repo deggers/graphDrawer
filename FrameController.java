@@ -20,7 +20,7 @@ public class FrameController {
 
     private PaneController paneController;
     private ParseController parseController;
-//    private FrameController frameController;
+    //    private FrameController frameController;
     private SplitPane rootPane;
     private Main main;
     private MutableTree tree;
@@ -82,7 +82,7 @@ public class FrameController {
 
         // Handle Slider value change events.
         sizeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            paneController.setNodeSize(newValue.doubleValue());
+            paneController.setNodeSize(newValue.intValue());
         });
     }
 
@@ -123,7 +123,7 @@ public class FrameController {
                 break;
             case "Radial":
                 this.selectedTreeAlgorithm = "Radial";
-               break;
+                break;
             default:
                 throw new IllegalArgumentException("The algo: " + selectedAlgo + " is not yet implemented");
         }
