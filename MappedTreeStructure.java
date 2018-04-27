@@ -1,50 +1,50 @@
+import java.io.Serializable;
 import java.util.*;
 
 // copied from https://stackoverflow.com/questions/3522454/java-tree-data-structure
 
-public class MappedTreeStructure<T> implements MutableTree<T> {
-    private final Map<T, T> nodeParent = new HashMap<T, T>();
-    private final LinkedHashSet<T> nodeList = new LinkedHashSet<T>();
+public class MappedTreeStructure<Node> implements MutableTree<Node> {
+    private final Map<Node, Node> nodeParent = new HashMap<Node, Node>();
+    private final LinkedHashSet<Node> nodeList = new LinkedHashSet<Node>();
 
 
-    private void checkNotNull(T node, String parameterName) {
+    private void checkNotNull(Node node, String parameterName) {
         if (node == null)
             throw new IllegalArgumentException(parameterName + " must not be null");
     }
 
     @Override
-    public boolean add(T parent, T node) {
+    public boolean add(Node parent, Node node) {
         checkNotNull(parent, "parent");
         checkNotNull(node, "node");
 
         // check for cycles
-        T current = parent;
+        Node current = parent;
         do {
             if (node.equals(current)) {
                 throw new IllegalArgumentException(" node must not be the same or an ancestor of the parent");
             }
         } while ((current = getParent(current)) != null);
 
-        boolean added = nodeList.add(node); //nötig?
-//        System.out.println("added = " + added);
+        boolean added = nodeList.add(node);
         nodeList.add(parent);
         nodeParent.put(node, parent);
         return added;
     }
 
     @Override
-    public boolean remove(T node, boolean cascade) { //nötig bei uns?
+    public boolean remove(Node node, boolean cascade) { //nötig bei uns?
         checkNotNull(node, "node");
 
         if (!nodeList.contains(node)) {
             return false;
         }
         if (cascade) {
-            for (T child : getChildren(node)) {
+            for (Node child : getChildren(node)) {
                 remove(child, true);					//löscht keine Einträge aus nodeParent!
             }
         } else {
-            for (T child : getChildren(node)) {
+            for (Node child : getChildren(node)) {
                 nodeParent.remove(child);
             }
         }
@@ -53,21 +53,21 @@ public class MappedTreeStructure<T> implements MutableTree<T> {
     }
 
     @Override
-    public List<T> getRoots() {
+    public List<Node> getRoots() {
         return getChildren(null);
     }
 
     @Override
-    public T getParent(T node) {
+    public Node getParent(Node node) {
         checkNotNull(node, "node");
         return nodeParent.get(node);
     }
 
     @Override
-    public List<T> getChildren(T node) {
-        List<T> children = new LinkedList<T>();
-        for (T n : nodeList) {
-            T parent = nodeParent.get(n);
+    public List<Node> getChildren(Node node) {
+        List<Node> children = new LinkedList<Node>();
+        for (Node n : nodeList) {
+            Node parent = nodeParent.get(n);
             if (node == null && parent == null) {
                 children.add(n);
             } else if (node != null && parent != null && parent.equals(node)) { //parent != 0 redundant für node != 0 && parent.equals(node) ???
@@ -84,14 +84,14 @@ public class MappedTreeStructure<T> implements MutableTree<T> {
         return builder.toString();
     }
 
-    private void dumpNodeStructure(StringBuilder builder, T node, String prefix) {
+    private void dumpNodeStructure(StringBuilder builder, Node node, String prefix) {
         if (node != null) {
             builder.append(prefix);
             builder.append(node.toString());
             builder.append('\n');
             prefix = "    " + prefix;
         }
-        for (T child : getChildren(node)) {
+        for (Node child : getChildren(node)) {
             dumpNodeStructure(builder, child, prefix);
         }
     }

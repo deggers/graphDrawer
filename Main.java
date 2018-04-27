@@ -39,6 +39,15 @@ public class Main extends Application {
         primaryStage.setMaximized(true);
         primaryStage.show();
 
+       // FrameController frameController = FrameController.getInstance();
+        // Parent root = frameController.getRoot();
+//        root.setStyle("-fx-background-color:transparent;");
+        //Scene scene = new Scene(root);
+        //stage.setTitle("Awesome project for BioVis 2018");
+        //stage.setScene(scene);
+        //stage.show();
+        //frameController.init();
+
 
     }
 }

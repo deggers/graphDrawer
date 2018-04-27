@@ -1,38 +1,60 @@
+import java.io.File;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 
 public class finalParserNewick {
-    private static int pseudoNode_id = 0;
+    static int pseudoNode_uuid = 0;
 
-    public static MutableTree<String> parseStringToTree(String string) {
+    public boolean parseFileToTree(File file) {
+        try {
+            Stream<String> lines = Files.lines(file.toPath());
+            String newickString = lines.map(line -> line.replaceAll("\\s+", "")).collect(Collectors.joining()).trim();
 
-        // check if string is valid format
-        if ( isValidFormat(string)) {
-            // process it
-            MutableTree<String> tree = new MappedTreeStructure<String>();
-            callMyselfRecursively(string, tree);
-            return tree;
-        }
-        else {
-            System.out.println("format for newick seems to be wrong, daaamn");
-            return null;
+            if (isValidFormat(newickString)) {
+                MutableTree<String> tree = new MappedTreeStructure<String>();
+                callMyselfRecursively(newickString, tree);
+                ParseController.getInstance().setTree(tree);
+                pseudoNode_uuid = 0; // count from new
+                return true;
+            } else {
+                System.out.println("format for newick seems to be wrong, daaamn");
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
+
 
     private static String callMyselfRecursively(String string, MutableTree tree) {
         try {  // try to find branch
             int rightPar = getClosingParenthesis(string);
-            int nodeName = pseudoNode_id++;
-            String toProcess = string.substring(1, rightPar);
-            String[] splitArray = splitToBranches(toProcess);
-            for (String branch : splitArray) {
-                String child = callMyselfRecursively(branch, tree);
-                tree.add(Integer.toString(nodeName), child);
+            int nodeName = pseudoNode_uuid++;
+            try {
+                String toProcess = string.substring(1, rightPar);
+                try {
+                    String[] splitArray = splitToBranches(toProcess);
+                    for (String branch : splitArray) {
+                        String child = callMyselfRecursively(branch, tree);
+                        tree.add(Integer.toString(nodeName), child);
+                    }
+                    return Integer.toString(nodeName);
+                } catch (Exception e) {
+                    System.out.println("splitToBranches not possible");
+
+                }
+            } catch (Exception e) {
+                System.out.println("Substring not possible ?");
+                System.out.println("string = " + string);
             }
-            return Integer.toString(nodeName);
         } catch (IllegalArgumentException e) {
 //            System.out.println("i guess we have a leaf here");
-            return string;
         }
+        return string;
     }
 
     private static int getClosingParenthesis(final String strng) {
@@ -92,7 +114,9 @@ public class finalParserNewick {
         }
         long countSemicolons = inputCleaned.chars().filter(num -> num == ';').count();
 
+//        somehow we have sometimes no semicolon
         if (!inputCleaned.endsWith(";") || countSemicolons != 1) {
+            System.out.println("Newick does not endsWith ; or contains more than one ; ");
             return false;
         }
         int brackets = 0;
@@ -107,10 +131,6 @@ public class finalParserNewick {
                 return false;
             }
         }
-        if (brackets != 0) {
-            return false;
-        }
-        return true;
+        return brackets == 0;
     }
-
 }

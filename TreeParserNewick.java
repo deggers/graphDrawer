@@ -4,20 +4,22 @@ public class TreeParserNewick {
     private static int pseudoNode_id = 0;
 
     public static Node parseStringToTree(String newickString) {
+        newickString = newickString.replace(" ", "");
+        newickString = newickString.replace("\t", "");
+        newickString = newickString.replace("\n", "");
 
         // check if string is valid format
-        if ( isValidFormat(newickString)) {
+        if (isValidFormat(newickString)) {
             // process it
             return buildTreeStructure(newickString);
-        }
-        else {
+        } else {
             System.out.println("format for newick seems to be wrong, daaamn");
             return null;
         }
     }
 
-
-    private static Node buildTreeStructure(String string){
+// Problem: es müssen noch die längen der kanten der pseudoknoten gespeichert werden!
+    private static Node buildTreeStructure(String string) {
         try {  // try to find branch
             int rightPar = getClosingParenthesis(string);
             int nodeId = pseudoNode_id++;
@@ -28,12 +30,20 @@ public class TreeParserNewick {
             for (String branch : splitArray) {
                 Node child = buildTreeStructure(branch);
                 currentNode.addChild(child);
+                if(currentNode.children.isEmpty()){
+                    currentNode.leftChild= child;
+                } else {
+                    currentNode.rightChild= child;
+                }
             }
             return currentNode;
         } catch (IllegalArgumentException e) {
 //            System.out.println("i guess we have a leaf here");
+            // problem: if node has name but is no leaf saved as label= id instead of label= name
             Node node = new Node();
-            node.label = string;
+            String[] nameSplit = string.split(":");
+            node.label = nameSplit[0];
+            node.weight= Double.parseDouble(nameSplit[1]);
             return node;
         }
     }
