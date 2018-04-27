@@ -4,34 +4,40 @@ import javafx.scene.Parent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-
 import java.io.IOException;
 
 public class PaneController {
-    private double nodeSize = 16;
     private MutableTree tree;
-
+    private FrameController.TreeAlgorithm algorithm;
+    private double nodeSize = 16;
     @FXML
     private AnchorPane rootPane;
 
+    public static PaneController instance;
+
 
     public static PaneController getInstance() {
-        FXMLLoader loader = new FXMLLoader();
-        try {  // Load root layout from fxml file.
-            loader.setLocation(PaneController.class.getResource("Pane.fxml"));
-            AnchorPane rootPane = loader.load();
-            PaneController paneController;
-            paneController = loader.<PaneController>getController();
-            paneController.setPane(rootPane);
-            return paneController;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+        if (instance == null){
+            FXMLLoader loader = new FXMLLoader();
+            try {  // Load root layout from fxml file.
+                loader.setLocation(PaneController.class.getResource("Pane.fxml"));
+                AnchorPane rootPane = loader.load();
+                PaneController paneController = loader.getController();
+                paneController.setPane(rootPane);
+                PaneController.instance = paneController;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
+        return instance;
     }
 
 
-    public void draw(MutableTree tree) {
+    public void draw() {
+        System.out.println("Selected Tree Algo = " + FrameController.getInstance().getSelectedTreeAlgorithm());
+        System.out.println("selected nodeSize = " + PaneController.getInstance().getNodeSize());
+        System.out.println("Tree = " + ParseController.getInstance().getTree());
         rootPane.getChildren().clear();
 
         // should get a tree - with the levels (y,x)
@@ -40,7 +46,7 @@ public class PaneController {
         double y = 10.0;
         double radius = nodeSize;
 
-        Circle leftNode = createNode(x+radius, y+radius, radius);
+        Circle leftNode = createNode(x + radius, y + radius, radius);
         rootPane.getChildren().add(leftNode);
     }
 
@@ -53,10 +59,8 @@ public class PaneController {
 
 
     public void setNodeSize(double nodeSize) {
-        // should first get the  tree we are working on?
-        // getTree from FrameController?
         this.nodeSize = nodeSize;
-        this.draw(tree);
+        this.draw();
     }
 
     public double getNodeSize() {

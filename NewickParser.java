@@ -66,10 +66,7 @@ class NewickParser {
                 return false;
             }
         }
-        if (brackets != 0) {
-            return false;
-        }
-        return true;
+        return brackets == 0;
     }
 
     public static Graph parse(String input) {
