@@ -11,23 +11,11 @@ public class Node implements Serializable {
     public int offset = 0;
     public Node parent;
     public List<Node> children = new ArrayList<>();
-    public Node leftChild;
-    public Node rightChild;
-    public double weight=0;  // len of edge to parent
 
     public void addChild(Node node) {
         children.add(node);
     }
-
-//    public void addChild(Node node, boolean left){
-//        children.add(node);
-//        if (left) {
-//            leftChild = node;
-//        } else {
-//            rightChild = node;
-//        }
-//    }
-
+  
     @Override
     public String toString() {
         String out = label + "(" + x + ", " + y + ")" + "\n";
