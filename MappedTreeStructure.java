@@ -3,8 +3,8 @@ import java.util.*;
 // copied from https://stackoverflow.com/questions/3522454/java-tree-data-structure
 
 public class MappedTreeStructure<T> implements MutableTree<T> {
-    private final Map<T, T> nodeParent = new HashMap<T, T>();
-    private final LinkedHashSet<T> nodeList = new LinkedHashSet<T>();
+    private final Map<T, T> nodeParent = new HashMap<>();
+    private final LinkedHashSet<T> nodeList = new LinkedHashSet<>();
 
 
     private void checkNotNull(T node, String parameterName) {
@@ -41,32 +41,32 @@ public class MappedTreeStructure<T> implements MutableTree<T> {
             return false;
         }
         if (cascade) {
-            for (T child : getChildren(node)) {
+            getChildren(node).forEach((child) -> {
                 remove(child, true);					//löscht keine Einträge aus nodeParent!
-            }
+            });
         } else {
-            for (T child : getChildren(node)) {
+            getChildren(node).forEach((child) -> {
                 nodeParent.remove(child);
-            }
+            });
         }
         nodeList.remove(node);
         return true;
     }
 
-    @Override
+    //@Override
     public List<T> getRoots() {
         return getChildren(null);
     }
 
-    @Override
+    //@Override
     public T getParent(T node) {
         checkNotNull(node, "node");
         return nodeParent.get(node);
     }
 
-    @Override
+    //@Override
     public List<T> getChildren(T node) {
-        List<T> children = new LinkedList<T>();
+        List<T> children = new LinkedList<>();
         for (T n : nodeList) {
             T parent = nodeParent.get(n);
             if (node == null && parent == null) {
