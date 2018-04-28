@@ -12,13 +12,13 @@ public class Node implements Serializable {
     public Node parent;
     public List<Node> children = new ArrayList<>();
 
-    public void addChild(Node node){
+    public void addChild(Node node) {
         children.add(node);
     }
-
+  
     @Override
     public String toString() {
-        String out = label + "\n";
+        String out = label + "(" + x + ", " + y + ")" + "\n";
         for (Node c : children) {
             out += c.toString();
         }

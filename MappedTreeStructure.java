@@ -25,15 +25,16 @@ public class MappedTreeStructure<T> implements MutableTree<T> {
             }
         } while ((current = getParent(current)) != null);
 
-        boolean added = nodeList.add(node); //nötig?
-//        System.out.println("added = " + added);
+        boolean added = nodeList.add(node);
         nodeList.add(parent);
         nodeParent.put(node, parent);
         return added;
     }
 
     @Override
+
     public boolean remove(T node, boolean cascade) { //nötig bei uns?
+
         checkNotNull(node, "node");
 
         if (!nodeList.contains(node)) {

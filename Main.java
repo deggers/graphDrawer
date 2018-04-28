@@ -1,14 +1,13 @@
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.control.ScrollPane;
 import javafx.stage.Stage;
 
+import java.awt.*;
 
 public class Main extends Application {
+
     private static final boolean GUI = false;
 
     public static void main(String[] args) {
@@ -26,19 +25,18 @@ public class Main extends Application {
         if (!GUI) {
             System.exit(1);
         }
+
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
-        Pane root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-        root.setStyle("-fx-background-color: black;");
-        primaryStage.setTitle("FunFunFun Group Graphs");
-
-
-        primaryStage.setScene(new Scene(root));
-        primaryStage.setMaximized(true);
-        primaryStage.show();
-
-
+    public void start(Stage stage) {
+        FrameController frameController = FrameController.getInstance();
+        Parent root = frameController.getRoot();
+//        root.setStyle("-fx-background-color:transparent;");
+        Scene scene = new Scene(root);
+        stage.setTitle("Awesome project for BioVis 2018");
+        stage.setScene(scene);
+        stage.show();
+        frameController.init();
     }
 }
