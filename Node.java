@@ -5,7 +5,6 @@ import java.util.List;
 public class Node implements Serializable {
     public String label;
     private final int id = 0;
-    //private boolean thread = false;
     
     //walker
     public double x = 0;
@@ -16,7 +15,11 @@ public class Node implements Serializable {
     public Node leftNeighbor = null;
     private final List<Node> children = new ArrayList<>();
     public int indexAsChild = 0;
-        
+    public Node ancestor = null;
+    public double change = 0;
+    public double shift = 0;
+    public Node thread = null;
+    
     public void addChild(Node node) {
         children.add(node);
     }
@@ -26,7 +29,19 @@ public class Node implements Serializable {
     }
     
     public Node getChild(int index) {
-        return children.get(index);
+        if (index >= 0) {
+            return children.get(index);
+        } else {
+            return children.get(children.size() - 1);
+        }
+    }
+    
+    public boolean isLeaf() {
+        return children.isEmpty();
+    }
+    
+    public boolean hasLeftSibling() {
+        return indexAsChild > 0;
     }
     
     @Override

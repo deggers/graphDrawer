@@ -57,6 +57,10 @@ public class MappedTreeStructure<T> implements MutableTree<T> {
     public List<T> getRoots() {
         return getChildren(null);
     }
+    
+    public List<T> listAllNodes() {
+        return new LinkedList<>(nodeList);
+    }
 
     //@Override
     public T getParent(T node) {
