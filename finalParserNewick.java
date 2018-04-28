@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 
 
 public class finalParserNewick {
+
     static int pseudoNode_uuid = 0;
 
     public boolean parseFileToTree(File file) {
