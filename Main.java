@@ -8,7 +8,7 @@ import java.awt.*;
 
 public class Main extends Application {
 
-    private static final boolean GUI = false;
+    private static final boolean GUI = true;
 
     public static void main(String[] args) {
         if (GUI) {
