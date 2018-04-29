@@ -17,6 +17,7 @@ public class MappedTreeStructure<T> implements MutableTree<T> {
         try {
             int indexAsChildSetter = 0;
             for (Node child : node.getChildren()) {
+                child.parent = node;
                 child.indexAsChild = indexAsChildSetter;
                 indexAsChildSetter++;
                 nodeParent.put( (T) child, e);
