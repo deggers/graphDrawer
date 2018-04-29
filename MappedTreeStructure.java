@@ -6,6 +6,26 @@ public class MappedTreeStructure<T> implements MutableTree<T> {
     private final Map<T, T> nodeParent = new HashMap<>();
     private final LinkedHashSet<T> nodeList = new LinkedHashSet<>();
 
+    public MappedTreeStructure(T root) {
+        fillTree((Node) root);
+    }
+    
+    private void fillTree(Node node) {
+        T e = (T) node;
+        nodeList.add(e);
+        //System.out.println("added: " + node.label);
+        try {
+            int indexAsChildSetter = 0;
+            for (Node child : node.getChildren()) {
+                child.indexAsChild = indexAsChildSetter;
+                indexAsChildSetter++;
+                nodeParent.put( (T) child, e);
+                //System.out.println("added pair (n/p): " + child + e);
+                fillTree(child);
+            } 
+        } catch (Exception ex) {
+        }
+    }
 
     private void checkNotNull(T node, String parameterName) {
         if (node == null)
@@ -53,22 +73,23 @@ public class MappedTreeStructure<T> implements MutableTree<T> {
         return true;
     }
 
-    //@Override
+    @Override
     public List<T> getRoots() {
         return getChildren(null);
     }
     
     public List<T> listAllNodes() {
+        //System.out.println("List of all nodes returned");
         return new LinkedList<>(nodeList);
     }
 
-    //@Override
+    @Override
     public T getParent(T node) {
         checkNotNull(node, "node");
         return nodeParent.get(node);
     }
 
-    //@Override
+    @Override
     public List<T> getChildren(T node) {
         List<T> children = new LinkedList<>();
         for (T n : nodeList) {
@@ -99,5 +120,9 @@ public class MappedTreeStructure<T> implements MutableTree<T> {
         for (T child : getChildren(node)) {
             dumpNodeStructure(builder, child, prefix);
         }
+    }
+    
+    public String echoContent() {
+        return nodeList.toString() + "\n" + nodeParent.toString();
     }
 }

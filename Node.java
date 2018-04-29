@@ -5,6 +5,7 @@ import java.util.List;
 public class Node implements Serializable {
     public String label;
     private final int id = 0;
+    double weight;
     
     //walker
     public double x = 0;
@@ -32,7 +33,7 @@ public class Node implements Serializable {
         if (index >= 0) {
             return children.get(index);
         } else {
-            return children.get(children.size() - 1);
+            return children.get(children.size()+index);
         }
     }
     
@@ -41,12 +42,12 @@ public class Node implements Serializable {
     }
     
     public boolean hasLeftSibling() {
-        return indexAsChild > 0;
+        return indexAsChild >= 1;
     }
     
     @Override
     public String toString() {
-        String out = label + "(" + x + ", " + y + ")" + "\n";
+        String out = label + "(x:" + x + ", y:" + y + ", prelim:" + prelim + ", modifier:" + modifier+ ", indexAsChild:" + indexAsChild + ")" + "\n";
         for (Node c : children) {
             out = out + "\t" + c.toString();
         }

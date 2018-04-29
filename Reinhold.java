@@ -12,7 +12,7 @@ public class Reinhold {
     private void addYCoords(Node node, int level) {
         tempXPos.put(level, 0);             // all x initially 0
         node.y = level;
-        for (Node child : node.children) {
+        for (Node child : node.getChildren()) {
             addYCoords(child, level + 1);
         }
     }
@@ -20,8 +20,8 @@ public class Reinhold {
     // post order: l r w
     public void postOrder(Node root) {
         if(root !=  null) {
-            postOrder(root.leftChild);
-            postOrder(root.rightChild);
+            postOrder(root.getChild(0));
+            postOrder(root.getChild(1));
             //System.out.println("root = " + root);
             addTempXPos(root); // stimmt das?
         }

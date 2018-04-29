@@ -2,15 +2,15 @@ import java.util.List;
 
 public class WalkerImproved {
 
-    private static int maxDepth;
+    private static int maxDepth = Integer.MAX_VALUE;
     private static double xTopAdjust;
     private static double xTemp;
     private static int levelSeparation;
     private static int yTopAdjust;
     private static int yTemp;
-    private static MappedTreeStructure tree; //hand over in walkerMain
-    private static double siblingSeparation;
-    private static double subtreeSeparation;
+    private MappedTreeStructure thisTree; //hand over in walkerMain
+    private static final double siblingSeparation = 2;
+    private static final double subtreeSeparation = 2;
     
     /* walker old
     private static void initPrevNodeList(){
@@ -48,19 +48,32 @@ public class WalkerImproved {
     }
     
     private static Node nextLeft(Node node) {
-        if (node.isLeaf()) {
+        try {
+            if (node.isLeaf()) {
             return node.thread;
-        } else {
+            } else {
             return node.getChild(0);
+            }
+        } catch (Exception e) {
+            System.out.println("End of contour");
+            return null;
         }
+
     }
     
     private static Node nextRight(Node node) {
-        if (node.isLeaf()) {
-            return node.thread;
-        } else {
-            return node.getChild(-1);
+        System.out.println("nextright called");
+        try {
+            if (node.isLeaf()) {
+                return node.thread;
+            } else {
+                return node.getChild(-1);
+            }    
+        } catch (Exception e) {
+            System.out.println("End of contour");
+            return null;
         }
+
     }
     
     private static Node findAncestor(Node leftNode, Node currentNode, Node defaultAncestor) {
@@ -71,17 +84,23 @@ public class WalkerImproved {
         }
     }
     
-    public static void treeLayout(MappedTreeStructure<Node> tree) throws Exception {
-        List<Node> roots = tree.getRoots();
+    public MappedTreeStructure<Node> treeLayout(MappedTreeStructure<Node> tree) throws Exception {
+        thisTree = tree;
+        List<Node> roots = thisTree.getRoots();
         if (roots.size() == 1) {
             Node root = roots.get(0);
+            System.out.println("Root found:" + root.label);
             tree.listAllNodes().forEach((Node n) -> {
                 n.modifier = 0;
-                //n.thread = 0;
+                n.thread = null;
                 n.ancestor = n;
             });
+            System.out.println("Doing First walk Now");
             firstWalk(root, 0);
+            System.out.println("Doing second walk now");
             secondWalk(root, 0, -root.prelim);
+            System.out.println("Second walk completed");
+            return thisTree;
             
         } else {
             if (roots.isEmpty()) {
@@ -104,7 +123,21 @@ public class WalkerImproved {
         */
         if (node.isLeaf() || level == maxDepth) {
             
-            node.prelim = 0;
+            System.out.println("Node is a leaf: " + node);
+            
+            if (node.hasLeftSibling()) {
+                System.out.println("Node has left sibling");
+                try {
+                    node.prelim = node.parent.getChild(node.indexAsChild - 1).prelim + siblingSeparation; /*+ Meannodesize(leftsibling, node)*/
+                } catch (Exception e) {
+                    System.out.println("problem with parent.getChild");
+                    node.prelim = 0;
+                }
+
+            } else {
+                node.prelim = 0;
+            }
+            
             /* walker old
             if (node.hasLeftSibling()) {
                 node.prelim = node.parent.getChild(node.indexAsChild - 1).prelim + siblingSeparation + Meannodesize(leftsibling, node);
@@ -116,15 +149,30 @@ public class WalkerImproved {
             
             defaultAncestor = node.getChild(0);
             for (Node child : node.getChildren()) {
-                firstWalk( child, level +1);
-                apportion(child, level, defaultAncestor);
+                firstWalk(child, level +1);
+                System.out.println("First walk for node completed: " + node.label);
+                try {
+                    apportion(child, level, defaultAncestor);
+                } catch (Exception e) {
+                    System.out.println("problme with apportion for Node: " + child.label + ", with defaultAncestor: " + defaultAncestor);
+                }
+                System.out.println("Apportion for node completed: " + node.label);
             }
+            System.out.println("ready to execute shifts");
             executeShifts(node);
             midPoint = (node.getChild(0).prelim + node.getChild(-1).prelim)/2;
             if (node.hasLeftSibling()) {
-                node.prelim = node.parent.getChild(node.indexAsChild - 1).prelim + siblingSeparation;
+                System.out.println("Node has left sibling");
+                try {
+                    node.prelim = node.parent.getChild(node.indexAsChild - 1).prelim + siblingSeparation;
+                } catch (Exception e) {
+                    System.out.println("problme with hasLeftSibling in firstwalk");
+                    node.prelim = 0;
+                }
                 node.modifier = node.prelim - midPoint;
+                System.out.println("Node prelim set to: " + node.prelim);
             } else {
+                System.out.println("Node has no left sibling");
                 node.prelim = midPoint;
             }
 
@@ -155,6 +203,7 @@ public class WalkerImproved {
                 secondWalk(child, level + 1, modsum + node.modifier);
             });
         }*/
+        System.out.println("Second walk called, modsum: " + modsum);
         node.x = node.prelim + modsum;
         node.y = level;
         if (!node.isLeaf()) {

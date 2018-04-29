@@ -28,7 +28,7 @@ public class TreeParserNewick {
             int nodeId = pseudoNode_id++;
             String toProcess = string.substring(1, rightPar);
             String[] splitArray = splitToBranches(toProcess);
-            Node currentNode = new Node();
+            Node currentNode = new Node("");
             currentNode.label = Integer.toString(nodeId);
             for (String branch : splitArray) {
                 Node child = buildTreeStructure(branch);
@@ -49,7 +49,7 @@ public class TreeParserNewick {
 //            System.out.println("i guess we have a leaf here");
 
             // problem: if node has name but is no leaf saved as label= id instead of label= name
-            Node node = new Node();
+            Node node = new Node("");
             String[] nameSplit = string.split(":");
             node.label = nameSplit[0];
             node.weight= Double.parseDouble(nameSplit[1]);

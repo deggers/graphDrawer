@@ -15,7 +15,7 @@ public class finalParserNewick {
             String newickString = lines.map(line -> line.replaceAll("\\s+", "")).collect(Collectors.joining()).trim();
 
             if (isValidFormat(newickString)) {
-                MutableTree<String> tree = new MappedTreeStructure<String>();
+                MutableTree<String> tree = new MappedTreeStructure<String>("");
                 callMyselfRecursively(newickString, tree);
                 ParseController.getInstance().setTree(tree);
                 pseudoNode_uuid = 0; // count from new
