@@ -20,8 +20,8 @@ public class Reinhold {
     // post order: l r w
     public void postOrder(Node root) {
         if(root !=  null) {
-            postOrder(root.left);
-            postOrder(root.right);
+//            postOrder(root.left);
+//            postOrder(root.right);
 
             addTempXPos(root); // stommt das?
         }
