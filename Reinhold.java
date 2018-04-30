@@ -6,11 +6,12 @@ import java.util.Map;
 public class Reinhold {
 
     //key= level value= Hilfsfkt x_l(l)
-    Map<Integer, Integer> tempXPos = new HashMap<>();
+    Map<Double, Double> tempXPos = new HashMap<>();
     Map<List<Node>, Double> minDistance = new HashMap<>();
+    Map<Node, Node> leftChild = new HashMap<>();
+    Map<Node, Node> rightChild = new HashMap<>();
 
     // step 1: set y coordinates= level
-    // sets parent, leftChild, rightChild
     // step 2: add tempXcoord, tree travers in postorder
     // step 3: position of subtrees
     // step 4: final x coords
@@ -21,11 +22,11 @@ public class Reinhold {
     }
 
     //step 1
-    private void addYCoords(Node node, int level) {
-        node.checked = false; // bisschen geschummelt, damit später die funktion setChildren klappt
-        tempXPos.put(level, 0);             // all x initially 0
+    private void addYCoords(Node node, double level) {
+        // node.checked = false; // bisschen geschummelt, damit später die funktion setChildren klappt
+        tempXPos.put(level, 0.0);             // all x initially 0
         node.y = level;
-        for (Node child : node.children) {
+        for (Node child : node.getChildren()) {
             addYCoords(child, level + 1);
         }
     }
@@ -36,7 +37,7 @@ public class Reinhold {
             //System.out.println("\n current node = " + node.label);
             List<Node> kids = new ArrayList<>();
             node.checked = true;
-            for (Node c : node.children) {
+            for (Node c : node.getChildren()) {
                 if (!c.checked && (c.y == (node.y + 1))) {
                     kids.add(c);
                     //System.out.println("kid = " + c.label);
@@ -45,7 +46,7 @@ public class Reinhold {
                 }
                 //System.out.println("Listsize= "+ kids.size());
                 if (kids.size() == 0) {
-                    node.isLeaf = true;
+                    //node.isLeaf = true;
                     node.checked = true;
                 }
                 if (kids.size() == 1) {
@@ -77,7 +78,7 @@ public class Reinhold {
 
     private void addTempXCoords(Node node) {
         if (node != null) {
-            if (node.isLeaf) {
+            if (node.isLeaf()) {
                 node.xtemp = tempXPos.get(node.y);
             } else if (node.leftChild != null && node.rightChild == null) { // stimmt das so???
                 node.xtemp = node.leftChild.xtemp + 1; // oder x+1?

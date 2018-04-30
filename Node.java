@@ -5,7 +5,12 @@ import java.util.List;
 public class Node implements Serializable {
     public String label;
     private final int id = 0;
-    double weight;
+    double weight=0;
+
+    //reingold
+    public boolean checked= false;
+    public Node rightChild= null, leftChild= null;
+    public double xtemp;
     
     //walker
     public double x = 0;
