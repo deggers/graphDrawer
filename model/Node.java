@@ -39,9 +39,9 @@ public class Node implements Serializable {
         return index >= 0 ? children.get(index) : children.get(children.size() + index);
     }
 
-    public static int countChildren(Node node) {
+    public static int treeDepth(Node node) {
         if (node == null) return 0;
-        for (Node tmp_node : node.getChildren()) return 1 + countChildren(tmp_node);
+        for (Node tmp_node : node.getChildren()) return 1 + treeDepth(tmp_node);
         return 0;
     }
 
