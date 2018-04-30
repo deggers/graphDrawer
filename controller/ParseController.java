@@ -1,14 +1,18 @@
+package controller;
+
+import model.Node;
+import model.TreeParserNewick;
+
 import java.io.File;
 
 public class ParseController {
 
-    private finalParserNewick parserNewick;
-    private MutableTree tree;
-
+    private         TreeParserNewick    parserNewick;
+    private         Node                tree;
     public static ParseController instance;
 
     public ParseController() {
-        parserNewick = new finalParserNewick();
+        parserNewick = new TreeParserNewick();
     }
 
     public static ParseController getInstance() {
@@ -19,22 +23,21 @@ public class ParseController {
     }
 
     public boolean initializeParsing(File file) {
-        parserNewick = new finalParserNewick();
         String fileName = file.getName();
         String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());
         if (fileExtension.equals("nh")) {
-            return parserNewick.parseFileToTree(file);
+            return TreeParserNewick.parseFileToTree(file);
         } else {
             System.out.println("Format is not .nh ?!");
             return false;
         }
     }
 
-    public void setTree(MutableTree<String> tree) {
+    // SETTER & GETTER AREA
+    public void setTree(Node tree) {
         this.tree = tree;
     }
-
-    public MutableTree getTree() {
+    public Node getTree() {
         return this.tree;
     }
 }

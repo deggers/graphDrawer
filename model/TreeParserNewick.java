@@ -1,24 +1,24 @@
+package model;
+
+import controller.ParseController;
+
 import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+public class TreeParserNewick {
+    private static int pseudoNode_id = 0;
 
-public class finalParserNewick {
-
-    static int pseudoNode_uuid = 0;
-
-    public boolean parseFileToTree(File file) {
+    public static boolean parseFileToTree(File file) {
         try {
             Stream<String> lines = Files.lines(file.toPath());
             String newickString = lines.map(line -> line.replaceAll("\\s+", "")).collect(Collectors.joining()).trim();
 
             if (isValidFormat(newickString)) {
-                MutableTree<String> tree = new MappedTreeStructure<String>();
-                callMyselfRecursively(newickString, tree);
-                ParseController.getInstance().setTree(tree);
-                pseudoNode_uuid = 0; // count from new
+                Node node = buildTreeStructure(newickString);
+                ParseController.getInstance().setTree(node);
                 return true;
             } else {
                 System.out.println("format for newick seems to be wrong, daaamn");
@@ -31,31 +31,59 @@ public class finalParserNewick {
     }
 
 
-    private static String callMyselfRecursively(String string, MutableTree tree) {
+
+    public static Node parseStringToTree(String newickString) {
+
+        newickString = newickString.replace(" ", "");
+        newickString = newickString.replace("\t", "");
+        newickString = newickString.replace("\n", "");
+
+        // check if string is valid format
+        if (isValidFormat(newickString)) {
+            // process it
+            return buildTreeStructure(newickString);
+        } else {
+
+            System.out.println("format for newick seems to be wrong, daaamn");
+            return null;
+        }
+    }
+
+// Problem: es müssen noch die längen der kanten der pseudoknoten gespeichert werden!
+    private static Node buildTreeStructure(String string) {
+
         try {  // try to find branch
             int rightPar = getClosingParenthesis(string);
-            int nodeName = pseudoNode_uuid++;
-            try {
-                String toProcess = string.substring(1, rightPar);
-                try {
-                    String[] splitArray = splitToBranches(toProcess);
-                    for (String branch : splitArray) {
-                        String child = callMyselfRecursively(branch, tree);
-                        tree.add(Integer.toString(nodeName), child);
-                    }
-                    return Integer.toString(nodeName);
-                } catch (Exception e) {
-                    System.out.println("splitToBranches not possible");
+            int nodeId = pseudoNode_id++;
+            String toProcess = string.substring(1, rightPar);
+            String[] splitArray = splitToBranches(toProcess);
+            Node currentNode = new Node("");
+            currentNode.label = Integer.toString(nodeId);
+            for (String branch : splitArray) {
+                Node child = buildTreeStructure(branch);
+                currentNode.addChild(child);
 
-                }
-            } catch (Exception e) {
-                System.out.println("Substring not possible ?");
-                System.out.println("string = " + string);
+//                if(currentNode.children.isEmpty()){ // klappt nicht, wird immer right da
+//                    // jeder knoten alle unter sich mit in children hat
+//                    currentNode.leftChild= child;
+//                    System.out.println("left = " + child);
+//                } else {
+//                    currentNode.rightChild= child;
+//                    System.out.println("right = " + child);
+//                }
+
             }
+            return currentNode;
         } catch (IllegalArgumentException e) {
 //            System.out.println("i guess we have a leaf here");
+
+            // problem: if node has name but is no leaf saved as label= id instead of label= name
+            Node node = new Node("");
+            String[] nameSplit = string.split(":");
+            node.label = nameSplit[0];
+            node.weight= Double.parseDouble(nameSplit[1]);
+            return node;
         }
-        return string;
     }
 
     private static int getClosingParenthesis(final String strng) {
@@ -115,9 +143,7 @@ public class finalParserNewick {
         }
         long countSemicolons = inputCleaned.chars().filter(num -> num == ';').count();
 
-//        somehow we have sometimes no semicolon
         if (!inputCleaned.endsWith(";") || countSemicolons != 1) {
-            System.out.println("Newick does not endsWith ; or contains more than one ; ");
             return false;
         }
         int brackets = 0;
@@ -132,6 +158,10 @@ public class finalParserNewick {
                 return false;
             }
         }
-        return brackets == 0;
+        if (brackets != 0) {
+            return false;
+        }
+        return true;
     }
+
 }
