@@ -81,31 +81,18 @@ public class GUIController {
         }
     }
 
-    private boolean drawTreeNodes(MappedTreeStructure tree) {
-        String toProcess = tree.getRoots().toString();
-        String[] splittedTree = toProcess.substring(1, toProcess.length() - 1).split(";");
-        for (String node : splittedTree) {
-            try {
-                String[] nodeString = node.split(",");
-
-                String[] label_stringArray = nodeString[0].split(":");
-                String label = label_stringArray[1];
-
-                String[] x_stringArray = nodeString[1].split(":");
-                double x = Double.parseDouble(x_stringArray[1]);
-                double startX = scaleCoordinate(x);
-
-                String[] y_stringArray = nodeString[2].split(":");
-                double y = Double.parseDouble(y_stringArray[1]);
-                double startY = scaleCoordinate(y);
-
-                pane.getChildren().add(createNode((int) startX, (int) startY, (int) getNodeSize() / 2));
-//                System.out.println("x: " + Double.toString(x) + ", y: " + Double.toString(y) + ", id: " + label);
-            } catch (Exception e) {
-                System.out.println("Fehler in drawTreeNodes");
-                System.out.println(e);
-                return false;
-            }
+    private boolean drawTreeNodes(MappedTreeStructure<Node> tree) {
+        try {
+            tree.listAllNodes().forEach((Node node) -> {
+                String label = node.label;
+                double x = scaleCoordinate(node.x);
+                double y = scaleCoordinate(node.y);
+                pane.getChildren().add(createNode((int) x, (int) y, getNodeSize()));
+            });
+        } catch (Exception e) {
+            System.out.println("Fehler in drawTreeNodes");
+            System.out.println(e);
+            return false;
         }
         return true;
     }
