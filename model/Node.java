@@ -47,24 +47,9 @@ public class Node implements Serializable {
         return indexAsChild >= 1;
     }
 
-    public String[] toStringArray(){
-        int depth = 0;
-
-        for (Node c : children) {
-            depth++;
-        }
-
-        String[] stringArray = new String[depth];
-        int index = 0;
-        for (Node c : children) {
-            stringArray[index] = c.toString();
-        }
-        return  stringArray;
-    }
-
-    @Override
+      @Override
     public String toString() {
-        String out = label + ", x:" + x + ", y:" + y + ", prelim:" + prelim + ", modifier:" + modifier+ ", indexAsChild:" + indexAsChild + "\n";
+        String out = label + ", x:" + x + ", y:" + y + ", prelim:" + prelim + ", modifier:" + modifier+ ", indexAsChild:" + indexAsChild + ";";
         for (Node c : children) {
             out = out + "\t" + c.toString();
         }

@@ -1,7 +1,7 @@
 package controller;
 
+import draw.NaiveDraw;
 import draw.WalkerImprovedDraw;
-import draw.naiveDraw;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -13,22 +13,26 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import model.MappedTreeStructure;
-import model.Node;
 
 import java.io.File;
-import java.util.List;
 
 public class GUIController {
-    private int             nodeSize = 16;
-    private String          selectedTreeAlgorithm;
+    private int nodeSize = 16;
+    private String selectedTreeAlgorithm;
+    private String[] treeWalker = null;
 
-    @FXML Pane          pane;
-    @FXML Button        exitBtn;
-    @FXML ToggleButton  fullscreenToggle;
-    @FXML Slider        nodeSizeSlider;
-    @FXML ChoiceBox     choiceBoxAlgorithm;
-    @FXML Button loadFile;
+    @FXML
+    Pane pane;
+    @FXML
+    Button exitBtn;
+    @FXML
+    ToggleButton fullscreenToggle;
+    @FXML
+    Slider nodeSizeSlider;
+    @FXML
+    ChoiceBox choiceBoxAlgorithm;
+    @FXML
+    Button loadFile;
 
     public void initialize() {
         nodeSizeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -36,11 +40,14 @@ public class GUIController {
         });
     } // setup observer for nodeSizeSlider
 
-    @FXML   private void closeButtonAction() {
+    @FXML
+    private void closeButtonAction() {
         Stage stage = (Stage) exitBtn.getScene().getWindow();
         stage.close();
     }
-    @FXML   private void toggleFullscreen() {
+
+    @FXML
+    private void toggleFullscreen() {
         Stage stage = (Stage) exitBtn.getScene().getWindow();
         if (stage.isFullScreen()) {
             stage.setFullScreen(false);
@@ -48,66 +55,79 @@ public class GUIController {
             stage.setFullScreen(true);
         }
     }
-    @FXML   private void drawCircles() {
+
+    @FXML
+    private void drawInit() {
         if (ParseController.getInstance().getTree() != null && getSelectedTreeAlgorithm() != null) {
             pane.getChildren().clear();
-            System.out.println(getSelectedTreeAlgorithm());
             switch (getSelectedTreeAlgorithm()) {
                 case "Naive":
                     System.out.println("Selected Naive");
-                    naiveDraw.processTree(ParseController.getInstance().getTree());
+                    NaiveDraw.processTree(ParseController.getInstance().getTree());
                     break;
                 case "Walker": // ugly much code..
-                    System.out.println("selected Walker");
-                    Node root = ParseController.getInstance().getTree();
-                    MappedTreeStructure<Node> tree = new MappedTreeStructure<Node>(root);
-                    try {
-                        WalkerImprovedDraw w = new WalkerImprovedDraw();
-                        tree = w.treeLayout(tree);
-                        //System.out.println("\n CONTENT: \n" + tree.echoContent());
-//                        System.out.println("Root(s): " + tree.getRoots().toString());
-                        List<Node> toWorkOn = tree.getRoots();
-
-                        for (Node node : toWorkOn) {
-                            String[] split = node.toString().split(",");
-                            System.out.println("label: " + split[0]);
-                        }
-
-
-                    } catch(Exception e){
-                        System.out.println("Error while running Walker Algorithm");
-                        System.out.println(e);
+                    if (treeWalker == null) {
+                        this.treeWalker = WalkerImprovedDraw.processTree(ParseController.getInstance().getTree());
                     }
+                    drawTreeStructure(treeWalker);
                     break;
                 default:
                     throw new IllegalArgumentException("The algo: " + selectedTreeAlgorithm + " is not yet implemented");
             }
         }
     }
-    @FXML   private void choiceBoxAlgorithmOnAction(ActionEvent event) {
+
+    // toDo for Dustyn
+    private void drawTreeStructure(String[] treeWalker) {
+        for (String node : treeWalker) {
+            String[] nodeString = node.split(",");
+
+            String[] x_stringArray = nodeString[1].split(":");
+            double x = Double.parseDouble(x_stringArray[1]);
+
+
+            String[] y_stringArray = nodeString[2].split(":");
+            double y = Double.parseDouble(y_stringArray[1]);
+
+            pane.getChildren().add(createNode((int) x*nodeSize+ 2* nodeSize+10,(int)y*nodeSize+2 * nodeSize+10, nodeSize));
+        }
+
+
+    }
+
+    @FXML
+    private void choiceBoxAlgorithmOnAction(ActionEvent event) {
         String selectedAlgo = String.valueOf(choiceBoxAlgorithm.getSelectionModel().getSelectedItem());
         switch (selectedAlgo) {
-            case "Naive":   this.selectedTreeAlgorithm = "Naive";   break;
-            case "Radial":  this.selectedTreeAlgorithm = "Radial";  break;
-            case "Walker":  this.selectedTreeAlgorithm = "Walker";  break;
-            default: throw new IllegalArgumentException("The algo: " + selectedAlgo + " is not yet implemented");
+            case "Naive":
+                this.selectedTreeAlgorithm = "Naive";
+                break;
+            case "Radial":
+                this.selectedTreeAlgorithm = "Radial";
+                break;
+            case "Walker":
+                this.selectedTreeAlgorithm = "Walker";
+                break;
+            default:
+                throw new IllegalArgumentException("The algo: " + selectedAlgo + " is not yet implemented");
         }
-        System.out.println("set algo to: " +this.selectedTreeAlgorithm);
-        drawCircles();
+        drawInit();
     }
-    @FXML   private void loadFileOnAction() {
+
+    @FXML
+    private void loadFileOnAction() {
         FileChooser fileChooser = new FileChooser();
 
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Newick files (*.nh)", "*.nh"),
                 new FileChooser.ExtensionFilter("GraphML files (*.graphml)", "*.graphml")
-                );
+        );
 
         File file = fileChooser.showOpenDialog(null);
 
         if (file != null) {
             if (ParseController.getInstance().initializeParsing(file)) {
-                drawCircles();
+                drawInit();
             } else {
                 System.out.println("was not able to ParseController.getInstance().initializeParsing(file)");
             }
@@ -124,8 +144,9 @@ public class GUIController {
     // SETTER & GETTER AREA
     public void setNodeSize(int nodeSize) {
         this.nodeSize = nodeSize;
-        this.drawCircles();
+        this.drawInit();
     }
+
     public int getNodeSize() {
         return nodeSize;
     }

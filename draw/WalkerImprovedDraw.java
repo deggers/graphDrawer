@@ -87,6 +87,24 @@ public class WalkerImprovedDraw {
         }
     }
 
+    public static String[] processTree(Node root) {
+        MappedTreeStructure<Node> tree = new MappedTreeStructure<Node>(root);
+        try {
+            WalkerImprovedDraw w = new WalkerImprovedDraw();
+            tree = w.treeLayout(tree);
+            String toProcess = tree.getRoots().toString(); 
+            String[] splittedTree = toProcess.substring(1,toProcess.length()-1).split(";");
+//            for (String node: splittedTree){
+//                System.out.println("node = " + node);
+//            }
+            return splittedTree;
+        } catch(Exception e){
+            System.out.println("Error while running Walker Algorithm");
+            System.out.println(e);
+            return null;
+        }
+    }
+
     public MappedTreeStructure<Node> treeLayout(MappedTreeStructure<Node> tree) throws Exception {
         List<Node> roots = tree.getRoots();
 

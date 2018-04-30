@@ -7,12 +7,11 @@ import java.io.File;
 
 public class ParseController {
 
-    private         TreeParserNewick    parserNewick;
     private         Node                tree;
-    public static ParseController instance;
+    public static   ParseController     instance;
 
     public ParseController() {
-        parserNewick = new TreeParserNewick();
+        TreeParserNewick parserNewick = new TreeParserNewick();
     }
 
     public static ParseController getInstance() {
@@ -37,7 +36,14 @@ public class ParseController {
     public void setTree(Node tree) {
         this.tree = tree;
     }
+
     public Node getTree() {
         return this.tree;
+    }
+
+    // not used, right?
+    public String[] getTreeStringArray() {
+        String[] splitTree = tree.toString().split("\t");
+        return splitTree;
     }
 }
