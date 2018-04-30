@@ -13,13 +13,15 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import model.MutableTree;
 
 import java.io.File;
 
 public class GUIController {
-    private int nodeSize = 16;
+    private int nodeSize = 8;
     private String selectedTreeAlgorithm;
-    private String[] treeWalker = null;
+    private MutableTree treeWalker = null;
+    public static final double OFFSET = 20;
 
     @FXML
     Pane pane;
@@ -67,7 +69,7 @@ public class GUIController {
                     break;
                 case "Walker": // ugly much code..
                     if (treeWalker == null) {
-                        this.treeWalker = WalkerImprovedDraw.processTree(ParseController.getInstance().getTree());
+                        this.treeWalker = WalkerImprovedDraw.processTreeNodes(ParseController.getInstance().getTree());
                     }
                     drawTreeStructure(treeWalker);
                     break;
@@ -77,23 +79,43 @@ public class GUIController {
         }
     }
 
+    private boolean drawTreeNodes(MutableTree tree) {
+        String toProcess = tree.getRoots().toString();
+        String[] splittedTree = toProcess.substring(1, toProcess.length() - 1).split(";");
+        for (String node : splittedTree) {
+            try {
+                String[] nodeString = node.split(",");
+
+                String[] label_stringArray = nodeString[0].split(":");
+                String label = label_stringArray[1];
+
+                String[] x_stringArray = nodeString[1].split(":");
+                double x = Double.parseDouble(x_stringArray[1]);
+                double startX = (x * 2 * nodeSize) + OFFSET;
+
+                String[] y_stringArray = nodeString[2].split(":");
+                double y = Double.parseDouble(y_stringArray[1]);
+                double startY = (y * 2 * nodeSize) + OFFSET;
+//            System.out.println("x: " + Double.toString(x) + ", y: " + Double.toString(y) + ", id: " + label);
+
+                pane.getChildren().add(createNode((int) startX, (int) startY, (int) getNodeSize() / 2));
+
+            }
+            catch (Exception e) {
+                System.out.println("Fehler in drawTreeNodes");
+                System.out.println(e);
+                return false;
+            }
+        }
+         return true;
+    }
+
     // toDo for Dustyn
-    private void drawTreeStructure(String[] treeWalker) {
-        for (String node : treeWalker) {
-            String[] nodeString = node.split(",");
+    private void drawTreeStructure(MutableTree tree) {
+            drawTreeNodes(tree);
 
-            String[] x_stringArray = nodeString[1].split(":");
-            double x = Double.parseDouble(x_stringArray[1]);
-
-
-            String[] y_stringArray = nodeString[2].split(":");
-            double y = Double.parseDouble(y_stringArray[1]);
-
-            pane.getChildren().add(createNode((int) x*nodeSize+ 2* nodeSize+10,(int)y*nodeSize+2 * nodeSize+10, nodeSize));
         }
 
-
-    }
 
     @FXML
     private void choiceBoxAlgorithmOnAction(ActionEvent event) {
@@ -154,4 +176,5 @@ public class GUIController {
     public String getSelectedTreeAlgorithm() {
         return this.selectedTreeAlgorithm;
     }
+
 }
