@@ -11,16 +11,18 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import model.MutableTree;
+import model.MappedTreeStructure;
+import model.Node;
 
 import java.io.File;
 
 public class GUIController {
     private int nodeSize = 8;
     private String selectedTreeAlgorithm;
-    private MutableTree treeWalker = null;
+    private MappedTreeStructure treeWalker = null;
     public static final double OFFSET = 20;
 
     @FXML
@@ -71,7 +73,7 @@ public class GUIController {
                     if (treeWalker == null) {
                         this.treeWalker = WalkerImprovedDraw.processTreeNodes(ParseController.getInstance().getTree());
                     }
-                    drawTreeStructure(treeWalker);
+                    drawTreeStructure(this.treeWalker);
                     break;
                 default:
                     throw new IllegalArgumentException("The algo: " + selectedTreeAlgorithm + " is not yet implemented");
@@ -79,7 +81,7 @@ public class GUIController {
         }
     }
 
-    private boolean drawTreeNodes(MutableTree tree) {
+    private boolean drawTreeNodes(MappedTreeStructure tree) {
         String toProcess = tree.getRoots().toString();
         String[] splittedTree = toProcess.substring(1, toProcess.length() - 1).split(";");
         for (String node : splittedTree) {
@@ -91,31 +93,59 @@ public class GUIController {
 
                 String[] x_stringArray = nodeString[1].split(":");
                 double x = Double.parseDouble(x_stringArray[1]);
-                double startX = (x * 2 * nodeSize) + OFFSET;
+                double startX = scaleCoordinate(x);
 
                 String[] y_stringArray = nodeString[2].split(":");
                 double y = Double.parseDouble(y_stringArray[1]);
-                double startY = (y * 2 * nodeSize) + OFFSET;
-//            System.out.println("x: " + Double.toString(x) + ", y: " + Double.toString(y) + ", id: " + label);
+                double startY = scaleCoordinate(y);
 
                 pane.getChildren().add(createNode((int) startX, (int) startY, (int) getNodeSize() / 2));
-
-            }
-            catch (Exception e) {
+//                System.out.println("x: " + Double.toString(x) + ", y: " + Double.toString(y) + ", id: " + label);
+            } catch (Exception e) {
                 System.out.println("Fehler in drawTreeNodes");
                 System.out.println(e);
                 return false;
             }
         }
-         return true;
+        return true;
+    }
+
+    private boolean drawTreeEdges(MappedTreeStructure<Node> tree) {
+        try {
+//            System.out.println("print now for drawTreeEdges");
+            tree.listAllNodes().forEach((Node child) -> {
+                //
+                if (child.parent != null) {
+                    Node parent = child.parent;
+                    String parentLabel = parent.label;
+                    double parentX = scaleCoordinate(parent.x);
+                    double parentY = scaleCoordinate(parent.y);
+
+                    String childLabel = child.label;
+                    double childX = scaleCoordinate(child.x);
+                    double childY = scaleCoordinate(child.y);
+                    pane.getChildren().add(new Line(parentX,parentY, childX, childY));
+//                    System.out.println("parent: " + parentLabel + "(" + String.valueOf(parentX) + "," + String.valueOf(parentY) + ") child: " + childLabel + "(" + String.valueOf(childX) + "," + String.valueOf(childY) + ") ");
+                }
+            });
+        } catch (Exception e) {
+            System.out.println("Exception in drawTreeEdges");
+            System.out.println(e);
+            return false;
+        }
+        return true;
     }
 
     // toDo for Dustyn
-    private void drawTreeStructure(MutableTree tree) {
-            drawTreeNodes(tree);
+    private void drawTreeStructure(MappedTreeStructure tree) {
+        drawTreeEdges(tree);
+        drawTreeNodes(tree);
+    }
 
-        }
-
+    private double scaleCoordinate(double number) {
+        double coordinate = (number * 2 * getNodeSize()) + OFFSET;
+        return coordinate;
+    }
 
     @FXML
     private void choiceBoxAlgorithmOnAction(ActionEvent event) {
