@@ -8,17 +8,18 @@ public class TreeParserNewick {
         newickString = newickString.replace("\t", "");
         newickString = newickString.replace("\n", "");
 
-        // check if string is valid format
+        // check if string is valid format, then process it
         if (isValidFormat(newickString)) {
-            // process it
-            return buildTreeStructure(newickString);
+            Node root = buildTreeStructure(newickString);
+            setParent(root);
+            return root;
         } else {
             System.out.println("format for newick seems to be wrong, daaamn");
             return null;
         }
     }
 
-// Problem: es müssen noch die längen der kanten der pseudoknoten gespeichert werden!
+    // Problem: es müssen noch die längen der kanten der pseudoknoten gespeichert werden, oder?
     private static Node buildTreeStructure(String string) {
         try {  // try to find branch
             int rightPar = getClosingParenthesis(string);
@@ -30,20 +31,15 @@ public class TreeParserNewick {
             for (String branch : splitArray) {
                 Node child = buildTreeStructure(branch);
                 currentNode.addChild(child);
-                if(currentNode.children.isEmpty()){
-                    currentNode.leftChild= child;
-                } else {
-                    currentNode.rightChild= child;
-                }
             }
             return currentNode;
         } catch (IllegalArgumentException e) {
 //            System.out.println("i guess we have a leaf here");
-            // problem: if node has name but is no leaf saved as label= id instead of label= name
+            // problem: if node has name but is no leaf it is saved as label= id instead of label= name
             Node node = new Node();
             String[] nameSplit = string.split(":");
             node.label = nameSplit[0];
-            node.weight= Double.parseDouble(nameSplit[1]);
+            node.weight = Double.parseDouble(nameSplit[1]);
             return node;
         }
     }
@@ -124,6 +120,18 @@ public class TreeParserNewick {
             return false;
         }
         return true;
+    }
+
+    // children are one level below parent (y= y+1)  & listed in the parent nodes list of children
+    public static void setParent(Node node) {
+        if (!node.checked) {
+            node.checked = true;
+            for (Node c : node.children) {
+                if (!c.checked && (c.y == (node.y + 1))) {
+                    c.parent = node;
+                }
+            }
+        }
     }
 
 }

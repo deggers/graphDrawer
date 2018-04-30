@@ -8,7 +8,7 @@ import java.awt.*;
 
 public class Main extends Application {
 
-    private static final boolean GUI = true;
+    private static final boolean GUI = false;
 
     public static void main(String[] args) {
         if (GUI) {
@@ -20,8 +20,9 @@ public class Main extends Application {
         //MutableTree tree = finalParserNewick.parseStringToTree(input);
         //System.out.println(tree);
         Node root = TreeParserNewick.parseStringToTree(input);
+        Reinhold r = new Reinhold();
+        r.layout(root);
         System.out.println(root);
-
         if (!GUI) {
             System.exit(1);
         }
