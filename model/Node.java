@@ -36,18 +36,12 @@ public class Node implements Serializable {
     }
 
     public Node getChild(int index) {
-        if (index >= 0) {
-            return children.get(index);
-        } else {
-            return children.get(children.size() + index);
-        }
+        return index >= 0 ? children.get(index) : children.get(children.size() + index);
     }
 
     public static int countChildren(Node node) {
         if (node == null) return 0;
-        for (Node tmp_node : node.getChildren()) {
-            return 1 + countChildren(tmp_node);
-        }
+        for (Node tmp_node : node.getChildren()) return 1 + countChildren(tmp_node);
         return 0;
     }
 
