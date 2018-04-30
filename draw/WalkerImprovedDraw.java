@@ -87,7 +87,7 @@ public class WalkerImprovedDraw {
         }
     }
 
-    public static MutableTree<Node> processTreeNodes(Node root) {
+    public static MappedTreeStructure<Node> processTreeNodes(Node root) {
         MappedTreeStructure<Node> tree = new MappedTreeStructure<Node>(root);
         try {
             WalkerImprovedDraw w = new WalkerImprovedDraw();
