@@ -57,9 +57,9 @@
             </Button>
          </children>
       </HBox>
-      <ScrollPane pannable="true" VBox.vgrow="ALWAYS"  style="-fx-background-color: white; -fx-border-color:grey; -fx-border-width: 1; -fx-border-style: solid;">
+      <ScrollPane pannable="true" VBox.vgrow="ALWAYS"  style="-fx-background: #ffffff; -fx-border-color:grey; -fx-border-width: 1; -fx-border-style: solid;">
          <content >
-            <Pane fx:id="pane" style="-fx-background-color: white;">
+            <Pane fx:id="pane" style="-fx-background: #ffffff;">
 
             </Pane>
          </content>
