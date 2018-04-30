@@ -27,7 +27,7 @@
                   <Font name="Arial Bold" size="12.0" />
                </font>
             </Button>
-            <Slider fx:id="nodeSizeSlider" blockIncrement="1" prefHeight="14.0" prefWidth="189.0">
+            <Slider fx:id="nodeSizeSlider" min="6" max="32" blockIncrement="1" prefHeight="14.0" prefWidth="189.0">
                <HBox.margin>
                   <Insets left="10.0" right="10.0" />
                </HBox.margin>
@@ -57,12 +57,10 @@
             </Button>
          </children>
       </HBox>
-      <ScrollPane pannable="true" VBox.vgrow="ALWAYS">
-         <content>
+      <ScrollPane pannable="true" VBox.vgrow="ALWAYS"  style="-fx-background-color: white; -fx-border-color:grey; -fx-border-width: 1; -fx-border-style: solid;">
+         <content >
             <Pane fx:id="pane" style="-fx-background-color: white;">
-               <opaqueInsets>
-                  <Insets />
-               </opaqueInsets>
+
             </Pane>
          </content>
       </ScrollPane>

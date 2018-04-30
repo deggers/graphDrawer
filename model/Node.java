@@ -49,7 +49,7 @@ public class Node implements Serializable {
 
       @Override
     public String toString() {
-        String out = label + ", x:" + x + ", y:" + y + ", prelim:" + prelim + ", modifier:" + modifier+ ", indexAsChild:" + indexAsChild + ";";
+        String out = "id: " + label + ", x:" + x + ", y:" + y + ", prelim:" + prelim + ", modifier:" + modifier+ ", indexAsChild:" + indexAsChild + ";";
         for (Node c : children) {
             out = out + "\t" + c.toString();
         }
