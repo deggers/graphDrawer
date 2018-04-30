@@ -23,6 +23,10 @@ public class Node implements Serializable {
     public double shift = 0;
     public Node thread = null;
 
+    public Node(String label) {
+        this.label = label;
+    }
+
     public void addChild(Node node) {
         children.add(node);
     }
@@ -35,8 +39,16 @@ public class Node implements Serializable {
         if (index >= 0) {
             return children.get(index);
         } else {
-            return children.get(children.size()+index);
+            return children.get(children.size() + index);
         }
+    }
+
+    public static int countChildren(Node node) {
+        if (node == null) return 0;
+        for (Node tmp_node : node.getChildren()) {
+            return 1 + countChildren(tmp_node);
+        }
+        return 0;
     }
 
     public boolean isLeaf() {
@@ -47,16 +59,14 @@ public class Node implements Serializable {
         return indexAsChild >= 1;
     }
 
-      @Override
+    @Override
     public String toString() {
-        String out = "id: " + label + ", x:" + x + ", y:" + y + ", prelim:" + prelim + ", modifier:" + modifier+ ", indexAsChild:" + indexAsChild + ";";
+        String out = "id: " + label + ", x:" + x + ", y:" + y + ", prelim:" + prelim + ", modifier:" + modifier + ", indexAsChild:" + indexAsChild + ";";
         for (Node c : children) {
             out = out + "\t" + c.toString();
         }
         return out;
     }
 
-    public Node(String label) {
-        this.label = label;
-    }
+
 }
