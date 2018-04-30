@@ -26,8 +26,8 @@ public class TreeParserNewick {
             int nodeId = pseudoNode_id++;
             String toProcess = string.substring(1, rightPar);
             String[] splitArray = splitToBranches(toProcess);
-            Node currentNode = new Node();
-            currentNode.label = Integer.toString(nodeId);
+            Node currentNode = new Node(Integer.toString(nodeId));
+            //currentNode.label = Integer.toString(nodeId);
             for (String branch : splitArray) {
                 Node child = buildTreeStructure(branch);
                 currentNode.addChild(child);
@@ -36,8 +36,8 @@ public class TreeParserNewick {
         } catch (IllegalArgumentException e) {
 //            System.out.println("i guess we have a leaf here");
             // problem: if node has name but is no leaf it is saved as label= id instead of label= name
-            Node node = new Node();
             String[] nameSplit = string.split(":");
+            Node node = new Node(nameSplit[0]);
             node.label = nameSplit[0];
             node.weight = Double.parseDouble(nameSplit[1]);
             return node;
@@ -122,11 +122,11 @@ public class TreeParserNewick {
         return true;
     }
 
-    // children are one level below parent (y= y+1)  & listed in the parent nodes list of children
+     //children are one level below parent (y= y+1)  & listed in the parent nodes list of children
     public static void setParent(Node node) {
         if (!node.checked) {
             node.checked = true;
-            for (Node c : node.children) {
+            for (Node c : node.getChildren()) {
                 if (!c.checked && (c.y == (node.y + 1))) {
                     c.parent = node;
                 }
