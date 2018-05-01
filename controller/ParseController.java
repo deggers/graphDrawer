@@ -7,6 +7,7 @@ import java.io.File;
 
 public class ParseController {
 
+    private         File                file;
     private         Node                tree;
     public static   ParseController     instance;
 
@@ -22,6 +23,7 @@ public class ParseController {
     }
 
     public boolean initializeParsing(File file) {
+        setFile(file);
         String fileName = file.getName();
         String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());
         if (fileExtension.equals("nh")) {
@@ -45,5 +47,13 @@ public class ParseController {
     public String[] getTreeStringArray() {
         String[] splitTree = tree.toString().split("\t");
         return splitTree;
+    }
+
+    public File getFile() {
+        return file;
+    }
+
+    public void setFile(File file) {
+        this.file = file;
     }
 }
