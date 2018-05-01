@@ -3,8 +3,6 @@ package controller;
 import draw.NaiveDraw;
 import draw.RadialTree;
 import draw.WalkerImprovedDraw;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -19,13 +17,23 @@ import model.MappedTreeStructure;
 import model.Node;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.stream.Collectors;
 
 public class GUIController {
     private int nodeSize = 8;
     private String selectedTreeAlgorithm;
     private MappedTreeStructure treeWalker = null;
     private Node treeRadial = null;
+
+    private ListIterator<File> filesIter;
+
+    List<File> filesInFolder = null;
     public static final double OFFSET = 20;
 
     @FXML
@@ -44,6 +52,8 @@ public class GUIController {
     ChoiceBox choiceBoxAlgorithm;
     @FXML
     Button loadFile;
+    @FXML
+    Button nextFile;
 
     public void initialize() {
         nodeSizeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -82,7 +92,11 @@ public class GUIController {
 
     @FXML
     private void drawInit() {
+        System.out.println("start drawInit()");
+        System.out.println("Tree: " + ParseController.getInstance().getTree());
+        System.out.println("Algorithm: " + getSelectedTreeAlgorithm());
         if (ParseController.getInstance().getTree() != null && getSelectedTreeAlgorithm() != null) {
+            System.out.println("i am in the process of doing the draw..");
             pane.getChildren().clear();
             switch (getSelectedTreeAlgorithm()) {
                 case "Naive":
@@ -90,10 +104,11 @@ public class GUIController {
                     nodeSizeSlider.setDisable(false);
                     NaiveDraw.processTree(ParseController.getInstance().getTree());
                     break;
-                case "Walker": // ugly much code..
-                    if (treeWalker == null) {
+                    // need to reset coords ..
+                case "Walker":
+//                    if (treeWalker == null) {
                         this.treeWalker = WalkerImprovedDraw.processTreeNodes(ParseController.getInstance().getTree());
-                    }
+//                    }
                     nodeSizeSlider.setDisable(false);
                     drawTreeStructure(this.treeWalker);
                     break;
@@ -112,15 +127,15 @@ public class GUIController {
     }
 
     private void drawRadialTreeStructure(Node root) {
-        int halfHeight = (int) scollPane.getHeight()/2;
-        int halfWidth = (int) scollPane.getWidth()/2;
+        int halfHeight = (int) scollPane.getHeight() / 2;
+        int halfWidth = (int) scollPane.getWidth() / 2;
         // draw levels
         int level = Node.treeDepth(root);
-        int decreasingRadius = (Math.min(halfHeight,halfWidth)) - ( 2 * nodeSize);
+        int decreasingRadius = (Math.min(halfHeight, halfWidth)) - (2 * nodeSize);
         int spaceBetweenLevels = decreasingRadius / level;
 
-        for (int i = 0; i <= level+1; i++) {
-            pane.getChildren().add(createGuideline(halfWidth,halfHeight,decreasingRadius));
+        for (int i = 0; i <= level + 1; i++) {
+            pane.getChildren().add(createGuideline(halfWidth, halfHeight, decreasingRadius));
             decreasingRadius -= spaceBetweenLevels;
         }
         // set appropriate nodeSize
@@ -167,7 +182,7 @@ public class GUIController {
                     String childLabel = child.label;
                     double childX = scaleCoordinate(child.x);
                     double childY = scaleCoordinate(child.y);
-                    pane.getChildren().add(new Line(parentX,parentY, childX, childY));
+                    pane.getChildren().add(new Line(parentX, parentY, childX, childY));
 
 //                    System.out.println("parent: " + parentLabel + "(" + String.valueOf(parentX) + "," + String.valueOf(parentY) + ") child: " + childLabel + "(" + String.valueOf(childX) + "," + String.valueOf(childY) + ") ");
                 }
@@ -180,24 +195,8 @@ public class GUIController {
         return true;
     }
 
-//    private void drawTreeArrows(double node1X, double node1Y, double node2X, double node2Y) {
-//        double arrowAngle = Math.toRadians(45.0);
-//        double arrowLength = 10.0;
-//        double dx = node1X - node2X;
-//        double dy = node1Y - node2Y;
-//        double angle = Math.atan2(dy, dx);
-//        double x1 = Math.cos(angle + arrowAngle) * arrowLength + node2X;
-//        double y1 = Math.sin(angle + arrowAngle) * arrowLength + node2Y;
-//
-//        double x2 = Math.cos(angle - arrowAngle) * arrowLength + node2X;
-//        double y2 = Math.sin(angle - arrowAngle) * arrowLength + node2Y;
-//
-//        pane.getChildren().add(new Line(scaleCoordinate(node2X), scaleCoordinate(node2Y), scaleCoordinate(x1), scaleCoordinate(y1)));
-//        pane.getChildren().add(new Line(scaleCoordinate(node2X), scaleCoordinate(node2Y), scaleCoordinate(x2), scaleCoordinate(y2)));
-//        pane.getChildren().add(new Line(scaleCoordinate(node1X), scaleCoordinate(node1Y), scaleCoordinate(node2X), scaleCoordinate(node2Y)));
-//    }
-
     private void drawTreeStructure(MappedTreeStructure tree) {
+        System.out.println("called drawTreeStructure");
         drawTreeEdges(tree);
         drawTreeNodes(tree);
     }
@@ -208,7 +207,7 @@ public class GUIController {
     }
 
     @FXML
-    private void choiceBoxAlgorithmOnAction(ActionEvent event) {
+    private void choiceBoxAlgorithmOnAction() {
         String selectedAlgo = String.valueOf(choiceBoxAlgorithm.getSelectionModel().getSelectedItem());
         switch (selectedAlgo) {
             case "Naive":
@@ -227,6 +226,31 @@ public class GUIController {
     }
 
     @FXML
+    public void setNextFileAsTree() {
+        System.out.println("next called!");
+        if (filesInFolder != null) { // we selected a file so we have the folder from here on
+            if (getFilesIter() == null) {
+                List<File> files = getFilesInFolder();
+                ListIterator<File> filesIter = files.listIterator();
+                setFilesIter(filesIter);
+            }
+            ParseController.getInstance().setFile(filesIter.next());
+
+            System.out.println(ParseController.getInstance().getTree());
+            System.out.println(getSelectedTreeAlgorithm());
+            System.out.println(ParseController.getInstance().getFile());
+
+            File file = ParseController.getInstance().getFile();
+            if (ParseController.getInstance().initializeParsing(file)) {
+                drawInit();
+            } else {
+                System.out.println("was not able to ParseController.getInstance().initializeParsing(file)");
+            }
+        }
+
+    }
+
+    @FXML
     private void loadFileOnAction() {
         FileChooser fileChooser = new FileChooser();
 
@@ -238,6 +262,17 @@ public class GUIController {
         File file = fileChooser.showOpenDialog(null);
 
         if (file != null) {
+            // todo: read folder and create next button
+            try {
+                filesInFolder = Files.walk(Paths.get(file.getParent()))
+                        .filter(Files::isRegularFile)
+                        .map(Path::toFile)
+                        .collect(Collectors.toList());
+                setFilesInFolder(filesInFolder);
+            } catch (IOException e) {
+                System.out.println("Error in loadFileAction");
+                e.printStackTrace();
+            }
             if (ParseController.getInstance().initializeParsing(file)) {
                 drawInit();
             } else {
@@ -266,4 +301,26 @@ public class GUIController {
     public String getSelectedTreeAlgorithm() {
         return this.selectedTreeAlgorithm;
     }
+
+    public void setSelectedTreeAlgorithm(String selectedTreeAlgorithm) {
+        this.selectedTreeAlgorithm = selectedTreeAlgorithm;
+    }
+
+    public List<File> getFilesInFolder() {
+        return filesInFolder;
+    }
+
+    public void setFilesInFolder(List<File> filesInFolder) {
+        this.filesInFolder = filesInFolder;
+    }
+
+    public ListIterator<File> getFilesIter() {
+        return filesIter;
+    }
+
+    public void setFilesIter(ListIterator<File> filesIter) {
+        this.filesIter = filesIter;
+    }
+
+
 }
