@@ -14,19 +14,19 @@ public class WalkerImprovedDraw {
     private static int yTemp;
     private static final double siblingSeparation = 3;
     private static final double subtreeSeparation = 4;
-    
+
     /* walker old
     private static void initPrevNodeList(){
-        
+
     }
-    
+
     private static model.Node getPrevNodeAtLevel(int level){
         model.Node node = new model.Node("");
         return node;
     }
-    
+
     private static void setPrevNodeAtLevel(int level, model.Node node){
-        
+
     }
     */
 
@@ -158,7 +158,7 @@ public class WalkerImprovedDraw {
             } else {
                 node.prelim = 0;
             }
-            
+
             /* walker old
             if (node.hasLeftSibling()) {
                 node.prelim = node.parent.getChild(node.indexAsChild - 1).prelim + siblingSeparation + Meannodesize(leftsibling, node);
@@ -240,15 +240,15 @@ public class WalkerImprovedDraw {
         int depthToStop = maxDepth - level;
         double leftModsum, rightModsum, moveDistance, portion;
         int leftSiblings;
-        
+
         try {
-            leftmost = node.getChild(0); 
-            neighbor = leftmost.leftNeighbor;   
+            leftmost = node.getChild(0);
+            neighbor = leftmost.leftNeighbor;
         } catch (Exception e) {
             leftmost = null;
             neighbor = null;
         }
-                
+
         while (leftmost != null && neighbor != null && compareDepth <= depthToStop){
             leftModsum = 0;
             rightModsum = 0;
@@ -277,7 +277,7 @@ public class WalkerImprovedDraw {
                 } else {
                     return;
                 }
-            } 
+            }
             compareDepth++;
             if (leftmost.isLeaf()) {
                 //leftmost = getLeftMost; Verbesserung einfügen
