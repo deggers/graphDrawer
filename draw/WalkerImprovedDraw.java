@@ -1,8 +1,8 @@
 package draw;
 
 import model.*;
-
 import java.util.List;
+import java.util.ListIterator;
 
 public class WalkerImprovedDraw {
 
@@ -12,8 +12,8 @@ public class WalkerImprovedDraw {
     private static int levelSeparation;
     private static int yTopAdjust;
     private static int yTemp;
-    private static final double siblingSeparation = 2;
-    private static final double subtreeSeparation = 2;
+    private static final double siblingSeparation = 3;
+    private static final double subtreeSeparation = 4;
     
     /* walker old
     private static void initPrevNodeList(){
@@ -30,8 +30,8 @@ public class WalkerImprovedDraw {
     }
     */
 
-    public static MappedTreeStructure<Node> processTreeNodes(Node root) {
-        MappedTreeStructure<Node> tree = new MappedTreeStructure<Node>(root);
+    public static MappedTreeStructure<Node> processTreeNodes(MappedTreeStructure<Node> tree) {
+
         try {
             WalkerImprovedDraw w = new WalkerImprovedDraw();
             tree = w.treeLayout(tree);
@@ -60,7 +60,9 @@ public class WalkerImprovedDraw {
     private static void executeShifts(Node node) {
         double tempShift = 0;
         double tempChange = 0;
-        for (Node c : node.getChildren()) {
+        ListIterator<Node> tempIter = node.getChildren().listIterator(node.getChildren().size());
+        while (tempIter.hasPrevious()) {
+            Node c = tempIter.previous();
             c.prelim += tempShift;
             c.modifier += tempShift;
             tempChange += c.change;
@@ -223,7 +225,7 @@ public class WalkerImprovedDraw {
         }*/
 //        System.out.println("Second walk called, modsum: " + modsum);
         node.x = node.prelim + modsum;
-        node.y = level;
+        node.y = level * 3;
         if (!node.isLeaf()) {
             node.getChildren().forEach((c) -> {
                 secondWalk(c, level + 1, modsum + node.modifier);

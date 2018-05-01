@@ -28,8 +28,8 @@ import java.util.stream.Collectors;
 public class GUIController {
     private int nodeSize = 8;
     private String selectedTreeAlgorithm;
-    private MappedTreeStructure treeWalker = null;
-    private Node treeRadial = null;
+    private MappedTreeStructure<Node> treeWalker = null;
+    private MappedTreeStructure<Node> treeRadial = null;
 
     private ListIterator<File> filesIter;
 
@@ -126,11 +126,14 @@ public class GUIController {
         }
     }
 
-    private void drawRadialTreeStructure(Node root) {
+    private void drawRadialTreeStructure(MappedTreeStructure<Node> root) {
         int halfHeight = (int) scollPane.getHeight() / 2;
         int halfWidth = (int) scollPane.getWidth() / 2;
+        int level = 0;
         // draw levels
-        int level = Node.treeDepth(root);
+        for (Node node: root.nodeList) {
+            level = Node.treeDepth(node);
+        }
         int decreasingRadius = (Math.min(halfHeight, halfWidth)) - (2 * nodeSize);
         int spaceBetweenLevels = decreasingRadius / level;
 

@@ -1,5 +1,6 @@
 package controller;
 
+import model.MappedTreeStructure;
 import model.Node;
 import model.TreeParserNewick;
 
@@ -8,7 +9,7 @@ import java.io.File;
 public class ParseController {
 
     private         File                file;
-    private         Node                tree;
+    private MappedTreeStructure<Node> tree;
     public static   ParseController     instance;
 
     public ParseController() {
@@ -35,11 +36,11 @@ public class ParseController {
     }
 
     // SETTER & GETTER AREA
-    public void setTree(Node tree) {
+    public void setTree(MappedTreeStructure<Node> tree) {
         this.tree = tree;
     }
 
-    public Node getTree() {
+    public MappedTreeStructure<Node> getTree() {
         return this.tree;
     }
 

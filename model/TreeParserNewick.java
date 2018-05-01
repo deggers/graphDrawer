@@ -17,8 +17,10 @@ public class TreeParserNewick {
             String newickString = lines.map(line -> line.replaceAll("\\s+", "")).collect(Collectors.joining()).trim();
 
             if (isValidFormat(newickString)) {
-                Node node = buildTreeStructure(newickString);
-                ParseController.getInstance().setTree(node);
+                Node root = buildTreeStructure(newickString);
+                MappedTreeStructure<Node> tree = new MappedTreeStructure<>(root);
+                fillTree(root, tree);
+                ParseController.getInstance().setTree(tree);
                 return true;
             } else {
                 System.out.println("format for newick seems to be wrong, daaamn");
@@ -30,7 +32,21 @@ public class TreeParserNewick {
         }
     }
 
+    private static void fillTree(Node root, MappedTreeStructure tree) {
 
+        try {
+            int indexAsChildSetter = 0;
+            for (Node child : root.getChildren()) {
+                child.parent = root;
+                child.indexAsChild = indexAsChildSetter;
+                indexAsChildSetter++;
+                tree.add(root, child);
+                //System.out.println("added pair (n/p): " + child + e);
+                fillTree(child, tree);
+            }
+        } catch (Exception e) {
+        }
+    }
 
     public static Node parseStringToTree(String newickString) {
 

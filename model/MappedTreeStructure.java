@@ -5,11 +5,13 @@ import java.util.*;
 // inspired heavely from https://stackoverflow.com/questions/3522454/java-tree-data-structure
 
 public class MappedTreeStructure<T> implements MutableTree<T> {
-    private final Map<T, T> nodeParent = new HashMap<>();
-    private final LinkedHashSet<T> nodeList = new LinkedHashSet<>();
+    public final Map<T, T> nodeParent = new HashMap<>();
+    public final LinkedHashSet<T> nodeList = new LinkedHashSet<>();
+
+    public MappedTreeStructure() {}
 
     public MappedTreeStructure(T root) {
-        fillTree((Node) root);
+        nodeList.add(root);
     }
 
     private void fillTree(Node node) {
@@ -34,6 +36,7 @@ public class MappedTreeStructure<T> implements MutableTree<T> {
         if (node == null)
             throw new IllegalArgumentException(parameterName + " must not be null");
     }
+
 
     @Override
     public boolean add(T parent, T node) {

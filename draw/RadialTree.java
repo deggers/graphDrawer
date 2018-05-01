@@ -5,8 +5,8 @@ import model.Node;
 
 public class RadialTree {
 
-    public static Node processTree(Node node) {
+    public static MappedTreeStructure<Node> processTree(MappedTreeStructure<Node> tree) {
         // todo work that stuff out : yes, indeed!
-        return node;
+        return tree;
     }
 }
