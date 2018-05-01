@@ -5,7 +5,13 @@ import java.util.List;
 public class Node implements Serializable {
     public String label;
     private final int id = 0;
-    double weight;
+    double weight=0;
+    List<Integer> depthList = new ArrayList<>();
+
+    //reingold
+    public boolean checked= false, onlyChild= false, hasThread= false;
+    public Node rightChild= null, leftChild= null, threadTo= null;
+    public double xtemp;
     
     //walker
     public double x = 0;
@@ -57,4 +63,27 @@ public class Node implements Serializable {
     public Node(String label) {
         this.label = label;
     }
+
+    int findMaxLevel(Node root, int count) {
+        if (root == null) return 0;
+        for (Node n : root.getChildren()) {
+            findMaxLevel(n,++count);
+            depthList.add(count);
+        }
+        return 0;
+    }
+
+    public Integer getMaxDepth(Node root) {
+        findMaxLevel(root,0);
+        int max=0;
+        for (int i: depthList){
+            if(i>max){
+                max= i;
+            }
+        }
+        return max;
+    }
+
 }
+
+
