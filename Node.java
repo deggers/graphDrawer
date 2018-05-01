@@ -8,8 +8,8 @@ public class Node implements Serializable {
     double weight=0;
 
     //reingold
-    public boolean checked= false;
-    public Node rightChild= null, leftChild= null;
+    public boolean checked= false, onlyChild= false, hasThread= false;
+    public Node rightChild= null, leftChild= null, threadTo= null;
     public double xtemp;
     
     //walker
