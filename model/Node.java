@@ -7,6 +7,9 @@ import java.util.List;
 public class Node implements Serializable {
     public String label;
     private final int id = 0;
+    public boolean checked, onlyChild, hasThread;
+    public Node leftChild, rightChild, threadTo;
+    public Double xtemp;
     double weight;
 
     //walker
@@ -22,6 +25,8 @@ public class Node implements Serializable {
     public double change = 0;
     public double shift = 0;
     public Node thread = null;
+    public static List<Integer> depthList = new ArrayList<>();// muss resetted werden
+
 
     public Node(String label) {
         this.label = label;
@@ -39,9 +44,21 @@ public class Node implements Serializable {
         return index >= 0 ? children.get(index) : children.get(children.size() + index);
     }
 
-    public static int treeDepth(Node node) {
+    public static int getTreeDepth(Node root) {
+        getListOfDepths(root, 0);
+        int max = 0;
+        for (Integer count : depthList){
+            if (count > max) max = count;
+        }
+        return max;
+    }
+
+    public static int getListOfDepths(Node node, int count) {
         if (node == null) return 0;
-        for (Node tmp_node : node.getChildren()) return 1 + treeDepth(tmp_node);
+        for (Node child : node.getChildren()){
+            depthList.add(++count);
+            getListOfDepths(child,count);
+        }
         return 0;
     }
 

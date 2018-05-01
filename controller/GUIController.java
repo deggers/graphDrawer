@@ -1,9 +1,5 @@
 package controller;
 
-import draw.NaiveDraw;
-import draw.RadialTree;
-import draw.WalkerImprovedDraw;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
@@ -13,8 +9,8 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import model.MappedTreeStructure;
-import model.Node;
+import model.*;
+import draw.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -132,7 +128,7 @@ public class GUIController {
         int level = 0;
         // draw levels
         for (Node node: root.nodeList) {
-            level = Node.treeDepth(node);
+            level = Node.getTreeDepth(node);
         }
         int decreasingRadius = (Math.min(halfHeight, halfWidth)) - (2 * nodeSize);
         int spaceBetweenLevels = decreasingRadius / level;
