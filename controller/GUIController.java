@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 import model.MappedTreeStructure;
 import model.Node;
 
+import javax.xml.bind.annotation.XmlAnyAttribute;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -34,6 +35,8 @@ public class GUIController {
     private ListIterator<File> filesIter;
 
     List<File> filesInFolder = null;
+    private String fileName;
+
     public static final double OFFSET = 20;
 
     @FXML
@@ -54,6 +57,8 @@ public class GUIController {
     Button loadFile;
     @FXML
     Button nextFile;
+    @FXML
+    Label fileNameLabel;
 
     public void initialize() {
         nodeSizeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -98,6 +103,7 @@ public class GUIController {
         if (ParseController.getInstance().getTree() != null && getSelectedTreeAlgorithm() != null) {
             System.out.println("i am in the process of doing the draw..");
             pane.getChildren().clear();
+            fileNameLabel.setText(this.fileName);
             switch (getSelectedTreeAlgorithm()) {
                 case "Naive":
                     System.out.println("Selected Naive");
@@ -225,7 +231,7 @@ public class GUIController {
 
     @FXML
     public void setNextFileAsTree() {
-        System.out.println("next called!");
+//        System.out.println("next called!");
         if (filesInFolder != null) { // we selected a file so we have the folder from here on
             if (getFilesIter() == null || !getFilesIter().hasNext()) {
                 List<File> files = getFilesInFolder();
@@ -233,13 +239,9 @@ public class GUIController {
                 setFilesIter(filesIter);
             }
             ParseController.getInstance().setFile(filesIter.next());
-
-            System.out.println(ParseController.getInstance().getTree());
-            System.out.println(getSelectedTreeAlgorithm());
-            System.out.println(ParseController.getInstance().getFile());
-
             File file = ParseController.getInstance().getFile();
             if (ParseController.getInstance().initializeParsing(file)) {
+                this.fileName = file.getName();
                 drawInit();
             } else {
                 System.out.println("was not able to ParseController.getInstance().initializeParsing(file)");
@@ -260,7 +262,7 @@ public class GUIController {
         File file = fileChooser.showOpenDialog(null);
 
         if (file != null) {
-            // todo: read folder and create next button
+            this.fileName = file.getName();
             try {
                 filesInFolder = Files.walk(Paths.get(file.getParent()))
                         .filter(Files::isRegularFile)
