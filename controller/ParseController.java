@@ -12,10 +12,6 @@ public class ParseController {
     private MappedTreeStructure<Node> tree;
     public static   ParseController     instance;
 
-    public ParseController() {
-        TreeParserNewick parserNewick = new TreeParserNewick();
-    }
-
     public static ParseController getInstance() {
         if (instance == null) {
             ParseController.instance = new ParseController();
