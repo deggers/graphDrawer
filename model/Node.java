@@ -26,7 +26,7 @@ public class Node implements Serializable {
     public double shift = 0;
     public Node thread = null;
     public static List<Integer> depthList = new ArrayList<>();// muss resetted werden
-    
+
     // for the radialTree 
     private int angle;
     private double lowerBisector;
@@ -53,7 +53,7 @@ public class Node implements Serializable {
     public static int getTreeDepth(Node root) {
         getListOfDepths(root, 0);
         int max = 0;
-        for (Integer count : depthList){
+        for (Integer count : depthList) {
             if (count > max) max = count;
         }
         return max;
@@ -78,19 +78,19 @@ public class Node implements Serializable {
 
     public static int getListOfDepths(Node node, int count) {
         if (node == null) return 0;
-        for (Node child : node.getChildren()){
+        for (Node child : node.getChildren()) {
             depthList.add(++count);
-            getListOfDepths(child,count);
+            getListOfDepths(child, count);
         }
         return 0;
     }
 
     public void setAngle(int i) {
-        this.angle = i; 
+        this.angle = i;
     }
 
     public void setLowerBisector(double v) {
-        this.lowerBisector = v; 
+        this.lowerBisector = v;
     }
 
     public void setHigherBisector(double v) {
@@ -99,5 +99,13 @@ public class Node implements Serializable {
 
     public void setTangentLimit(double v) {
         this.tangentLimit = v;
+    }
+
+    public static int getDepth(Node node) {
+        int depth = 0;
+        while (node.parent != null) {
+            depth++;
+        }
+        return depth;
     }
 }

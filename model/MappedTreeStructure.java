@@ -89,7 +89,6 @@ public class MappedTreeStructure<T> implements MutableTree<T> {
         return (Node) nodeList.iterator().next();
     }
 
-
     public List<T> listAllNodes() {
         //System.out.println("List of all nodes returned");
         return new LinkedList<>(nodeList);
