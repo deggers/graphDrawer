@@ -8,7 +8,8 @@ public class MappedTreeStructure<T> implements MutableTree<T> {
     public final Map<T, T> nodeParent = new HashMap<>();
     public final LinkedHashSet<T> nodeList = new LinkedHashSet<>();
 
-    public MappedTreeStructure() {}
+    public MappedTreeStructure() {
+    }
 
     public MappedTreeStructure(T root) {
         nodeList.add(root);
@@ -24,7 +25,7 @@ public class MappedTreeStructure<T> implements MutableTree<T> {
                 child.parent = node;
                 child.indexAsChild = indexAsChildSetter;
                 indexAsChildSetter++;
-                nodeParent.put( (T) child, e);
+                nodeParent.put((T) child, e);
                 //System.out.println("added pair (n/p): " + child + e);
                 fillTree(child);
             }
@@ -68,7 +69,7 @@ public class MappedTreeStructure<T> implements MutableTree<T> {
         }
         if (cascade) {
             getChildren(node).forEach((child) -> {
-                remove(child, true);					//löscht keine Einträge aus nodeParent!
+                remove(child, true);                    //löscht keine Einträge aus nodeParent!
             });
         } else {
             getChildren(node).forEach((child) -> {
@@ -83,6 +84,11 @@ public class MappedTreeStructure<T> implements MutableTree<T> {
     public List<T> getRoots() {
         return getChildren(null);
     }
+
+    public Node getRoot() {
+        return (Node) nodeList.iterator().next();
+    }
+
 
     public List<T> listAllNodes() {
         //System.out.println("List of all nodes returned");

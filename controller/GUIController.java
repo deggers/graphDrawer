@@ -1,5 +1,8 @@
 package controller;
 
+import draw.NaiveDraw;
+import draw.RadialTree;
+import draw.WalkerImprovedDraw;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
@@ -9,9 +12,10 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import model.*;
-import draw.*;
+import model.MappedTreeStructure;
+import model.Node;
 
+import javax.xml.bind.annotation.XmlAnyAttribute;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,10 +30,13 @@ public class GUIController {
     private String selectedTreeAlgorithm;
     private MappedTreeStructure<Node> treeWalker = null;
     private MappedTreeStructure<Node> treeRadial = null;
+    public static GUIController instance;
 
     private ListIterator<File> filesIter;
 
     List<File> filesInFolder = null;
+    private String fileName;
+
     public static final double OFFSET = 20;
 
     @FXML
@@ -50,6 +57,8 @@ public class GUIController {
     Button loadFile;
     @FXML
     Button nextFile;
+    @FXML
+    Label fileNameLabel;
 
     public void initialize() {
         nodeSizeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -88,31 +97,27 @@ public class GUIController {
 
     @FXML
     private void drawInit() {
-        System.out.println("start drawInit()");
-        System.out.println("Tree: " + ParseController.getInstance().getTree());
-        System.out.println("Algorithm: " + getSelectedTreeAlgorithm());
+//        System.out.println("start drawInit()");
+//        System.out.println("Tree: " + ParseController.getInstance().getTree());
+//        System.out.println("Algorithm: " + getSelectedTreeAlgorithm());
         if (ParseController.getInstance().getTree() != null && getSelectedTreeAlgorithm() != null) {
             System.out.println("i am in the process of doing the draw..");
             pane.getChildren().clear();
+            fileNameLabel.setText(this.fileName);
             switch (getSelectedTreeAlgorithm()) {
                 case "Naive":
                     System.out.println("Selected Naive");
                     nodeSizeSlider.setDisable(false);
                     NaiveDraw.processTree(ParseController.getInstance().getTree());
                     break;
-                    // need to reset coords ..
                 case "Walker":
-//                    if (treeWalker == null) {
-                        this.treeWalker = WalkerImprovedDraw.processTreeNodes(ParseController.getInstance().getTree());
-//                    }
+                    this.treeWalker = WalkerImprovedDraw.processTreeNodes(ParseController.getInstance().getTree());
                     nodeSizeSlider.setDisable(false);
                     drawTreeStructure(this.treeWalker);
                     break;
                 case "Radial":
                     System.out.println("Selected Radial");
-                    if (treeRadial == null) {
-                        this.treeRadial = RadialTree.processTree(ParseController.getInstance().getTree());
-                    }
+                    this.treeRadial = RadialTree.processTree(ParseController.getInstance().getTree());
                     nodeSizeSlider.setDisable(true);
                     drawRadialTreeStructure(this.treeRadial);
                     break;
@@ -127,7 +132,7 @@ public class GUIController {
         int halfWidth = (int) scollPane.getWidth() / 2;
         int level = 0;
         // draw levels
-        for (Node node: root.nodeList) {
+        for (Node node : root.nodeList) {
             level = Node.getTreeDepth(node);
         }
         int decreasingRadius = (Math.min(halfHeight, halfWidth)) - (2 * nodeSize);
@@ -226,21 +231,17 @@ public class GUIController {
 
     @FXML
     public void setNextFileAsTree() {
-        System.out.println("next called!");
+//        System.out.println("next called!");
         if (filesInFolder != null) { // we selected a file so we have the folder from here on
-            if (getFilesIter() == null) {
+            if (getFilesIter() == null || !getFilesIter().hasNext()) {
                 List<File> files = getFilesInFolder();
                 ListIterator<File> filesIter = files.listIterator();
                 setFilesIter(filesIter);
             }
             ParseController.getInstance().setFile(filesIter.next());
-
-            System.out.println(ParseController.getInstance().getTree());
-            System.out.println(getSelectedTreeAlgorithm());
-            System.out.println(ParseController.getInstance().getFile());
-
             File file = ParseController.getInstance().getFile();
             if (ParseController.getInstance().initializeParsing(file)) {
+                this.fileName = file.getName();
                 drawInit();
             } else {
                 System.out.println("was not able to ParseController.getInstance().initializeParsing(file)");
@@ -261,13 +262,14 @@ public class GUIController {
         File file = fileChooser.showOpenDialog(null);
 
         if (file != null) {
-            // todo: read folder and create next button
+            this.fileName = file.getName();
             try {
                 filesInFolder = Files.walk(Paths.get(file.getParent()))
                         .filter(Files::isRegularFile)
                         .map(Path::toFile)
                         .collect(Collectors.toList());
                 setFilesInFolder(filesInFolder);
+//                System.out.println("filesInFolder = " + filesInFolder);
             } catch (IOException e) {
                 System.out.println("Error in loadFileAction");
                 e.printStackTrace();
@@ -321,5 +323,11 @@ public class GUIController {
         this.filesIter = filesIter;
     }
 
+    public static GUIController getInstance() {
+        if (instance == null) {
+            GUIController.instance = new GUIController();
+        }
+        return GUIController.instance;
+    }
 
 }
