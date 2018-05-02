@@ -37,7 +37,7 @@
                 <items>
                     <FXCollections fx:factory="observableArrayList">
                         <String fx:value="Naive"/>
-                        <String fx:value="RT-model.Tree"/>
+                        <String fx:value="RT"/>
                         <String fx:value="Walker"/>
                         <String fx:value="Radial"/>
                         <String fx:value="TreeMap"/>
