@@ -8,17 +8,17 @@ import java.util.List;
 import java.util.Map;
 
 
+import static java.lang.Math.abs;
 import static java.lang.Math.max;
 
 public class Reinhold {
 
     //key= level value= Hilfsfkt x_l(l)
-    Map<Double, Double> tempXPos = new HashMap<>();
-    Map<List<Node>, Double> sCuccrent = new HashMap<>();
-    //    Map<Node, Node> leftChild = new HashMap<>();
-//    Map<Node, Node> rightChild = new HashMap<>();
-    double smin = 2;
-    Node LL;
+    private Map<Double, Double> tempXPos = new HashMap<>();
+   // private Map<List<Node>, Double> sCuccrent = new HashMap<>();
+    private double minsep = 100;
+    public Node LL, LR, RL, RR, lmost, rmost;
+    private double rootsep = 0, loffsum = 0, roffsum = 0, cursep = 0;
 
     // step 1: set y coordinates= level
     // step 2: add tempXcoord, tree travers in postorder
@@ -28,11 +28,15 @@ public class Reinhold {
         addYCoords(root, 0);
         setChildrenBinaryTree(root);
         postOrder(root);
+        outerNodes(root);
+        getSubtreePositions(root);
+        setCoords(root.leftChild, root.rightChild, root);
+        petrify(root, 0);
+        System.out.println("root = " + root);
     }
 
     //step 1
     private void addYCoords(Node node, double level) {
-        node.checked = false; // bisschen geschummelt, damit später die funktion setChildren klappt
         tempXPos.put(level, 0.0);             // all x initially 0
         node.y = level;
         for (Node child : node.getChildren()) {
@@ -47,6 +51,7 @@ public class Reinhold {
             List<Node> kids = new ArrayList<>();
             node.checked = true;
             for (Node c : node.getChildren()) {
+                c.directParent = node;
                 if (!c.checked && (c.y == (node.y + 1))) {
                     kids.add(c);
                 }
@@ -79,91 +84,176 @@ public class Reinhold {
         }
     }
 
-
     private void addTempXCoords(Node node) {
         if (node != null) {
             if (node.isLeaf()) {
                 node.xtemp = tempXPos.get(node.y);
-            } else if (node.leftChild != null && node.rightChild == null) { // stimmt das so???
+            }
+            if (node.leftChild != null && node.rightChild != null) {
+                node.xtemp = (0.5 * (node.rightChild.xtemp)) + (0.5 * node.leftChild.xtemp);
+            }
+            if (node.leftChild != null && node.rightChild == null) { // stimmt das so???
                 node.xtemp = node.leftChild.xtemp + 1;
-            } else if (node.rightChild != null && node.leftChild == null) {
+            }
+            if (node.rightChild != null && node.leftChild == null) {
                 node.xtemp = node.rightChild.xtemp - 1; // oder x+1?
-            } else if (node.leftChild != null && node.rightChild != null) {
-                node.xtemp = 0.5 * (node.rightChild.xtemp + node.leftChild.xtemp);
             }
             if (node.xtemp < tempXPos.get(node.y)) {
                 node.xtemp = tempXPos.get(node.y);
             }
-            tempXPos.put(node.y, node.y + 2);
-
+            tempXPos.put(node.y, tempXPos.get(node.y) + 2);
         }
     }
 
-    //step 3: position of subtrees ,get mindist of 2 subtrees:
-    // compare right conture of left & left conture of right subtree
+    //step 3: position of subtrees ,get mindist of 2 subtrees: compare right conture of left & left conture of right subtree
     public void getSubtreePositions(Node root) {
-        smin = root.leftChild.xtemp - root.rightChild.xtemp;
-        getMinDist(root.leftChild, root.rightChild);
-        for (Node c : root.getChildren()) {
-            if(! c.isLeaf()) {
-                getMinDist(c.leftChild, c.rightChild);
+        if (root != null && root.getChildren().size() > 1) {
+            getMinDist(root.leftChild, root.rightChild);
+            for (Node c : root.getChildren()) {
+                getSubtreePositions(c);
             }
         }
-
-
     }
 
+    //threading auskommatiert
     public void getMinDist(Node left, Node right) {
-        List<Node> NodesDist = new ArrayList<>();
-        NodesDist.add(left);
-        NodesDist.add(right);
-        double scurr = right.xtemp - left.xtemp;
-        sCuccrent.put(NodesDist, scurr);
-        // problem bei überlagerung dass dist negativ wird?
-        if (scurr < smin) {
-            smin = scurr;
-        }
-        // hier zeiger einführen
-        if(left.rightChild.isLeaf() && !right.leftChild.isLeaf()){
-            left.rightChild.threadTo = right.leftChild;
-            left.rightChild.hasThread=true;
-        }
-        else if(right.leftChild.isLeaf() && !left.rightChild.isLeaf()){
-            right.leftChild.threadTo = left.rightChild;
-            right.leftChild.hasThread=true;
+//        List<Node> NodesDist = new ArrayList<>();
+//        NodesDist.add(left);
+//        NodesDist.add(right);
+        double scurr = (right.xtemp - left.xtemp);
+       // sCuccrent.put(NodesDist, scurr);
+        if (scurr > 0 && scurr < minsep) {
+            minsep = scurr;
         }
         if (left.rightChild != null && right.leftChild != null) {
             getMinDist(left.rightChild, right.leftChild);
         }
-
+//        if (left.isLeaf() && !right.isLeaf()) {
+//            left.threadTo = right.leftChild;
+//            left.hasThread = true;
+//            // getMinDist(right.leftChild,right.leftChild);
+//        }
+//        if (!left.isLeaf() && right.isLeaf()) {
+//            right.threadTo = left.rightChild;
+//            right.hasThread = true;
+//            // getMinDist(left.leftChild, left.rightChild);
+//        }
 
     }
+
+    // offset wird so berechnet dass für links neg und für rechts pos-- stimmt das?
+    public void setCoords(Node left, Node right, Node root) {
+        cursep = minsep;
+        rootsep = minsep;
+        while (left != null && right != null) {
+            left.offset = (left.xtemp - root.xtemp);
+            right.offset = (right.xtemp - root.xtemp);
+            cursep = left.xtemp - right.xtemp;
+            if (cursep < minsep) {
+                rootsep = rootsep + (minsep - cursep);
+                cursep = minsep;
+            }
+            if (left.rightChild != null) {
+                loffsum = loffsum + left.offset; // reihenfolge hier richtig herum?
+                cursep = cursep - left.offset;// reihenfolge hier richtig herum?
+                left = left.rightChild;
+            } else {
+                loffsum = loffsum - left.offset;// reihenfolge hier richtig herum?
+                cursep = cursep + left.offset; // reihenfolge hier richtig herum?
+                left = left.leftChild;
+            }
+            if (right.leftChild != null) {
+                roffsum = roffsum - right.offset;// reihenfolge hier richtig herum?
+                cursep = cursep - right.offset;
+                right = right.leftChild;
+            } else {
+                roffsum = roffsum + right.offset;
+                cursep = cursep + right.offset;
+                right = right.rightChild;
+            }
+        }
+
+        root.offset = (rootsep + 1) / 2;
+        loffsum = loffsum - root.offset;
+        roffsum = roffsum + root.offset;
+
+        //UPDATE EXTREME DESCENDANTS INFOREMATIOS
+        if (RL.y > LL.y || root.leftChild == null) {
+            lmost = RL;
+            lmost.offset += root.offset;
+        } else {
+            lmost = LL;
+            lmost.offset -= root.offset;
+        }
+        if (LR.y > RR.y || root.rightChild == null) {
+            rmost = LR;
+            rmost.offset -= root.offset;
+        } else {
+            rmost = RR;
+            rmost.offset += root.offset;
+        }
+
+        if (left != null && left != root.leftChild) {
+            RR.hasThread = true;
+            RR.offset = abs(RR.offset + root.offset - loffsum);
+            if (loffsum - root.offset <= RR.offset) {
+                RR.leftChild = left;
+            } else {
+                RR.rightChild = left;
+            }
+            if (right != null || right != root.rightChild) {
+                LL.hasThread = true;
+                LL.offset = abs(LL.offset - root.offset - roffsum);
+                if (roffsum + root.offset >= LL.offset) {
+                    LL.rightChild = right;
+                } else {
+                    LL.leftChild = right;
+                }
+            }
+        }
+    }
+
+
+    //Procedure PETRIFY converts relative positionings (offsets) to absolute coordinates.
+    //preorder traversal of tree
+
+    public void petrify (Node root, double xpos) {
+        if(root!= null){
+            root.x= xpos;
+        }
+        if(root.leftChild!=null){
+            petrify(root.leftChild, xpos -= root.offset);
+
+        }
+        if(root.rightChild!=null){
+            petrify(root.rightChild, xpos += root.offset);
+        }
+    }
+
 
     int findMaxLevel(Node root) {
         if (root == null)
             return 0;
-
         return 1 + max((findMaxLevel(root.leftChild)), findMaxLevel(root.rightChild));
     }
 
     public void outerNodes(Node root) {
-        Node LL = getLL(root.leftChild);
-        Node LR = getLR(root.leftChild);
-        Node RL = getLL(root.rightChild);
-        Node RR = getLR(root.rightChild);
-
+        LL = getLL(root.leftChild);
+        LR = getLR(root.leftChild);
+        RL = getLL(root.rightChild);
+        RR = getLR(root.rightChild);
     }
 
     public Node getLL(Node node) {
         while (!node.isLeaf()) {
-            outerNodes(node.leftChild);
+            node = node.leftChild;
         }
         return node;
     }
 
     public Node getLR(Node node) {
         while (!node.isLeaf()) {
-            outerNodes(node.rightChild);
+            node = node.rightChild;
         }
         return node;
     }
