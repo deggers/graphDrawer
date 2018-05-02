@@ -53,15 +53,6 @@ public class Node implements Serializable {
         return max;
     }
 
-    public static int getListOfDepths(Node node, int count) {
-        if (node == null) return 0;
-        for (Node child : node.getChildren()){
-            depthList.add(++count);
-            getListOfDepths(child,count);
-        }
-        return 0;
-    }
-
     public boolean isLeaf() {
         return children.isEmpty();
     }
@@ -79,5 +70,13 @@ public class Node implements Serializable {
         return out;
     }
 
+    public static int getListOfDepths(Node node, int count) {
+        if (node == null) return 0;
+        for (Node child : node.getChildren()){
+            depthList.add(++count);
+            getListOfDepths(child,count);
+        }
+        return 0;
+    }
 
 }
