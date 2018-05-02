@@ -13,12 +13,10 @@ import static java.lang.Math.max;
 public class Reinhold {
 
     //key= level value= Hilfsfkt x_l(l)
-    Map<Double, Double> tempXPos = new HashMap<>();
-    Map<List<Node>, Double> sCuccrent = new HashMap<>();
-    //    Map<Node, Node> leftChild = new HashMap<>();
-//    Map<Node, Node> rightChild = new HashMap<>();
-    double smin = 2;
-    Node LL;
+    private Map<Double, Double> tempXPos = new HashMap<>();
+    private Map<List<Node>, Double> sCuccrent = new HashMap<>();
+    private double smin = 2;
+    public Node LL, LR, RL, RR;
 
     // step 1: set y coordinates= level
     // step 2: add tempXcoord, tree travers in postorder
@@ -28,11 +26,16 @@ public class Reinhold {
         addYCoords(root, 0);
         setChildrenBinaryTree(root);
         postOrder(root);
+        System.out.println("tempXPos = " + tempXPos.entrySet());
+        System.out.println("root = " + root);
+        outerNodes(root);
+        getSubtreePositions(root);
+
+
     }
 
     //step 1
     private void addYCoords(Node node, double level) {
-        node.checked = false; // bisschen geschummelt, damit später die funktion setChildren klappt
         tempXPos.put(level, 0.0);             // all x initially 0
         node.y = level;
         for (Node child : node.getChildren()) {
@@ -47,6 +50,7 @@ public class Reinhold {
             List<Node> kids = new ArrayList<>();
             node.checked = true;
             for (Node c : node.getChildren()) {
+                c.directParent = node;
                 if (!c.checked && (c.y == (node.y + 1))) {
                     kids.add(c);
                 }
@@ -84,33 +88,34 @@ public class Reinhold {
         if (node != null) {
             if (node.isLeaf()) {
                 node.xtemp = tempXPos.get(node.y);
-            } else if (node.leftChild != null && node.rightChild == null) { // stimmt das so???
+            }
+            if (node.leftChild != null && node.rightChild != null) {
+                node.xtemp = (0.5 * (node.rightChild.xtemp) + (0.5 * node.leftChild.xtemp));
+            }
+            if (node.leftChild != null && node.rightChild == null) { // stimmt das so???
                 node.xtemp = node.leftChild.xtemp + 1;
-            } else if (node.rightChild != null && node.leftChild == null) {
+            }
+            if (node.rightChild != null && node.leftChild == null) {
                 node.xtemp = node.rightChild.xtemp - 1; // oder x+1?
-            } else if (node.leftChild != null && node.rightChild != null) {
-                node.xtemp = 0.5 * (node.rightChild.xtemp + node.leftChild.xtemp);
             }
             if (node.xtemp < tempXPos.get(node.y)) {
                 node.xtemp = tempXPos.get(node.y);
             }
-            tempXPos.put(node.y, node.y + 2);
-
+            double temp = node.y + 2.00;
+            tempXPos.put(node.y, temp);
         }
     }
 
-    //step 3: position of subtrees ,get mindist of 2 subtrees:
-    // compare right conture of left & left conture of right subtree
+    //step 3: position of subtrees ,get mindist of 2 subtrees: compare right conture of left & left conture of right subtree
     public void getSubtreePositions(Node root) {
-        smin = root.leftChild.xtemp - root.rightChild.xtemp;
-        getMinDist(root.leftChild, root.rightChild);
-        for (Node c : root.getChildren()) {
-            if(! c.isLeaf()) {
-                getMinDist(c.leftChild, c.rightChild);
+        if (root != null && root.getChildren().size() > 1) {
+            getMinDist(root.leftChild, root.rightChild);
+            for (Node c : root.getChildren()) {
+                if (c.getChildren().size() > 1) {
+                    getMinDist(c.leftChild, c.rightChild);
+                }
             }
         }
-
-
     }
 
     public void getMinDist(Node left, Node right) {
@@ -119,24 +124,20 @@ public class Reinhold {
         NodesDist.add(right);
         double scurr = right.xtemp - left.xtemp;
         sCuccrent.put(NodesDist, scurr);
-        // problem bei überlagerung dass dist negativ wird?
         if (scurr < smin) {
             smin = scurr;
         }
-        // hier zeiger einführen
-        if(left.rightChild.isLeaf() && !right.leftChild.isLeaf()){
-            left.rightChild.threadTo = right.leftChild;
-            left.rightChild.hasThread=true;
-        }
-        else if(right.leftChild.isLeaf() && !left.rightChild.isLeaf()){
-            right.leftChild.threadTo = left.rightChild;
-            right.leftChild.hasThread=true;
+
+        if (left.isLeaf() && !right.isLeaf()) {
+            left.threadTo = right.leftChild;
+            left.hasThread = true;
+        } else if (!left.isLeaf() && right.isLeaf()) {
+            right.threadTo = left.rightChild;
+            right.hasThread = true;
         }
         if (left.rightChild != null && right.leftChild != null) {
             getMinDist(left.rightChild, right.leftChild);
         }
-
-
     }
 
     int findMaxLevel(Node root) {
@@ -146,24 +147,24 @@ public class Reinhold {
         return 1 + max((findMaxLevel(root.leftChild)), findMaxLevel(root.rightChild));
     }
 
-    public void outerNodes(Node root) {
-        Node LL = getLL(root.leftChild);
-        Node LR = getLR(root.leftChild);
-        Node RL = getLL(root.rightChild);
-        Node RR = getLR(root.rightChild);
 
+    public void outerNodes(Node root) {
+        LL = getLL(root.leftChild);
+        LR = getLR(root.leftChild);
+        RL = getLL(root.rightChild);
+        RR = getLR(root.rightChild);
     }
 
     public Node getLL(Node node) {
         while (!node.isLeaf()) {
-            outerNodes(node.leftChild);
+            node = node.leftChild;
         }
         return node;
     }
 
     public Node getLR(Node node) {
         while (!node.isLeaf()) {
-            outerNodes(node.rightChild);
+            node = node.rightChild;
         }
         return node;
     }
