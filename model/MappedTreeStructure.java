@@ -7,9 +7,11 @@ public class MappedTreeStructure implements MutableTree<Node> {
     public final Map<Node, Node> nodeParent = new HashMap<>();
     public final LinkedHashSet<Node> nodeList = new LinkedHashSet<>();
     private boolean yValuesHasBeenSet = false;
+    private int treeDepth = 0;
 
     public MappedTreeStructure(Node root) {
-        nodeList.add(root);
+        nodeList.add(root); // set root-node
+        getYCoords(root,0); // set all y-values
     }
 
     public LinkedList<Node> getNodesFromLevel(int level) {
@@ -26,6 +28,7 @@ public class MappedTreeStructure implements MutableTree<Node> {
 
     private void getYCoords(Node node, int level) {
         node.y = level;
+        if (level > this.treeDepth) this.treeDepth = level;
         for (Node child : node.getChildren())
             getYCoords(child, level + 1);
         this.yValuesHasBeenSet = true;
@@ -89,7 +92,7 @@ public class MappedTreeStructure implements MutableTree<Node> {
             });
         } else {
             getChildren(node).forEach((child) -> {
-                nodeParent.remove(child);
+                nodeParent.remove(child);            // hier löscht er doch nodeParent ?! -dustyn
             });
         }
         nodeList.remove(node);
@@ -151,5 +154,9 @@ public class MappedTreeStructure implements MutableTree<Node> {
 
     public String echoContent() {
         return nodeList.toString() + "\n" + nodeParent.toString();
+    }
+
+    public int getTreeDepth() {
+        return this.treeDepth;
     }
 }
