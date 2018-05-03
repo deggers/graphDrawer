@@ -28,7 +28,6 @@ public class Reinhold {
         try {
             Reinhold r = new Reinhold();
             Node root = tree.getRoot();
-//            System.out.println("r = " + root);
             r.layout(root);
             return tree;
         } catch (Exception e) {
@@ -99,15 +98,19 @@ public class Reinhold {
         if (node != null) {
             if (node.isLeaf()) {
                 node.xtemp = tempXPos.get(node.y);
+//                System.out.println("node.xtemp = " + node.xtemp);
             }
             if (node.leftChild != null && node.rightChild != null) {
-                node.xtemp = (0.5 * (node.rightChild.xtemp)) + (0.5 * node.leftChild.xtemp);
+                System.out.println("node.rightChild.xtemp = " + node.rightChild.xtemp);
+                System.out.println("node.leftChild.xtemp = " + node.leftChild.xtemp);
+                node.xtemp = 0.5 * (node.rightChild.xtemp + node.leftChild.xtemp);
+                System.out.println("node.xtemp = " + node.xtemp);
             }
-            if (node.leftChild != null && node.rightChild == null) { // stimmt das so???
+            if (node.leftChild != null && node.rightChild == null) {
                 node.xtemp = node.leftChild.xtemp + 1;
             }
             if (node.rightChild != null && node.leftChild == null) {
-                node.xtemp = node.rightChild.xtemp - 1; // oder x+1?
+                node.xtemp = node.rightChild.xtemp - 1;
             }
             if (node.xtemp < tempXPos.get(node.y)) {
                 node.xtemp = tempXPos.get(node.y);
@@ -135,17 +138,6 @@ public class Reinhold {
         if (left.rightChild != null && right.leftChild != null) {
             getMinDist(left.rightChild, right.leftChild);
         }
-//        if (left.isLeaf() && !right.isLeaf()) {
-//            left.threadTo = right.leftChild;
-//            left.hasThread = true;
-//            // getMinDist(right.leftChild,right.leftChild);
-//        }
-//        if (!left.isLeaf() && right.isLeaf()) {
-//            right.threadTo = left.rightChild;
-//            right.hasThread = true;
-//            // getMinDist(left.leftChild, left.rightChild);
-//        }
-
     }
 
     // offset wird so berechnet dass für links neg und für rechts pos-- stimmt das?
@@ -153,8 +145,8 @@ public class Reinhold {
         cursep = minsep;
         rootsep = minsep;
         while (left != null && right != null) {
-            left.offset = (left.xtemp - root.xtemp);
-            right.offset = (right.xtemp - root.xtemp);
+            //left.offset = (left.xtemp - root.xtemp);
+            //right.offset = (right.xtemp - root.xtemp);
             cursep = left.xtemp - right.xtemp;
             if (cursep < minsep) {
                 rootsep = rootsep + (minsep - cursep);
@@ -234,10 +226,10 @@ public class Reinhold {
             root.leftChild=null;
         }
         if (root.leftChild != null) {
-            petrify(root.leftChild, xpos -= rootOffset, rootOffset);
+            petrify(root.leftChild, xpos - rootOffset, rootOffset);
         }
         if (root.rightChild != null) {
-            petrify(root.rightChild, xpos += rootOffset, rootOffset);
+            petrify(root.rightChild, xpos + rootOffset, rootOffset);
         }
     }
 
