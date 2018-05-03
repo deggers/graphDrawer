@@ -2,6 +2,7 @@ package controller;
 
 import draw.NaiveDraw;
 import draw.RadialTree;
+import draw.Reinhold;
 import draw.WalkerImprovedDraw;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -28,8 +29,9 @@ import java.util.stream.Collectors;
 public class GUIController {
     private int nodeSize = 8;
     private String selectedTreeAlgorithm;
-    private MappedTreeStructure<Node> treeWalker = null;
-    private MappedTreeStructure<Node> treeRadial = null;
+    private MappedTreeStructure treeWalker = null;
+    private MappedTreeStructure treeRadial = null;
+    private MappedTreeStructure reinholdTree = null;
     public static GUIController instance;
 
     private ListIterator<File> filesIter;
@@ -121,13 +123,18 @@ public class GUIController {
                     nodeSizeSlider.setDisable(true);
                     drawRadialTreeStructure(this.treeRadial);
                     break;
+                case "RT":
+                    System.out.println("Selected Reinhold");
+//                    this.reinholdTree = Reinhold.processTree(ParseController.getInstance().getTree());
+                    drawTreeStructure(this.reinholdTree);
+                    break;
                 default:
                     throw new IllegalArgumentException("The algo: " + selectedTreeAlgorithm + " is not yet implemented");
             }
         }
     }
 
-    private void drawRadialTreeStructure(MappedTreeStructure<Node> root) {
+    private void drawRadialTreeStructure(MappedTreeStructure root) {
         int halfHeight = (int) scollPane.getHeight() / 2;
         int halfWidth = (int) scollPane.getWidth() / 2;
         int level = 0;
@@ -147,6 +154,18 @@ public class GUIController {
 
         // draw root
         pane.getChildren().add(createNode(halfWidth, halfHeight, getNodeSize()));
+
+
+    }
+
+    private void drawRadialTreeStructureHelper(MappedTreeStructure tree, double alpha, double beta, int spaceBetweenLevels){
+        // the depth of v in T
+        Node root = tree.getRoot();
+        int depthOfNode = Node.getDepth(root);
+        double theta = alpha;
+        // radius for the concentric circle levels
+
+
     }
 
     private Circle createGuideline(int halfWidth, int halfHeight, int decreasingRadius) {
@@ -156,7 +175,7 @@ public class GUIController {
         return node;
     }
 
-    private boolean drawTreeNodes(MappedTreeStructure<Node> tree) {
+    private boolean drawTreeNodes(MappedTreeStructure tree) {
         try {
             tree.listAllNodes().forEach((Node node) -> {
                 String label = node.label;
@@ -172,7 +191,7 @@ public class GUIController {
         return true;
     }
 
-    private boolean drawTreeEdges(MappedTreeStructure<Node> tree) {
+    private boolean drawTreeEdges(MappedTreeStructure tree) {
         try {
 //            System.out.println("print now for drawTreeEdges");
             tree.listAllNodes().forEach((Node child) -> {

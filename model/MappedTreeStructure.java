@@ -1,22 +1,35 @@
 package model;
 
 import java.util.*;
-
+import model.Node;
 // inspired heavely from https://stackoverflow.com/questions/3522454/java-tree-data-structure
 
-public class MappedTreeStructure<T> implements MutableTree<T> {
-    public final Map<T, T> nodeParent = new HashMap<>();
-    public final LinkedHashSet<T> nodeList = new LinkedHashSet<>();
+public class MappedTreeStructure implements MutableTree<Node> {
+    public final Map<Node, Node> nodeParent = new HashMap<>();
+    public final LinkedHashSet<Node> nodeList = new LinkedHashSet<>();
 
-    public MappedTreeStructure() {
-    }
+    // not used.. ?
+    public final Map<Node, ArrayList<Node>> levelList = new HashMap<>();
 
-    public MappedTreeStructure(T root) {
+    public MappedTreeStructure(Node root) {
         nodeList.add(root);
     }
 
+
+    // how should that work=? ...
+    public ArrayList<Node> getNodesFromLevel(int level) {
+        for (Node node: getRoot().getChildren()) {
+            for (int i = 0; i <= level; i++) {
+                if (node.getChildren() != null) {
+
+                }
+            }
+        }
+        return null;
+    }
+
     private void fillTree(Node node) {
-        T e = (T) node;
+        Node e = (Node) node;
         nodeList.add(e);
         //System.out.println("added: " + node.label);
         try {
@@ -25,7 +38,7 @@ public class MappedTreeStructure<T> implements MutableTree<T> {
                 child.parent = node;
                 child.indexAsChild = indexAsChildSetter;
                 indexAsChildSetter++;
-                nodeParent.put((T) child, e);
+                nodeParent.put((Node) child, e);
                 //System.out.println("added pair (n/p): " + child + e);
                 fillTree(child);
             }
@@ -33,19 +46,19 @@ public class MappedTreeStructure<T> implements MutableTree<T> {
         }
     }
 
-    private void checkNotNull(T node, String parameterName) {
+    private void checkNotNull(Node node, String parameterName) {
         if (node == null)
             throw new IllegalArgumentException(parameterName + " must not be null");
     }
 
 
     @Override
-    public boolean add(T parent, T node) {
+    public boolean add(Node parent, Node node) {
         checkNotNull(parent, "parent");
         checkNotNull(node, "node");
 
         // check for cycles
-        T current = parent;
+        Node current = parent;
         do {
             if (node.equals(current)) {
                 throw new IllegalArgumentException(" node must not be the same or an ancestor of the parent");
@@ -60,7 +73,7 @@ public class MappedTreeStructure<T> implements MutableTree<T> {
 
     @Override
 
-    public boolean remove(T node, boolean cascade) { //nötig bei uns?
+    public boolean remove(Node node, boolean cascade) { //nötig bei uns?
 
         checkNotNull(node, "node");
 
@@ -81,30 +94,30 @@ public class MappedTreeStructure<T> implements MutableTree<T> {
     }
 
     @Override
-    public List<T> getRoots() {
+    public List<Node> getRoots() {
         return getChildren(null);
     }
 
     public Node getRoot() {
-        return (Node) nodeList.iterator().next();
+        return nodeList.iterator().next();
     }
 
-    public List<T> listAllNodes() {
+    public List<Node> listAllNodes() {
         //System.out.println("List of all nodes returned");
         return new LinkedList<>(nodeList);
     }
 
     @Override
-    public T getParent(T node) {
+    public Node getParent(Node node) {
         checkNotNull(node, "node");
         return nodeParent.get(node);
     }
 
     @Override
-    public List<T> getChildren(T node) {
-        List<T> children = new LinkedList<>();
-        for (T n : nodeList) {
-            T parent = nodeParent.get(n);
+    public List<Node> getChildren(Node node) {
+        List<Node> children = new LinkedList<>();
+        for (Node n : nodeList) {
+            Node parent = nodeParent.get(n);
             if (node == null && parent == null) {
                 children.add(n);
             } else if (node != null && parent != null && parent.equals(node)) { //parent != 0 redundant für node != 0 && parent.equals(node) ???
@@ -121,14 +134,14 @@ public class MappedTreeStructure<T> implements MutableTree<T> {
         return builder.toString();
     }
 
-    private void dumpNodeStructure(StringBuilder builder, T node, String prefix) {
+    private void dumpNodeStructure(StringBuilder builder, Node node, String prefix) {
         if (node != null) {
             builder.append(prefix);
             builder.append(node.toString());
             builder.append('\n');
             prefix = "    " + prefix;
         }
-        for (T child : getChildren(node)) {
+        for (Node child : getChildren(node)) {
             dumpNodeStructure(builder, child, prefix);
         }
     }

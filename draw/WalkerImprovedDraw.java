@@ -30,7 +30,7 @@ public class WalkerImprovedDraw {
     }
     */
 
-    public static MappedTreeStructure<Node> processTreeNodes(MappedTreeStructure<Node> tree) {
+    public static MappedTreeStructure processTreeNodes(MappedTreeStructure tree) {
 
         try {
             WalkerImprovedDraw w = new WalkerImprovedDraw();
@@ -108,7 +108,7 @@ public class WalkerImprovedDraw {
     }
 
 
-    public MappedTreeStructure<Node> treeLayout(MappedTreeStructure<Node> tree) throws Exception {
+    public MappedTreeStructure treeLayout(MappedTreeStructure tree) throws Exception {
         List<Node> roots = tree.getRoots();
 
         if (roots.size() == 1) {

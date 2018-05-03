@@ -9,7 +9,7 @@ import java.io.File;
 public class ParseController {
 
     private         File                file;
-    private MappedTreeStructure<Node> tree;
+    private MappedTreeStructure tree;
     public static   ParseController     instance;
 
     public static ParseController getInstance() {
@@ -32,11 +32,11 @@ public class ParseController {
     }
 
     // SETTER & GETTER AREA
-    public void setTree(MappedTreeStructure<Node> tree) {
+    public void setTree(MappedTreeStructure tree) {
         this.tree = tree;
     }
 
-    public MappedTreeStructure<Node> getTree() {
+    public MappedTreeStructure getTree() {
         return this.tree;
     }
 
