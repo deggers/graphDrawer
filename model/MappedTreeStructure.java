@@ -2,7 +2,7 @@ package model;
 
 import java.util.*;
 import model.Node;
-// inspired heavely from https://stackoverflow.com/questions/3522454/java-tree-data-structure
+// inspired heavily from https://stackoverflow.com/questions/3522454/java-tree-data-structure
 
 public class MappedTreeStructure implements MutableTree<Node> {
     public final Map<Node, Node> nodeParent = new HashMap<>();
