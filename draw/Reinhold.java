@@ -40,10 +40,11 @@ public class Reinhold {
     public void layout(Node root) {
         addYCoords(root, 0);
         setChildrenBinaryTree(root);
-        postOrder(root);
+        //postOrder(root);
         outerNodes(root);
-        getSubtreePositions(root);
-        setCoords(root.leftChild, root.rightChild, root);
+       // getSubtreePositions(root);
+        //setCoords(root.leftChild, root.rightChild, root);
+        setup(root, 0, RR, LL);
         petrify(root, 30, root.offset);
     }
 
@@ -52,11 +53,12 @@ public class Reinhold {
         tempXPos.put(level, 0.0);             // all x initially 0
         node.y = level;
         for (Node child : node.getChildren()) {
+
             addYCoords(child, level + 1);
         }
     }
 
-    // set right, left, parent -- nur 1 dann gleichz l und r
+    // set right, left, parent
     public void setChildrenBinaryTree(Node node) {
         if (!node.checked) {
             //System.out.println("\n current node = " + node.label);
@@ -211,6 +213,104 @@ public class Reinhold {
             }
         }
     }
+
+
+    //cursep = separation on cuurent level
+    // rootsep= cuurent separation at node t - accumulates the required sepatation
+// distance for the sons of T so that their subtrees will have a sepatation
+// of at least MINSEp at all levels
+    // loffsum & roffsum = offset from l and r to t
+    // Minsep = min separation allowed between two nodes on a level
+public void setup(Node root, int level, Node rmost, Node lmost){
+        Node left, right;
+        if (root== null){
+            lmost.level= -1;
+            rmost.level= -1;
+        } else{
+            root.ycoord= level;
+            left= root.leftChild;
+            right= root.rightChild;
+            setup (left, level+1, LR, LL);
+            setup(right, level+1, RR, RL);
+            if (right== null && left == null ){
+                rmost = root;
+                lmost= root;
+                rmost.level= level;
+                rmost.offset= 0;
+                lmost.offset=0;
+                root.offset=0;
+            }
+            cursep= minsep;
+            rootsep= minsep;
+            loffsum=0;
+            roffsum=0;
+
+            while (left != null && right != null) {
+                if (cursep < minsep) {
+                    rootsep = rootsep + (minsep - cursep);
+                    cursep = minsep;
+                }
+                if (left.rightChild != null) {
+                    loffsum = loffsum + left.offset;
+                    cursep = cursep - left.offset;
+                    left = left.rightChild;
+                } else {
+                    loffsum = loffsum - left.offset;
+                    cursep = cursep + left.offset;
+                    left = left.leftChild;
+                }
+                if (right.leftChild != null) {
+                    roffsum = roffsum - right.offset;
+                    cursep = cursep - right.offset;
+                    right = right.leftChild;
+                } else {
+                    roffsum = roffsum + right.offset;
+                    cursep = cursep + right.offset;
+                    right = right.rightChild;
+                }
+            }
+
+            root.offset = (rootsep + 1) / 2;
+            loffsum = loffsum - root.offset;
+            roffsum = roffsum + root.offset;
+
+            //UPDATE EXTREME DESCENDANTS INFOREMATIOS
+            if (RL.level > LL.level || root.leftChild == null) {
+                lmost = RL;
+                lmost.offset += root.offset;
+            } else {
+                lmost = LL;
+                lmost.offset -= root.offset;
+            }
+            if (LR.level > RR.level || root.rightChild == null) {
+                rmost = LR;
+                rmost.offset -= root.offset;
+            } else {
+                rmost = RR;
+                rmost.offset += root.offset;
+            }
+
+            if (left != null && left != root.leftChild) {
+                RR.hasThread = true;
+                RR.offset = abs(RR.offset + root.offset - loffsum);
+                if (loffsum - root.offset <= RR.offset) {
+                    RR.leftChild = left;
+                } else {
+                    RR.rightChild = left;
+                }
+                if (right != null || right != root.rightChild) {
+                    LL.hasThread = true;
+                    LL.offset = abs(LL.offset - root.offset - roffsum);
+                    if (roffsum + root.offset >= LL.offset) {
+                        LL.rightChild = right;
+                    } else {
+                        LL.leftChild = right;
+                    }
+                }
+            }
+        }
+}
+
 
 
     //Procedure PETRIFY converts relative positionings (offsets) to absolute coordinates.
