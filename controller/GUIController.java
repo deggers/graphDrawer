@@ -153,7 +153,7 @@ public class GUIController {
         this.nodeSize = spaceBetweenLevels >> 2;
 
         // draw root
-        pane.getChildren().add(createNode(halfWidth, halfHeight, getNodeSize()));
+        pane.getChildren().add(createNode(halfWidth, halfHeight, getNodeSize(),"root"));
 
 
     }
@@ -181,7 +181,7 @@ public class GUIController {
                 String label = node.label;
                 double x = scaleCoordinate(node.x);
                 double y = scaleCoordinate(node.y);
-                pane.getChildren().add(createNode((int) x, (int) y, getNodeSize()));
+                pane.getChildren().add(createNode((int) x, (int) y, getNodeSize(),label));
             });
         } catch (Exception e) {
             System.out.println("Fehler in drawTreeNodes");
@@ -220,6 +220,7 @@ public class GUIController {
 
     private void drawTreeStructure(MappedTreeStructure tree) {
         System.out.println("called drawTreeStructure");
+        System.out.println("The tree = " + tree);
         drawTreeEdges(tree);
         drawTreeNodes(tree);
     }
@@ -304,10 +305,13 @@ public class GUIController {
         }
     }
 
-    private Circle createNode(int x, int y, int radius) {
+    private Circle createNode(int x, int y, int radius, String id) {
         Circle node = new Circle(x, y, radius);
         node.setFill(Color.FORESTGREEN);
         node.setStroke(Color.BLACK);
+        Tooltip tip = new Tooltip(id);
+        Tooltip.install(node,tip);
+
         return node;
     }
 
