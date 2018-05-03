@@ -15,7 +15,6 @@ public class Reinhold {
 
     //key= level value= Hilfsfkt x_l(l)
     private Map<Double, Double> tempXPos = new HashMap<>();
-   // private Map<List<Node>, Double> sCuccrent = new HashMap<>();
     private double minsep = 100;
     public Node LL, LR, RL, RR, lmost, rmost;
     private double rootsep = 0, loffsum = 0, roffsum = 0, cursep = 0;
@@ -31,8 +30,7 @@ public class Reinhold {
         outerNodes(root);
         getSubtreePositions(root);
         setCoords(root.leftChild, root.rightChild, root);
-        petrify(root, 0);
-        System.out.println("root = " + root);
+        petrify(root, 300, root.offset);
     }
 
     //step 1
@@ -51,7 +49,7 @@ public class Reinhold {
             List<Node> kids = new ArrayList<>();
             node.checked = true;
             for (Node c : node.getChildren()) {
-                c.directParent = node;
+                c.parent = node;
                 if (!c.checked && (c.y == (node.y + 1))) {
                     kids.add(c);
                 }
@@ -62,8 +60,6 @@ public class Reinhold {
                     node.leftChild = kids.get(0);
                     kids.get(0).onlyChild = true;
                     setChildrenBinaryTree(kids.get(0));
-                    // gleichzeitig left und right???
-                    // node.rightChild = kids.get(0);
                 }
                 if (kids.size() == 2) {
                     node.leftChild = kids.get(0);
@@ -117,11 +113,7 @@ public class Reinhold {
 
     //threading auskommatiert
     public void getMinDist(Node left, Node right) {
-//        List<Node> NodesDist = new ArrayList<>();
-//        NodesDist.add(left);
-//        NodesDist.add(right);
         double scurr = (right.xtemp - left.xtemp);
-       // sCuccrent.put(NodesDist, scurr);
         if (scurr > 0 && scurr < minsep) {
             minsep = scurr;
         }
@@ -217,16 +209,15 @@ public class Reinhold {
     //Procedure PETRIFY converts relative positionings (offsets) to absolute coordinates.
     //preorder traversal of tree
 
-    public void petrify (Node root, double xpos) {
-        if(root!= null){
-            root.x= xpos;
+    public void petrify(Node root, double xpos, double rootOffset) {
+        if (root != null) {
+            root.x = xpos;
         }
-        if(root.leftChild!=null){
-            petrify(root.leftChild, xpos -= root.offset);
-
+        if (root.leftChild != null) {
+            petrify(root.leftChild, xpos-= rootOffset, rootOffset);
         }
-        if(root.rightChild!=null){
-            petrify(root.rightChild, xpos += root.offset);
+        if (root.rightChild != null) {
+            petrify(root.rightChild, xpos += rootOffset, rootOffset);
         }
     }
 
