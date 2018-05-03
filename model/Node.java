@@ -11,6 +11,7 @@ public class Node implements Serializable {
     public Node leftChild, rightChild, threadTo;
     public double xtemp=0, offset=0;
     double weight;
+    public String GraphMLType;
 
     //walker
     public double x = 0;
