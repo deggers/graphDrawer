@@ -67,8 +67,17 @@ public class Node implements Serializable {
         return indexAsChild >= 1;
     }
 
+
+    // der gibt nicht nur den Node aus, sondern alles was am Node dranhängt ?!
     @Override
     public String toString() {
+//        String out = "id: " + label + ", x:" + x + ", y:" + y + ", prelim:" + prelim + ", modifier:" + modifier + ", indexAsChild:" + indexAsChild + ";";
+        String out = "id: " + label + ", x:" + x + ", y:" + y + ";";
+
+        return out;
+    }
+
+    public String toStringWithAllChildren() {
         String out = "id: " + label + ", x:" + x + ", y:" + y + ", prelim:" + prelim + ", modifier:" + modifier + ", indexAsChild:" + indexAsChild + ";";
         for (Node c : children) {
             out = out + "\t" + c.toString();
