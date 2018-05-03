@@ -1,36 +1,39 @@
 package model;
 
 import java.util.*;
-import model.Node;
 // inspired heavely from https://stackoverflow.com/questions/3522454/java-tree-data-structure
 
 public class MappedTreeStructure implements MutableTree<Node> {
     public final Map<Node, Node> nodeParent = new HashMap<>();
     public final LinkedHashSet<Node> nodeList = new LinkedHashSet<>();
-
-    // not used.. ?
-    public final Map<Node, ArrayList<Node>> levelList = new HashMap<>();
+    private boolean yValuesHasBeenSet = false;
 
     public MappedTreeStructure(Node root) {
         nodeList.add(root);
     }
 
-
-    // how should that work=? ...
-    public ArrayList<Node> getNodesFromLevel(int level) {
-        for (Node node: getRoot().getChildren()) {
-            for (int i = 0; i <= level; i++) {
-                if (node.getChildren() != null) {
-
-                }
+    public LinkedList<Node> getNodesFromLevel(int level) {
+        LinkedList<Node> levelList = new LinkedList<>();
+        if (!this.yValuesHasBeenSet) getYCoords(getRoot(), 0);
+        for (Node node : nodeList)
+            if (node.y == level) {
+                levelList.add(node);
+                System.out.println("node.y = " + node.y + " , level: " + level);
+                System.out.println("levelList = " + levelList);
             }
-        }
-        return null;
+        return levelList;
     }
 
+    private void getYCoords(Node node, int level) {
+        node.y = level;
+        for (Node child : node.getChildren())
+            getYCoords(child, level + 1);
+        this.yValuesHasBeenSet = true;
+    }
+
+
     private void fillTree(Node node) {
-        Node e = (Node) node;
-        nodeList.add(e);
+        nodeList.add(node);
         //System.out.println("added: " + node.label);
         try {
             int indexAsChildSetter = 0;
@@ -38,7 +41,7 @@ public class MappedTreeStructure implements MutableTree<Node> {
                 child.parent = node;
                 child.indexAsChild = indexAsChildSetter;
                 indexAsChildSetter++;
-                nodeParent.put((Node) child, e);
+                nodeParent.put(child, node);
                 //System.out.println("added pair (n/p): " + child + e);
                 fillTree(child);
             }
