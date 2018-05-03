@@ -9,8 +9,9 @@ public class Node implements Serializable {
     private final int id = 0;
     public boolean checked=false, onlyChild=false, hasThread=false;
     public Node leftChild, rightChild, threadTo;
-    public double xtemp=0, offset=0;
+    public double xtemp=0, offset=1;
     double weight;
+    public int level= 0, ycoord=0 ;
 
     //walker
     public double x = 0;

@@ -45,7 +45,7 @@ public class Reinhold {
        // getSubtreePositions(root);
         //setCoords(root.leftChild, root.rightChild, root);
         setup(root, 0, RR, LL);
-        petrify(root, 30, root.offset);
+        petrify(root,60, root.offset);
     }
 
     //step 1
