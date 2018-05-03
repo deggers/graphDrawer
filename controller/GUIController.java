@@ -125,7 +125,7 @@ public class GUIController {
                     break;
                 case "RT":
                     System.out.println("Selected Reinhold");
-//                    this.reinholdTree = Reinhold.processTree(ParseController.getInstance().getTree());
+                    this.reinholdTree = Reinhold.processTree(ParseController.getInstance().getTree());
                     drawTreeStructure(this.reinholdTree);
                     break;
                 default:
@@ -241,6 +241,9 @@ public class GUIController {
                 break;
             case "Walker":
                 this.selectedTreeAlgorithm = "Walker";
+                break;
+            case "RT":
+                this.selectedTreeAlgorithm = "RT";
                 break;
             default:
                 throw new IllegalArgumentException("The algo: " + selectedAlgo + " is not yet implemented");

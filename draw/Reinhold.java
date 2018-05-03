@@ -15,7 +15,7 @@ public class Reinhold {
 
     //key= level value= Hilfsfkt x_l(l)
     private Map<Double, Double> tempXPos = new HashMap<>();
-    private double minsep = 100;
+    private double minsep = 2;
     public Node LL, LR, RL, RR, lmost, rmost;
     private double rootsep = 0, loffsum = 0, roffsum = 0, cursep = 0;
 
@@ -23,6 +23,21 @@ public class Reinhold {
     // step 2: add tempXcoord, tree travers in postorder
     // step 3: position of subtrees
     // step 4: final x coords
+
+    public static MappedTreeStructure processTree(MappedTreeStructure tree) {
+        try {
+            Reinhold r = new Reinhold();
+            Node root = tree.getRoot();
+//            System.out.println("r = " + root);
+            r.layout(root);
+            return tree;
+        } catch (Exception e) {
+            System.out.println("Error while running RT Algorithm");
+            System.out.println(e);
+            return null;
+        }
+    }
+
     public void layout(Node root) {
         addYCoords(root, 0);
         setChildrenBinaryTree(root);
@@ -30,7 +45,7 @@ public class Reinhold {
         outerNodes(root);
         getSubtreePositions(root);
         setCoords(root.leftChild, root.rightChild, root);
-        petrify(root, 300, root.offset);
+        petrify(root, 30, root.offset);
     }
 
     //step 1
@@ -114,7 +129,7 @@ public class Reinhold {
     //threading auskommatiert
     public void getMinDist(Node left, Node right) {
         double scurr = (right.xtemp - left.xtemp);
-        if (scurr > 0 && scurr < minsep) {
+        if (scurr > 2 && scurr < minsep) {
             minsep = scurr;
         }
         if (left.rightChild != null && right.leftChild != null) {
@@ -146,16 +161,16 @@ public class Reinhold {
                 cursep = minsep;
             }
             if (left.rightChild != null) {
-                loffsum = loffsum + left.offset; // reihenfolge hier richtig herum?
-                cursep = cursep - left.offset;// reihenfolge hier richtig herum?
+                loffsum = loffsum + left.offset;
+                cursep = cursep - left.offset;
                 left = left.rightChild;
             } else {
-                loffsum = loffsum - left.offset;// reihenfolge hier richtig herum?
-                cursep = cursep + left.offset; // reihenfolge hier richtig herum?
+                loffsum = loffsum - left.offset;
+                cursep = cursep + left.offset;
                 left = left.leftChild;
             }
             if (right.leftChild != null) {
-                roffsum = roffsum - right.offset;// reihenfolge hier richtig herum?
+                roffsum = roffsum - right.offset;
                 cursep = cursep - right.offset;
                 right = right.leftChild;
             } else {
@@ -213,8 +228,13 @@ public class Reinhold {
         if (root != null) {
             root.x = xpos;
         }
+        if(root.hasThread){
+            root.hasThread=false;
+            root.rightChild=null;
+            root.leftChild=null;
+        }
         if (root.leftChild != null) {
-            petrify(root.leftChild, xpos-= rootOffset, rootOffset);
+            petrify(root.leftChild, xpos -= rootOffset, rootOffset);
         }
         if (root.rightChild != null) {
             petrify(root.rightChild, xpos += rootOffset, rootOffset);
