@@ -8,7 +8,7 @@ public class Node implements Serializable {
     public String label;
     private final int id = 0;
     public boolean checked=false, onlyChild=false, hasThread=false;
-    public Node leftChild, rightChild, directParent, threadTo;
+    public Node leftChild, rightChild, threadTo;
     public double xtemp=0, offset=0;
     double weight;
 
