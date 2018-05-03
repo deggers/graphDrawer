@@ -6,7 +6,8 @@ import model.Node;
 public class RadialTree {
 
     public static MappedTreeStructure processTree(MappedTreeStructure tree) {
-        calculateAngles(tree, 360,0);
+//        calculateAngles(tree, 360,0);
+        System.out.println(tree.getNodesFromLevel(2));
         return tree;
     }
 
