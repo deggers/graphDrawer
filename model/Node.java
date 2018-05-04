@@ -6,10 +6,7 @@ import java.util.List;
 
 public class Node implements Serializable {
     public String label;
-    public boolean checked=false, hasThread=false;
-    public Node leftChild, rightChild, threadTo;
-    public double offset=1;
-    double weight;
+    public double weight=0;
     public int level= 0;
 
     //walker
@@ -28,6 +25,9 @@ public class Node implements Serializable {
     public static List<Integer> depthList = new ArrayList<>();// muss resetted werden
 
     // RT
+    public boolean checked=false, hasThread=false;
+    public Node leftChild, rightChild;
+    public double offset=1;
 
     // for the radialTree 
     private int angle;

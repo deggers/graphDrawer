@@ -3,22 +3,12 @@ package draw;
 import model.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 
 import static java.lang.Math.abs;
-import static java.lang.Math.max;
 
 public class Reinhold {
-
     private double rootsep = 0;
-
-    // step 1: set y coordinates= level
-    // step 2: add tempXcoord, tree travers in postorder
-    // step 3: position of subtrees
-    // step 4: final x coords
 
     public static MappedTreeStructure processTree(MappedTreeStructure tree) {
         try {
@@ -36,11 +26,6 @@ public class Reinhold {
     public void layout(Node root) {
         addYCoords(root, 0);
         setChildrenBinaryTree(root);
-        //postOrder(root);
-        //outerNodes(root);
-        // getSubtreePositions(root);
-        //setCoords(root.leftChild, root.rightChild, root);
-
         setup(root, 0, getRR(root), getLL(root));
         petrify(root, 0);
         double offset = getLL(root).x;
@@ -49,7 +34,6 @@ public class Reinhold {
 
     //step 1
     private void addYCoords(Node node, double level) {
-        //tempXPos.put(level, 0.0);             // all x initially 0
         node.y = level;
         for (Node child : node.getChildren()) {
             addYCoords(child, level + 1);
@@ -67,11 +51,9 @@ public class Reinhold {
                     kids.add(c);
                 }
                 if (kids.size() == 0) {
-                    //node.checked = true;
                 }
                 if (kids.size() == 1) {
                     node.leftChild = kids.get(0);
-                    //kids.get(0).onlyChild = true;
                     setChildrenBinaryTree(kids.get(0));
                 }
                 if (kids.size() == 2) {
