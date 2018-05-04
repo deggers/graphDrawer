@@ -1,16 +1,18 @@
 package controller;
 
+import model.GraphMLGraph;
+import model.GraphMLParser;
 import model.MappedTreeStructure;
-import model.Node;
 import model.TreeParserNewick;
 
 import java.io.File;
 
 public class ParseController {
 
-    private         File                file;
+    private File file;
     private MappedTreeStructure tree;
-    public static   ParseController     instance;
+    public static ParseController instance;
+    private GraphMLGraph graph;
 
     public static ParseController getInstance() {
         if (instance == null) {
@@ -25,8 +27,11 @@ public class ParseController {
         String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());
         if (fileExtension.equals("nh")) {
             return TreeParserNewick.parseFileToTree(file);
+        } else if (fileExtension.equalsIgnoreCase("graphml")) {
+            System.out.println("here i am, GraphML File! ");
+            return GraphMLParser.parseFileToTree(file);
         } else {
-            System.out.println("Format is not .nh ?!");
+            System.out.println("Format is unknown WTF ?!");
             return false;
         }
     }
@@ -52,5 +57,9 @@ public class ParseController {
 
     public void setFile(File file) {
         this.file = file;
+    }
+
+    public void setGraph(GraphMLGraph graph) {
+        this.graph = graph;
     }
 }

@@ -35,6 +35,9 @@ public class Node implements Serializable {
     private double tangentLimit;
 
 
+    public Node() {
+    }
+
     public Node(String label) {
         this.label = label;
     }

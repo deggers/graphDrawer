@@ -18,7 +18,7 @@ import javax.xml.stream.events.*;
 
 public class GraphMLParser {
     
-    public static boolean parseFileToTree(File file) throws Exception {
+    public static boolean parseFileToTree(File file) {
         try {
             // Ressourcen anlegen
             GraphMLGraph graph = null;
@@ -57,21 +57,21 @@ public class GraphMLParser {
                                 while (attributes.hasNext()){
                                     String name = attributes.next().getName().getLocalPart();
                                     switch (name){
-                                        case "id":
-                                            id = name;
-                                            break;
-                                        case "for":
-                                            if (!name.equalsIgnoreCase("edge")) throw new Exception("Unknown attribute for GraphML key: for=\""+name+"\"");
-                                            break;
-                                        case "attr.name":
-                                            if (!name.equalsIgnoreCase(id)) throw new Exception("GraphML Key id doesn't match attr.name or was not set");
-                                            break;
-                                        case "sttr.type":
-                                            ktype = name;
-                                            System.out.println("Warning: non-standard EdgeType added: " + name);
-                                            break;
-                                        default:
-                                            System.out.println("Unknown attribute type for Key: " + name);
+                                            case "id":
+                                                id = name;
+                                                break;
+                                            case "for":
+                                                if (!name.equalsIgnoreCase("edge")) throw new Exception("Unknown attribute for GraphML key: for=\""+name+"\"");
+                                                break;
+                                            case "attr.name":
+                                                if (!name.equalsIgnoreCase(id)) throw new Exception("GraphML Key id doesn't match attr.name or was not set");
+                                                break;
+                                            case "sttr.type":
+                                                ktype = name;
+                                                System.out.println("Warning: non-standard EdgeType added: " + name);
+                                                break;
+                                            default:
+                                                System.out.println("Unknown attribute type for Key: " + name);
                                             break;
                                     }
                                 }
@@ -83,23 +83,21 @@ public class GraphMLParser {
                             case "node":
                                 attributes = startElement.getAttributes();
                                 String label = null;
-                                String ntype = null;
+                                node = new Node("ich sollte nicht hier sein");
                                 while (attributes.hasNext()){
                                     String name = attributes.next().getName().getLocalPart();
                                     switch (name){
                                         case "id":
-                                            label = name;
+                                            node.label = name;
                                             break;
                                         case "type":
-                                            ntype = name;
+                                            node.GraphMLType = name;
                                             break;
                                         default:
                                             System.out.println("Unknown attribute type for Node: " + name);
                                             break;
                                     }
                                 }
-                                node = new Node(label);
-                                node.GraphMLType = ntype;
                                 nodes.add(node);
                                 nodesMap.put(label, node);
                                 break;
@@ -145,7 +143,7 @@ public class GraphMLParser {
                 }
             }
             //Postprocessing der erhaltenen Daten
-            
+            ParseController.getInstance().setGraph(graph);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
