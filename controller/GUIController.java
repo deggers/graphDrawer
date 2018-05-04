@@ -16,7 +16,6 @@ import javafx.stage.Stage;
 import model.MappedTreeStructure;
 import model.Node;
 
-import javax.xml.bind.annotation.XmlAnyAttribute;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -61,6 +60,7 @@ public class GUIController {
     Button nextFile;
     @FXML
     Label fileNameLabel;
+    private int spaceBetweenRadii;
 
     public void initialize() {
         nodeSizeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -103,7 +103,6 @@ public class GUIController {
 //        System.out.println("Tree: " + ParseController.getInstance().getTree());
 //        System.out.println("Algorithm: " + getSelectedTreeAlgorithm());
         if (ParseController.getInstance().getTree() != null && getSelectedTreeAlgorithm() != null) {
-            System.out.println("i am in the process of doing the draw..");
             pane.getChildren().clear();
             fileNameLabel.setText(this.fileName);
             switch (getSelectedTreeAlgorithm()) {
@@ -134,44 +133,122 @@ public class GUIController {
         }
     }
 
-    private void drawRadialTreeStructure(MappedTreeStructure root) {
+    private void drawRadialTreeStructure(MappedTreeStructure tree) {
         int halfHeight = (int) scollPane.getHeight() / 2;
         int halfWidth = (int) scollPane.getWidth() / 2;
         int level = 0;
         // draw levels
-        for (Node node : root.nodeList) {
-            level = Node.getTreeDepth(node);
-        }
-        int decreasingRadius = (Math.min(halfHeight, halfWidth)) - (2 * nodeSize);
-        int spaceBetweenLevels = decreasingRadius / level;
+        level = tree.getTreeDepth();
+        System.out.println("Number of levels = " + level);
+        System.out.println("");
+
+        int maxRadius = (Math.min(halfHeight, halfWidth)) - (2 * nodeSize);
+        int spaceBetweenRadii = maxRadius / level;
+        this.spaceBetweenRadii = spaceBetweenRadii;
+        System.out.println("spaceBetweenRadii = " + spaceBetweenRadii);
+        System.out.println("");
 
         for (int i = 0; i <= level + 1; i++) {
-            pane.getChildren().add(createGuideline(halfWidth, halfHeight, decreasingRadius));
-            decreasingRadius -= spaceBetweenLevels;
+            pane.getChildren().add(createGuideline(halfWidth, halfHeight, maxRadius));
+            maxRadius -= spaceBetweenRadii;
         }
-        // set appropriate nodeSize
-        this.nodeSize = spaceBetweenLevels >> 2;
+
+        this.nodeSize = spaceBetweenRadii >> 2;         // set appropriate nodeSize
 
         // draw root
-        pane.getChildren().add(createNode(halfWidth, halfHeight, getNodeSize(),"root"));
+//        pane.getChildren().add(createNode(halfWidth, halfHeight, getNodeSize(), "root"));
 
+        Node root = tree.getRoot();
+        System.out.println("root = " + root);
 
+        this.treeRadial = radialPositions(tree, root, Math.toRadians(60), Math.toRadians(360));
+        drawRadialTreeEdges(this.treeRadial);
     }
 
-    private void drawRadialTreeStructureHelper(MappedTreeStructure tree, double alpha, double beta, int spaceBetweenLevels){
-        // the depth of v in T
-        Node root = tree.getRoot();
-        int depthOfNode = Node.getDepth(root);
+    private MappedTreeStructure radialPositions(MappedTreeStructure radialTree, Node node, double alpha, double beta) {
+        int centerY = (int) scollPane.getHeight() / 2;
+        int centerX = (int) scollPane.getWidth() / 2;
+
+        if (node.parent == null) { // if node is root
+            radialTree.setNodeCoords(node, centerX, centerY);
+            pane.getChildren().add(createNode(centerX, centerY, getNodeSize(), node.label));
+        }
+
+        //Depth of vertex starting from 0 and adding one
+        double depthOfVertex = node.level + 1;
         double theta = alpha;
-        // radius for the concentric circle levels
+        double radius = (this.spaceBetweenRadii * depthOfVertex) + nodeSize;
 
+        // number of leaves for the subtree rooted in v
+        int k = treeRadial.getLeavesOfNode(node);
+        System.out.println("numberOfLeafs = " + k);
 
+//        System.out.println("numberOfLeafs = " + numberOfLeafs + " from: " + node);
+//        int runner = 0;
+        for (Node child : node.getChildren()) {
+//            runner++;
+            int lambda = treeRadial.getLeavesOfNode(child);
+            System.out.println("lambda = " + lambda);
+            double betaAlphaTemp = beta - alpha;
+            System.out.println("beta-alpha: " + betaAlphaTemp);
+            System.out.println("lambda/k = " + (lambda/k));
+            System.out.println("k = " + k);
+            System.out.println("lambda = " + lambda);
+            double mi = theta + (((double)lambda / k) * (beta - alpha));
+            System.out.println("mi = " + mi);
+
+            double term = (theta + mi)/2;
+            double cosTerm = Math.cos(term);
+            double sinTerm = Math.sin(term);
+            System.out.println("cosTerm = " + cosTerm);
+            System.out.println("sinTerm = " + sinTerm);
+            System.out.println("");
+            // x = center x + radius * cos(angle)
+            int x = (int) (centerX + (radius * cosTerm));
+            int y = (int) (centerY + (radius * sinTerm));
+            radialTree.setNodeCoords(child, x, y);
+            pane.getChildren().add(createNode(x, y, getNodeSize(), child.label));
+
+            if (!child.isLeaf()) {
+                radialPositions(radialTree, child, theta, mi);
+            }
+            theta = mi;
+//            System.out.println("theta = " + theta);
+        }
+        return radialTree;
+    }
+
+    private boolean drawRadialTreeEdges(MappedTreeStructure tree) {
+        try {
+            for (Node child : tree.listAllNodes()) {
+                System.out.println(child);
+                if (child.parent != null) {
+                    Node parent = child.parent;
+                    double parentX = parent.x;
+                    double parentY = parent.y;
+
+                    double childX = child.x;
+                    double childY = child.y;
+
+                    pane.getChildren().add(new Line(parentX, parentY, childX, childY));
+//                    System.out.println("childY = " + childY);
+//                    System.out.println("childX = " + childX);
+//                    System.out.println("parentY = " + parentY);
+//                    System.out.println("parentX = " + parentX);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Exception in drawRadialTreeEdges");
+            System.out.println(e);
+            return false;
+        }
+        return true;
     }
 
     private Circle createGuideline(int halfWidth, int halfHeight, int decreasingRadius) {
         Circle node = new Circle(halfWidth, halfHeight, decreasingRadius);
         node.setFill(Color.TRANSPARENT);
-        node.setStroke(Color.BLACK);
+        node.setStroke(Color.LIGHTGRAY);
         return node;
     }
 
@@ -181,7 +258,7 @@ public class GUIController {
                 String label = node.label;
                 double x = scaleCoordinate(node.x);
                 double y = scaleCoordinate(node.y);
-                pane.getChildren().add(createNode((int) x, (int) y, getNodeSize(),label));
+                pane.getChildren().add(createNode((int) x, (int) y, getNodeSize(), label));
             });
         } catch (Exception e) {
             System.out.println("Fehler in drawTreeNodes");
@@ -307,11 +384,17 @@ public class GUIController {
 
     private Circle createNode(int x, int y, int radius, String id) {
         Circle node = new Circle(x, y, radius);
-        node.setFill(Color.FORESTGREEN);
+        try {
+            int test = Integer.parseInt(id);
+            node.setFill(Color.GRAY);
+
+        } catch (NumberFormatException e) {
+            node.setFill(Color.FORESTGREEN);
+        }
+
         node.setStroke(Color.BLACK);
         Tooltip tip = new Tooltip(id);
-        Tooltip.install(node,tip);
-
+        Tooltip.install(node, tip);
         return node;
     }
 

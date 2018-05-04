@@ -28,6 +28,8 @@ public class Node implements Serializable {
     public Node thread = null;
     public static List<Integer> depthList = new ArrayList<>();// muss resetted werden
 
+    // RT
+
     // for the radialTree 
     private int angle;
     private double lowerBisector;

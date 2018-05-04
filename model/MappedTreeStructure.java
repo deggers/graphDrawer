@@ -4,6 +4,7 @@ import java.util.*;
 // inspired heavely from https://stackoverflow.com/questions/3522454/java-tree-data-structure
 
 public class MappedTreeStructure implements MutableTree<Node> {
+
     public final Map<Node, Node> nodeParent = new HashMap<>();
     public final LinkedHashSet<Node> nodeList = new LinkedHashSet<>();
     private boolean yValuesHasBeenSet = false;
@@ -11,14 +12,15 @@ public class MappedTreeStructure implements MutableTree<Node> {
 
     public MappedTreeStructure(Node root) {
         nodeList.add(root); // set root-node
-        getYCoords(root,0); // set all y-values
+        fillTree(root);
+        setLevels(root, 0); // set all level-values
     }
 
     public LinkedList<Node> getNodesFromLevel(int level) {
         LinkedList<Node> levelList = new LinkedList<>();
-        if (!this.yValuesHasBeenSet) getYCoords(getRoot(), 0);
+        if (!this.yValuesHasBeenSet) setLevels(getRoot(), 0); // eig unnötig, aber failsave -dustyn
         for (Node node : nodeList)
-            if (node.y == level) {
+            if (node.level == level) {
                 levelList.add(node);
                 System.out.println("node.y = " + node.y + " , level: " + level);
                 System.out.println("levelList = " + levelList);
@@ -26,11 +28,11 @@ public class MappedTreeStructure implements MutableTree<Node> {
         return levelList;
     }
 
-    private void getYCoords(Node node, int level) {
-        node.y = level;
+    private void setLevels(Node node, int level) {
+        node.level = level;
         if (level > this.treeDepth) this.treeDepth = level;
         for (Node child : node.getChildren())
-            getYCoords(child, level + 1);
+            setLevels(child, level + 1);
         this.yValuesHasBeenSet = true;
     }
 
@@ -42,9 +44,9 @@ public class MappedTreeStructure implements MutableTree<Node> {
             int indexAsChildSetter = 0;
             for (Node child : node.getChildren()) {
                 child.parent = node;
+                nodeParent.put(child, node);
                 child.indexAsChild = indexAsChildSetter;
                 indexAsChildSetter++;
-                nodeParent.put(child, node);
                 //System.out.println("added pair (n/p): " + child + e);
                 fillTree(child);
             }
@@ -158,5 +160,45 @@ public class MappedTreeStructure implements MutableTree<Node> {
 
     public int getTreeDepth() {
         return this.treeDepth;
+    }
+
+    public boolean setNodeCoords(Node node, int x, int y) {
+        boolean found = false;
+        for (Node lookupNode : nodeList)
+            if (lookupNode.equals(node)) {
+//                System.out.println("found matching node! look.");
+//                System.out.println(nodeTmp);
+//                System.out.println("with");
+//                System.out.println(node);
+                node.x = x;
+                node.y = y;
+                found = true;
+//                System.out.println("Coords now: ");
+//                System.out.println(node.x + ", " + node.y);
+//                System.out.println("");
+            }
+        if (!found) System.out.println("setNodeX failed");
+        return found;
+    }
+
+    public int getLeavesOfNode(Node node) {
+        int innerCounter = 0;
+        if (!node.isLeaf()) {
+            for (Node rec : node.getChildren()) {
+                if (rec.isLeaf()) {
+                    innerCounter++;
+                } else {
+                    innerCounter += getLeavesOfNode(rec);
+                }
+            }
+            return innerCounter;
+        } else {
+            return 1;
+        }
+    }
+
+
+    public Map<Node, Node> getNodeParentsMap() {
+        return this.nodeParent;
     }
 }

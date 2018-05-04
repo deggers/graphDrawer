@@ -19,7 +19,7 @@ public class TreeParserNewick {
             if (isValidFormat(newickString)) {
                 Node root = buildTreeStructure(newickString);
                 MappedTreeStructure tree = new MappedTreeStructure(root);
-                fillTree(root, tree);
+//                fillTree(root, tree);  is now done in constructor
                 ParseController.getInstance().setTree(tree);
                 return true;
             } else {
@@ -29,22 +29,6 @@ public class TreeParserNewick {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
-        }
-    }
-
-    private static void fillTree(Node root, MappedTreeStructure tree) {
-
-        try {
-            int indexAsChildSetter = 0;
-            for (Node child : root.getChildren()) {
-                child.parent = root;
-                child.indexAsChild = indexAsChildSetter;
-                indexAsChildSetter++;
-                tree.add(root, child);
-                //System.out.println("added pair (n/p): " + child + e);
-                fillTree(child, tree);
-            }
-        } catch (Exception e) {
         }
     }
 

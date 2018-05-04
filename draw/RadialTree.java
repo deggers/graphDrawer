@@ -7,20 +7,13 @@ public class RadialTree {
 
     public static MappedTreeStructure processTree(MappedTreeStructure tree) {
 //        calculateAngles(tree, 360,0);
-        System.out.println(tree.getNodesFromLevel(2));
+//        System.out.println("tree = " + tree);
         return tree;
     }
 
     public static void calculateAngles(MappedTreeStructure tree, double alpha, double beta) {
-        // the depth of v in T
-        Node root = tree.getRoot();
-        int depthOfNode = Node.getDepth(root);
-        double theta = alpha;
-        // radius for the concentric circle levels
 
     }
-
-
 
 //        // initialize
 //        int treeDepth = Node.getTreeDepth(tree.getRoot());
