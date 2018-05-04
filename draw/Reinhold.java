@@ -13,10 +13,7 @@ import static java.lang.Math.max;
 
 public class Reinhold {
 
-    //key= level value= Hilfsfkt x_l(l)
-    //private Map<Double, Double> tempXPos = new HashMap<>();
-    //public Node LL, LR, RL, RR, lmost, rmost;
-    private double minsep = 2, rootsep = 0, loffsum = 0, roffsum = 0, cursep = 2;
+    private double rootsep = 0;
 
     // step 1: set y coordinates= level
     // step 2: add tempXcoord, tree travers in postorder
@@ -45,7 +42,9 @@ public class Reinhold {
         //setCoords(root.leftChild, root.rightChild, root);
 
         setup(root, 0, getRR(root), getLL(root));
-        petrify(root, 30);
+        petrify(root, 0);
+        double offset = getLL(root).x;
+        petrify(root,-offset);
     }
 
     //step 1
@@ -84,141 +83,7 @@ public class Reinhold {
             }
         }
     }
-//
-//    // step 2: add x temp, post order: l r w
-//    public void postOrder(Node root) {
-//        if (root != null) {
-//            postOrder(root.leftChild);
-//            postOrder(root.rightChild);
-//            addTempXCoords(root);
-//        }
-//    }
-//
-//    private void addTempXCoords(Node node) {
-//        if (node != null) {
-//            if (node.isLeaf()) {
-//                node.xtemp = tempXPos.get(node.y);
-////                System.out.println("node.xtemp = " + node.xtemp);
-//            }
-//            if (node.leftChild != null && node.rightChild != null) {
-//                System.out.println("node.rightChild.xtemp = " + node.rightChild.xtemp);
-//                System.out.println("node.leftChild.xtemp = " + node.leftChild.xtemp);
-//                node.xtemp = 0.5 * (node.rightChild.xtemp + node.leftChild.xtemp);
-//                System.out.println("node.xtemp = " + node.xtemp);
-//            }
-//            if (node.leftChild != null && node.rightChild == null) {
-//                node.xtemp = node.leftChild.xtemp + 1;
-//            }
-//            if (node.rightChild != null && node.leftChild == null) {
-//                node.xtemp = node.rightChild.xtemp - 1;
-//            }
-//            if (node.xtemp < tempXPos.get(node.y)) {
-//                node.xtemp = tempXPos.get(node.y);
-//            }
-//            tempXPos.put(node.y, tempXPos.get(node.y) + 2);
-//        }
-//    }
-//
-//    //step 3: position of subtrees ,get mindist of 2 subtrees: compare right conture of left & left conture of right subtree
-//    public void getSubtreePositions(Node root) {
-//        if (root != null && root.getChildren().size() > 1) {
-//            getMinDist(root.leftChild, root.rightChild);
-//            for (Node c : root.getChildren()) {
-//                getSubtreePositions(c);
-//            }
-//        }
-//    }
-//
-//    //threading auskommatiert
-//    public void getMinDist(Node left, Node right) {
-//        double scurr = (right.xtemp - left.xtemp);
-//        if (scurr > 2 && scurr < minsep) {
-//            minsep = scurr;
-//        }
-//        if (left.rightChild != null && right.leftChild != null) {
-//            getMinDist(left.rightChild, right.leftChild);
-//        }
-//    }
 
-    // offset wird so berechnet dass für links neg und für rechts pos-- stimmt das?
-//    public void setCoords(Node left, Node right, Node root) {
-//        cursep = minsep;
-//        rootsep = minsep;
-//        while (left != null && right != null) {
-//            //left.offset = (left.xtemp - root.xtemp);
-//            //right.offset = (right.xtemp - root.xtemp);
-//            cursep = left.xtemp - right.xtemp;
-//            if (cursep < minsep) {
-//                rootsep = rootsep + (minsep - cursep);
-//                cursep = minsep;
-//            }
-//            if (left.rightChild != null) {
-//                loffsum = loffsum + left.offset;
-//                cursep = cursep - left.offset;
-//                left = left.rightChild;
-//            } else {
-//                loffsum = loffsum - left.offset;
-//                cursep = cursep + left.offset;
-//                left = left.leftChild;
-//            }
-//            if (right.leftChild != null) {
-//                roffsum = roffsum - right.offset;
-//                cursep = cursep - right.offset;
-//                right = right.leftChild;
-//            } else {
-//                roffsum = roffsum + right.offset;
-//                cursep = cursep + right.offset;
-//                right = right.rightChild;
-//            }
-//        }
-//
-//        root.offset = (rootsep + 1) / 2;
-//        loffsum = loffsum - root.offset;
-//        roffsum = roffsum + root.offset;
-//
-//        //UPDATE EXTREME DESCENDANTS INFOREMATIOS
-//        if (RL.y > LL.y || root.leftChild == null) {
-//            lmost = RL;
-//            lmost.offset += root.offset;
-//        } else {
-//            lmost = LL;
-//            lmost.offset -= root.offset;
-//        }
-//        if (LR.y > RR.y || root.rightChild == null) {
-//            rmost = LR;
-//            rmost.offset -= root.offset;
-//        } else {
-//            rmost = RR;
-//            rmost.offset += root.offset;
-//        }
-//
-//        if (left != null && left != root.leftChild) {
-//            RR.hasThread = true;
-//            RR.offset = abs(RR.offset + root.offset - loffsum);
-//            if (loffsum - root.offset <= RR.offset) {
-//                RR.leftChild = left;
-//            } else {
-//                RR.rightChild = left;
-//            }
-//            if (right != null || right != root.rightChild) {
-//                LL.hasThread = true;
-//                LL.offset = abs(LL.offset - root.offset - roffsum);
-//                if (roffsum + root.offset >= LL.offset) {
-//                    LL.rightChild = right;
-//                } else {
-//                    LL.leftChild = right;
-//                }
-//            }
-//        }
-//    }
-//
-
-    // cursep = separation on current level
-    // rootsep= current separation at node t - accumulates the required sepatation,
-    // distance for the sons of root so that their subtrees will have a sepatation
-    // of at least MINSEP at all levels
-    // loffsum & roffsum = offset from l and r to t
-    // Minsep = min separation allowed between two nodes on a level
     public void setup(Node root, int level, Node rmost, Node lmost) {
         // avoid selecting an extreme
         if (root == null) {
@@ -247,12 +112,12 @@ public class Reinhold {
                 rmost.offset = 0;
                 lmost.offset = 0;
                 root.offset = 0;
-            } // no leaf:
-            // set up for subtree pushing, place roots of subtrees min dist apart
-            cursep = minsep;
+            }
+            double minsep = 2;
+            double cursep = minsep;
             rootsep = minsep;
-            loffsum = 0;
-            roffsum = 0;
+            double loffsum = 0;
+            double roffsum = 0;
             // consider each level in turn until one subtree ist exhausted, pushing subtrees
             // apart when neccessary
             while (left != null && right != null) {
@@ -323,7 +188,6 @@ public class Reinhold {
         }
     }
 
-
     //Procedure PETRIFY converts relative positionings (offsets) to absolute coordinates.
     //preorder traversal of tree
 
@@ -337,26 +201,13 @@ public class Reinhold {
             root.leftChild = null;
         }
         if (root.leftChild != null) {
-            petrify(root.leftChild, xpos - roffsum);
+            petrify(root.leftChild, xpos - root.offset);
         }
         if (root.rightChild != null) {
-            petrify(root.rightChild, xpos + roffsum);
+            petrify(root.rightChild, xpos + root.offset);
         }
     }
 
-
-//    int findMaxLevel(Node root) {
-//        if (root == null)
-//            return 0;
-//        return 1 + max((findMaxLevel(root.leftChild)), findMaxLevel(root.rightChild));
-//    }
-
-//    public void outerNodes(Node root) {
-//        LL = getLL(root.leftChild);
-//        LR = getRR(root.leftChild);
-//        RL = getLL(root.rightChild);
-//        RR = getRR(root.rightChild);
-//    }
 
     public Node getLL(Node node) {
         while (node != null && !node.isLeaf()) {
@@ -372,24 +223,3 @@ public class Reinhold {
         return node;
     }
 }
-
-
-//    public void preorder(TreeNode root) {
-//        if(root !=  null) {
-//            //Visit the node by Printing the node data
-//            System.out.printf("%d ",root.data);
-//            preorder(root.left);
-//            preorder(root.right);
-//        }
-//    }
-//
-//    public void inOrder(TreeNode root) {
-//        if(root !=  null) {
-//            inOrder(root.left);
-//            //Visit the node by Printing the node data
-//            System.out.printf("%d ",root.data);
-//            inOrder(root.right);
-//        }
-//    }
-
-

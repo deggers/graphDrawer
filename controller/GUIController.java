@@ -124,6 +124,7 @@ public class GUIController {
                     break;
                 case "RT":
                     System.out.println("Selected Reinhold");
+                    nodeSizeSlider.setDisable(false);
                     this.reinholdTree = Reinhold.processTree(ParseController.getInstance().getTree());
                     drawTreeStructure(this.reinholdTree);
                     break;
