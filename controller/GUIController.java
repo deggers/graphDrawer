@@ -137,31 +137,19 @@ public class GUIController {
     private void drawRadialTreeStructure(Tree tree) {
         int halfHeight = (int) scollPane.getHeight() / 2;
         int halfWidth = (int) scollPane.getWidth() / 2;
-        int level = 0;
-        // draw levels
-        level = tree.getTreeDepth();
-        System.out.println("Number of levels = " + level);
-        System.out.println("");
+        int level = tree.getTreeDepth();
 
         int maxRadius = (Math.min(halfHeight, halfWidth)) - (2 * nodeSize);
         int spaceBetweenRadii = maxRadius / level;
         this.spaceBetweenRadii = spaceBetweenRadii;
-        System.out.println("spaceBetweenRadii = " + spaceBetweenRadii);
-        System.out.println("");
+        this.nodeSize = spaceBetweenRadii >> 2;
 
         for (int i = 0; i <= level + 1; i++) {
             pane.getChildren().add(createGuideline(halfWidth, halfHeight, maxRadius));
             maxRadius -= spaceBetweenRadii;
         }
 
-        this.nodeSize = spaceBetweenRadii >> 2;         // set appropriate nodeSize
-
-        // draw root
-//        pane.getChildren().add(createNode(halfWidth, halfHeight, getNodeSize(), "root"));
-
         Node root = tree.getRoot();
-        System.out.println("root = " + root);
-
         this.treeRadial = radialPositions(tree, root, Math.toRadians(60), Math.toRadians(360));
         drawRadialTreeEdges(this.treeRadial);
     }
@@ -182,28 +170,16 @@ public class GUIController {
 
         // number of leaves for the subtree rooted in v
         int k = treeRadial.getLeavesOfNode(node);
-        System.out.println("numberOfLeafs = " + k);
 
-//        System.out.println("numberOfLeafs = " + numberOfLeafs + " from: " + node);
-//        int runner = 0;
         for (Node child : node.getChildren()) {
-//            runner++;
             int lambda = treeRadial.getLeavesOfNode(child);
-            System.out.println("lambda = " + lambda);
             double betaAlphaTemp = beta - alpha;
-            System.out.println("beta-alpha: " + betaAlphaTemp);
-            System.out.println("lambda/k = " + (lambda/k));
-            System.out.println("k = " + k);
-            System.out.println("lambda = " + lambda);
             double mi = theta + (((double)lambda / k) * (beta - alpha));
-            System.out.println("mi = " + mi);
 
             double term = (theta + mi)/2;
             double cosTerm = Math.cos(term);
             double sinTerm = Math.sin(term);
-            System.out.println("cosTerm = " + cosTerm);
-            System.out.println("sinTerm = " + sinTerm);
-            System.out.println("");
+
             // x = center x + radius * cos(angle)
             int x = (int) (centerX + (radius * cosTerm));
             int y = (int) (centerY + (radius * sinTerm));
@@ -214,7 +190,6 @@ public class GUIController {
                 radialPositions(radialTree, child, theta, mi);
             }
             theta = mi;
-//            System.out.println("theta = " + theta);
         }
         return radialTree;
     }
@@ -232,10 +207,6 @@ public class GUIController {
                     double childY = child.y;
 
                     pane.getChildren().add(new Line(parentX, parentY, childX, childY));
-//                    System.out.println("childY = " + childY);
-//                    System.out.println("childX = " + childX);
-//                    System.out.println("parentY = " + parentY);
-//                    System.out.println("parentX = " + parentX);
                 }
             }
         } catch (Exception e) {
@@ -284,9 +255,7 @@ public class GUIController {
                     double childX = scaleCoordinate(child.x);
                     double childY = scaleCoordinate(child.y);
                     pane.getChildren().add(new Line(parentX, parentY, childX, childY));
-
-//                    System.out.println("parent: " + parentLabel + "(" + String.valueOf(parentX) + "," + String.valueOf(parentY) + ") child: " + childLabel + "(" + String.valueOf(childX) + "," + String.valueOf(childY) + ") ");
-                }
+                    }
             });
         } catch (Exception e) {
             System.out.println("Exception in drawTreeEdges");
@@ -332,8 +301,7 @@ public class GUIController {
 
     @FXML
     public void setNextFileAsTree() {
-//        System.out.println("next called!");
-        if (filesInFolder != null) { // we selected a file so we have the folder from here on
+       if (filesInFolder != null) { // we selected a file so we have the folder from here on
             if (getFilesIter() == null || !getFilesIter().hasNext()) {
                 List<File> files = getFilesInFolder();
                 ListIterator<File> filesIter = files.listIterator();
