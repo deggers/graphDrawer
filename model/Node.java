@@ -6,12 +6,11 @@ import java.util.List;
 
 public class Node implements Serializable {
     public String label;
-    //private final int id = 0;
-    public boolean checked=false, hasThread=false; //onlyChild=false,
+    public boolean checked=false, hasThread=false;
     public Node leftChild, rightChild, threadTo;
-    public double offset=1; //xtemp=0,
+    public double offset=1;
     double weight;
-    public int level= 0;// ycoord=0 ;
+    public int level= 0;
 
     //walker
     public double x = 0;
