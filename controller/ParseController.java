@@ -1,7 +1,6 @@
 package controller;
 
-import model.MappedTreeStructure;
-import model.Node;
+import model.Tree;
 import model.TreeParserNewick;
 
 import java.io.File;
@@ -9,7 +8,7 @@ import java.io.File;
 public class ParseController {
 
     private         File                file;
-    private MappedTreeStructure tree;
+    private Tree tree;
     public static   ParseController     instance;
 
     public static ParseController getInstance() {
@@ -32,18 +31,12 @@ public class ParseController {
     }
 
     // SETTER & GETTER AREA
-    public void setTree(MappedTreeStructure tree) {
+    public void setTree(Tree tree) {
         this.tree = tree;
     }
 
-    public MappedTreeStructure getTree() {
+    public Tree getTree() {
         return this.tree;
-    }
-
-    // not used, right?
-    public String[] getTreeStringArray() {
-        String[] splitTree = tree.toString().split("\t");
-        return splitTree;
     }
 
     public File getFile() {

@@ -10,7 +10,7 @@ import static java.lang.Math.abs;
 public class Reinhold {
     private double rootsep = 0;
 
-    public static MappedTreeStructure processTree(MappedTreeStructure tree) {
+    public static Tree processTree(Tree tree) {
         try {
             Reinhold r = new Reinhold();
             Node root = tree.getRoot();
