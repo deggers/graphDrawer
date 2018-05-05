@@ -10,6 +10,9 @@ public class Tree {
     private boolean yValuesHasBeenSet = false;
     private int treeDepth = 0;
 
+    public Tree(){
+    }
+
     public Tree(Node root) {
         nodeList.add(root); // set root-node
         fillTree(root);
