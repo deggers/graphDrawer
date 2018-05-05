@@ -7,9 +7,9 @@ import java.io.File;
 
 public class ParseController {
 
-    private         File                file;
+    private File file;
     private Tree tree;
-    public static   ParseController     instance;
+    public static ParseController instance;
 
     public static ParseController getInstance() {
         if (instance == null) {
