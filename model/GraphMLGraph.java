@@ -5,7 +5,7 @@ import model.HelperTypes.EdgeType;
 import model.Node;
 // inspired heavily from https://stackoverflow.com/questions/3522454/java-tree-data-structure
 
-public class GraphMLGraph extends Graph{
+public class GraphMLGraph extends Tree{
     public final LinkedHashSet<Node> nodeList = new LinkedHashSet<>();
     private final HashSet<Edge> edgeList = new HashSet<>();
     private final HashSet<EdgeType> EdgeTypeList = new HashSet<>();

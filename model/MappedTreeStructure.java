@@ -1,44 +1,52 @@
 package model;
 
 import java.util.*;
-import model.Node;
-// inspired heavily from https://stackoverflow.com/questions/3522454/java-tree-data-structure
+// inspired heavely from https://stackoverflow.com/questions/3522454/java-tree-data-structure
 
-public class MappedTreeStructure extends Graph {
+public class MappedTreeStructure extends Tree{
+
     public final Map<Node, Node> nodeParent = new HashMap<>();
     public final LinkedHashSet<Node> nodeList = new LinkedHashSet<>();
-
-    // not used.. ?
-    public final Map<Node, ArrayList<Node>> levelList = new HashMap<>();
+    private boolean yValuesHasBeenSet = false;
+    private int treeDepth = 0;
 
     public MappedTreeStructure(Node root) {
-        nodeList.add(root);
+        nodeList.add(root); // set root-node
+        fillTree(root);
+        setLevels(root, 0); // set all level-values
     }
 
-
-    // how should that work=? ...
-    public ArrayList<Node> getNodesFromLevel(int level) {
-        for (Node node: getRoot().getChildren()) {
-            for (int i = 0; i <= level; i++) {
-                if (node.getChildren() != null) {
-
-                }
+    public LinkedList<Node> getNodesFromLevel(int level) {
+        LinkedList<Node> levelList = new LinkedList<>();
+        if (!this.yValuesHasBeenSet) setLevels(getRoot(), 0); // eig unnötig, aber failsave -dustyn
+        for (Node node : nodeList)
+            if (node.level == level) {
+                levelList.add(node);
+                System.out.println("node.y = " + node.y + " , level: " + level);
+                System.out.println("levelList = " + levelList);
             }
-        }
-        return null;
+        return levelList;
     }
+
+    private void setLevels(Node node, int level) {
+        node.level = level;
+        if (level > this.treeDepth) this.treeDepth = level;
+        for (Node child : node.getChildren())
+            setLevels(child, level + 1);
+        this.yValuesHasBeenSet = true;
+    }
+
 
     private void fillTree(Node node) {
-        Node e = (Node) node;
-        nodeList.add(e);
+        nodeList.add(node);
         //System.out.println("added: " + node.label);
         try {
             int indexAsChildSetter = 0;
             for (Node child : node.getChildren()) {
                 child.parent = node;
+                nodeParent.put(child, node);
                 child.indexAsChild = indexAsChildSetter;
                 indexAsChildSetter++;
-                nodeParent.put((Node) child, e);
                 //System.out.println("added pair (n/p): " + child + e);
                 fillTree(child);
             }
@@ -52,7 +60,7 @@ public class MappedTreeStructure extends Graph {
     }
 
 
-    //@Override
+    @Override
     public boolean add(Node parent, Node node) {
         checkNotNull(parent, "parent");
         checkNotNull(node, "node");
@@ -71,7 +79,8 @@ public class MappedTreeStructure extends Graph {
         return added;
     }
 
-    //@Override
+    @Override
+
     public boolean remove(Node node, boolean cascade) { //nötig bei uns?
 
         checkNotNull(node, "node");
@@ -85,7 +94,7 @@ public class MappedTreeStructure extends Graph {
             });
         } else {
             getChildren(node).forEach((child) -> {
-                nodeParent.remove(child);
+                nodeParent.remove(child);            // hier löscht er doch nodeParent ?! -dustyn
             });
         }
         nodeList.remove(node);
@@ -106,13 +115,13 @@ public class MappedTreeStructure extends Graph {
         return new LinkedList<>(nodeList);
     }
 
-    //@Override
+    @Override
     public Node getParent(Node node) {
         checkNotNull(node, "node");
         return nodeParent.get(node);
     }
 
-    //@Override
+    @Override
     public List<Node> getChildren(Node node) {
         List<Node> children = new LinkedList<>();
         for (Node n : nodeList) {
@@ -147,5 +156,49 @@ public class MappedTreeStructure extends Graph {
 
     public String echoContent() {
         return nodeList.toString() + "\n" + nodeParent.toString();
+    }
+
+    public int getTreeDepth() {
+        return this.treeDepth;
+    }
+
+    public boolean setNodeCoords(Node node, int x, int y) {
+        boolean found = false;
+        for (Node lookupNode : nodeList)
+            if (lookupNode.equals(node)) {
+//                System.out.println("found matching node! look.");
+//                System.out.println(nodeTmp);
+//                System.out.println("with");
+//                System.out.println(node);
+                node.x = x;
+                node.y = y;
+                found = true;
+//                System.out.println("Coords now: ");
+//                System.out.println(node.x + ", " + node.y);
+//                System.out.println("");
+            }
+        if (!found) System.out.println("setNodeX failed");
+        return found;
+    }
+
+    public int getLeavesOfNode(Node node) {
+        int innerCounter = 0;
+        if (!node.isLeaf()) {
+            for (Node rec : node.getChildren()) {
+                if (rec.isLeaf()) {
+                    innerCounter++;
+                } else {
+                    innerCounter += getLeavesOfNode(rec);
+                }
+            }
+            return innerCounter;
+        } else {
+            return 1;
+        }
+    }
+
+
+    public Map<Node, Node> getNodeParentsMap() {
+        return this.nodeParent;
     }
 }
