@@ -9,6 +9,7 @@ public class GraphMLGraph extends Tree{
     public final LinkedHashSet<Node> nodeList = new LinkedHashSet<>();
     private final HashSet<Edge> edgeList = new HashSet<>();
     private final HashSet<EdgeType> EdgeTypeList = new HashSet<>();
+    //Feld nodeParent wird jetzt von Tree geerbt. sollte vielleicht anders gelöst werden
     
     public boolean addEdgeType(String id, String attrType){
         EdgeType et = new EdgeType(id, "double");
@@ -36,6 +37,7 @@ public class GraphMLGraph extends Tree{
     void addAllEdges(ArrayList<Edge> edges) {
         edges.forEach(e -> {
             edgeList.add(e);
+            //nodeParent.put(e.target, e.source);
         });
     }
 
