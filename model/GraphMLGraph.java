@@ -89,6 +89,7 @@ public class GraphMLGraph extends Tree{
         return true;
     }*/
 
+    @Override
     public List<Node> getRoots() {
         List<Node> roots = new LinkedList<>();
         for (Node node : nodeList) {
@@ -99,6 +100,7 @@ public class GraphMLGraph extends Tree{
         return roots;
     }
 
+    @Override
     public List<Node> listAllNodes() {
         //System.out.println("List of all nodes returned");
         return new LinkedList<>(nodeList);

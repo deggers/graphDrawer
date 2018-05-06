@@ -16,6 +16,7 @@ public class MappedTreeStructure extends Tree{
         setLevels(root, 0); // set all level-values
     }
 
+    @Override
     public LinkedList<Node> getNodesFromLevel(int level) {
         LinkedList<Node> levelList = new LinkedList<>();
         if (!this.yValuesHasBeenSet) setLevels(getRoot(), 0); // eig unnötig, aber failsave -dustyn
