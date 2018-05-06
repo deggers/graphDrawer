@@ -5,9 +5,9 @@ import model.HelperTypes.EdgeType;
 import model.Node;
 // inspired heavily from https://stackoverflow.com/questions/3522454/java-tree-data-structure
 
-public class GraphMLGraph implements MutableTree<Node> {
-    public final Map<Node, Node> nodeParent = new HashMap<>();
+public class GraphMLGraph extends Graph{
     public final LinkedHashSet<Node> nodeList = new LinkedHashSet<>();
+    private final HashSet<Edge> edgeList = new HashSet<>();
     private final HashSet<EdgeType> EdgeTypeList = new HashSet<>();
     
     public boolean addEdgeType(String id, String attrType){
@@ -27,8 +27,24 @@ public class GraphMLGraph implements MutableTree<Node> {
         return new ArrayList<>(EdgeTypeList);
     }
     
+    void addAllNodes(ArrayList<Node> nodes) {
+        nodes.forEach(n -> {
+            nodeList.add(n);
+        });
+    }
+
+    void addAllEdges(ArrayList<Edge> edges) {
+        edges.forEach(e -> {
+            edgeList.add(e);
+        });
+    }
+
+    void finalizeGraphFromParser() {
+        
+    }
+
     //coppied from MappedTreeStructure for now
-    @Override
+    /*@Override
     public boolean add(Node parent, Node node) {
         checkNotNull(parent, "parent");
         checkNotNull(node, "node");
@@ -43,7 +59,7 @@ public class GraphMLGraph implements MutableTree<Node> {
 
         boolean added = nodeList.add(node);
         nodeList.add(parent);
-        nodeParent.put(node, parent);
+        edgeList.add(new Edge(parent, node));
         return added;
     }
     
@@ -71,11 +87,16 @@ public class GraphMLGraph implements MutableTree<Node> {
         }
         nodeList.remove(node);
         return true;
-    }
+    }*/
 
-    @Override
     public List<Node> getRoots() {
-        return getChildren(null);
+        List<Node> roots = new LinkedList<>();
+        for (Node node : nodeList) {
+            if (!getEdgesIn(node).isEmpty()) {
+                roots.add(node);
+            }
+        }
+        return roots;
     }
 
     public List<Node> listAllNodes() {
@@ -83,24 +104,31 @@ public class GraphMLGraph implements MutableTree<Node> {
         return new LinkedList<>(nodeList);
     }
 
-    @Override
+    /*@Override
     public Node getParent(Node node) {
         checkNotNull(node, "node");
         return nodeParent.get(node);
-    }
+    }*/
 
-    @Override
-    public List<Node> getChildren(Node node) {
-        List<Node> children = new LinkedList<>();
-        for (Node n : nodeList) {
-            Node parent = nodeParent.get(n);
-            if (node == null && parent == null) {
-                children.add(n);
-            } else if (node != null && parent != null && parent.equals(node)) { //parent != 0 redundant für node != 0 && parent.equals(node) ???
-                children.add(n);
+    //@Override
+    public List<Edge> getEdgesOut(Node node) {
+        List<Edge> outgoingEdges = new LinkedList<>();
+        for (Edge e : edgeList) {
+            if (e.start.equals(node)) {
+                outgoingEdges.add(e);
             }
         }
-        return children;
+        return outgoingEdges;
+    }
+    
+    public List<Edge> getEdgesIn(Node node) {
+        List<Edge> incomingEdges = new LinkedList<>();
+        for (Edge e : edgeList) {
+            if (e.target.equals(node)) {
+                incomingEdges.add(e);
+            }
+        }
+        return incomingEdges;
     }
 
     @Override
@@ -117,7 +145,7 @@ public class GraphMLGraph implements MutableTree<Node> {
             builder.append('\n');
             prefix = "    " + prefix;
         }
-        for (Node child : getChildren(node)) {
+        for (Node child : node.getChildren()) {
             dumpNodeStructure(builder, child, prefix);
         }
     }

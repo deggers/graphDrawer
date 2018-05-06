@@ -1,16 +1,16 @@
 package draw;
 
-import model.MappedTreeStructure;
+import model.Graph;
 import model.Node;
 
 public class RadialTree {
 
-    public static MappedTreeStructure processTree(MappedTreeStructure tree) {
+    public static Graph processTree(Graph tree) {
         calculateAngles(tree, 360,0);
         return tree;
     }
 
-    public static void calculateAngles(MappedTreeStructure tree, double alpha, double beta) {
+    public static void calculateAngles(Graph tree, double alpha, double beta) {
         // the depth of v in T
         Node root = tree.getRoot();
         int depthOfNode = Node.getDepth(root);

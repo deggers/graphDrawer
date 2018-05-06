@@ -4,7 +4,7 @@ import java.util.*;
 import model.Node;
 // inspired heavily from https://stackoverflow.com/questions/3522454/java-tree-data-structure
 
-public class MappedTreeStructure implements MutableTree<Node> {
+public class MappedTreeStructure extends Graph {
     public final Map<Node, Node> nodeParent = new HashMap<>();
     public final LinkedHashSet<Node> nodeList = new LinkedHashSet<>();
 
@@ -52,7 +52,7 @@ public class MappedTreeStructure implements MutableTree<Node> {
     }
 
 
-    @Override
+    //@Override
     public boolean add(Node parent, Node node) {
         checkNotNull(parent, "parent");
         checkNotNull(node, "node");
@@ -71,8 +71,7 @@ public class MappedTreeStructure implements MutableTree<Node> {
         return added;
     }
 
-    @Override
-
+    //@Override
     public boolean remove(Node node, boolean cascade) { //nötig bei uns?
 
         checkNotNull(node, "node");
@@ -107,13 +106,13 @@ public class MappedTreeStructure implements MutableTree<Node> {
         return new LinkedList<>(nodeList);
     }
 
-    @Override
+    //@Override
     public Node getParent(Node node) {
         checkNotNull(node, "node");
         return nodeParent.get(node);
     }
 
-    @Override
+    //@Override
     public List<Node> getChildren(Node node) {
         List<Node> children = new LinkedList<>();
         for (Node n : nodeList) {

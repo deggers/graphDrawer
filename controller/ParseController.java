@@ -4,15 +4,15 @@ import model.GraphMLGraph;
 import model.GraphMLParser;
 import model.MappedTreeStructure;
 import model.TreeParserNewick;
+import model.Graph;
 
 import java.io.File;
 
 public class ParseController {
 
     private File file;
-    private MappedTreeStructure tree;
     public static ParseController instance;
-    private GraphMLGraph graph;
+    private Graph graph;
 
     public static ParseController getInstance() {
         if (instance == null) {
@@ -37,17 +37,17 @@ public class ParseController {
     }
 
     // SETTER & GETTER AREA
-    public void setTree(MappedTreeStructure tree) {
-        this.tree = tree;
+    public void setTree(Graph graph) {
+        this.graph = graph;
     }
 
-    public MappedTreeStructure getTree() {
-        return this.tree;
+    public Graph getTree() {
+        return this.graph;
     }
 
     // not used, right?
     public String[] getTreeStringArray() {
-        String[] splitTree = tree.toString().split("\t");
+        String[] splitTree = graph.toString().split("\t");
         return splitTree;
     }
 
@@ -59,7 +59,4 @@ public class ParseController {
         this.file = file;
     }
 
-    public void setGraph(GraphMLGraph graph) {
-        this.graph = graph;
-    }
 }

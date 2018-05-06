@@ -13,7 +13,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import model.MappedTreeStructure;
+import model.Graph;
 import model.Node;
 
 import javax.xml.bind.annotation.XmlAnyAttribute;
@@ -25,13 +25,14 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.stream.Collectors;
+import model.Graph;
 
 public class GUIController {
     private int nodeSize = 8;
     private String selectedTreeAlgorithm;
-    private MappedTreeStructure treeWalker = null;
-    private MappedTreeStructure treeRadial = null;
-    private MappedTreeStructure reinholdTree = null;
+    private Graph treeWalker = null;
+    private Graph treeRadial = null;
+    private Graph reinholdTree = null;
     public static GUIController instance;
 
     private ListIterator<File> filesIter;
@@ -134,7 +135,7 @@ public class GUIController {
         }
     }
 
-    private void drawRadialTreeStructure(MappedTreeStructure root) {
+    private void drawRadialTreeStructure(Graph root) {
         int halfHeight = (int) scollPane.getHeight() / 2;
         int halfWidth = (int) scollPane.getWidth() / 2;
         int level = 0;
@@ -158,7 +159,7 @@ public class GUIController {
 
     }
 
-    private void drawRadialTreeStructureHelper(MappedTreeStructure tree, double alpha, double beta, int spaceBetweenLevels){
+    private void drawRadialTreeStructureHelper(Graph tree, double alpha, double beta, int spaceBetweenLevels){
         // the depth of v in T
         Node root = tree.getRoot();
         int depthOfNode = Node.getDepth(root);
@@ -175,7 +176,7 @@ public class GUIController {
         return node;
     }
 
-    private boolean drawTreeNodes(MappedTreeStructure tree) {
+    private boolean drawTreeNodes(Graph tree) {
         try {
             tree.listAllNodes().forEach((Node node) -> {
                 String label = node.label;
@@ -191,7 +192,7 @@ public class GUIController {
         return true;
     }
 
-    private boolean drawTreeEdges(MappedTreeStructure tree) {
+    private boolean drawTreeEdges(Graph tree) {
         try {
 //            System.out.println("print now for drawTreeEdges");
             tree.listAllNodes().forEach((Node child) -> {
@@ -218,7 +219,7 @@ public class GUIController {
         return true;
     }
 
-    private void drawTreeStructure(MappedTreeStructure tree) {
+    private void drawTreeStructure(Graph tree) {
         System.out.println("called drawTreeStructure");
         drawTreeEdges(tree);
         drawTreeNodes(tree);
