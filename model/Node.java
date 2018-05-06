@@ -9,6 +9,7 @@ public class Node implements Serializable {
     public String label;
     public double weight=0;
     public int level= 0;
+    String GraphMLType;
 
     //walker
     public double x = 0;

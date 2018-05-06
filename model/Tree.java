@@ -7,7 +7,7 @@ public class Tree {
 
     public final Map<Node, Node> nodeParent = new HashMap<>();
     public final LinkedHashSet<Node> nodeList = new LinkedHashSet<>();
-    private boolean yValuesHasBeenSet = false;
+    boolean yValuesHasBeenSet = false;
     private int treeDepth = 0;
 
     public Tree(){
