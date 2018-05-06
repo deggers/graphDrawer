@@ -1,7 +1,7 @@
+import controller.GUIController;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import model.Observe;
@@ -10,16 +10,18 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        VBox root = FXMLLoader.load(getClass().getResource("GUI.fxml"));
+        GUIController guiController = GUIController.getInstance();
+        Parent root = guiController.getRoot();
         Scene scene = new Scene(root);
-        stage.setScene(scene);
+
         stage.initStyle(StageStyle.UNDECORATED);
-        Observe.moveAction(stage, scene);
+        stage.setScene(scene);
         stage.show();
+        Observe.moveAction(stage, scene);
+        guiController.init();
     }
 
     public static void main(String[] args) {
         launch(args);
-
     }
 }

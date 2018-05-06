@@ -30,7 +30,7 @@ public class WalkerImprovedDraw {
     }
     */
 
-    public static Graph processTreeNodes(Graph tree) {
+    public static Tree processTreeNodes(Tree tree) {
 
         try {
             WalkerImprovedDraw w = new WalkerImprovedDraw();
@@ -108,7 +108,7 @@ public class WalkerImprovedDraw {
     }
 
 
-    public Graph treeLayout(Graph tree) throws Exception {
+    public Tree treeLayout(Tree tree) throws Exception {
         List<Node> roots = tree.getRoots();
 
         if (roots.size() == 1) {
@@ -325,6 +325,5 @@ public class WalkerImprovedDraw {
             defaultAncestor = node;
         }
     }
-
 
 }

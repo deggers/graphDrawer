@@ -1,3 +1,4 @@
+
 package model;
 
 import java.io.Serializable;
@@ -6,12 +7,8 @@ import java.util.List;
 
 public class Node implements Serializable {
     public String label;
-    private final int id = 0;
-    public boolean checked=false, onlyChild=false, hasThread=false;
-    public Node leftChild, rightChild, threadTo;
-    public double xtemp=0, offset=0;
-    double weight;
-    public String GraphMLType;
+    public double weight=0;
+    public int level= 0;
 
     //walker
     public double x = 0;
@@ -28,15 +25,17 @@ public class Node implements Serializable {
     public Node thread = null;
     public static List<Integer> depthList = new ArrayList<>();// muss resetted werden
 
+    // RT
+    public boolean checked=false, hasThread=false;
+    public Node leftChild, rightChild;
+    public double offset=1;
+
     // for the radialTree 
     private int angle;
     private double lowerBisector;
     private double higherBisector;
     private double tangentLimit;
 
-
-    public Node() {
-    }
 
     public Node(String label) {
         this.label = label;
@@ -71,8 +70,17 @@ public class Node implements Serializable {
         return indexAsChild >= 1;
     }
 
+
+    // der gibt nicht nur den Node aus, sondern alles was am Node dranhängt ?!
     @Override
     public String toString() {
+//        String out = "id: " + label + ", x:" + x + ", y:" + y + ", prelim:" + prelim + ", modifier:" + modifier + ", indexAsChild:" + indexAsChild + ";";
+        String out = "id: " + label + ", x:" + x + ", y:" + y + ";";
+
+        return out;
+    }
+
+    public String toStringWithAllChildren() {
         String out = "id: " + label + ", x:" + x + ", y:" + y + ", prelim:" + prelim + ", modifier:" + modifier + ", indexAsChild:" + indexAsChild + ";";
         for (Node c : children) {
             out = out + "\t" + c.toString();
