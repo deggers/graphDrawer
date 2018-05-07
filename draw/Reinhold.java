@@ -30,8 +30,15 @@ public class Reinhold {
         petrify(root, 0);
         double offset = getLL(root).x;
         petrify(root,-offset);
+        stretch(root);
     }
 
+    private void stretch(Node node){
+        node.y *=3;
+        for (Node n: node.getChildren()){
+            stretch(n);
+        }
+    }
     //step 1
     private void addYCoords(Node node, double level) {
         node.y = level;
