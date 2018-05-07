@@ -19,7 +19,7 @@ public class TreeParserNewick {
             if (isValidFormat(newickString)) {
                 Node root = buildTreeStructure(newickString);
                 Tree tree = new Tree(root);
-//                fillTree(root, tree);  is now done in constructor
+                //fillTree(root, tree); moved to constructor
                 ParseController.getInstance().setTree(tree);
                 return true;
             } else {
