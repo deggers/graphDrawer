@@ -110,7 +110,7 @@ public class WalkerImprovedDraw {
 
     public Tree treeLayout(Tree tree) throws Exception {
         List<Node> roots = tree.getRoots();
-
+        System.out.println("Roots found: " + roots.size() + " as following: " + roots);
         if (roots.size() == 1) {
             Node root = roots.get(0);
 //            System.out.println("Root found:" + root.label);
@@ -130,7 +130,18 @@ public class WalkerImprovedDraw {
             if (roots.isEmpty()) {
                 throw new Exception("No root found");
             } else {
-                throw new Exception("More than one root was found");
+                //throw new Exception("More than one root was found");
+                System.out.println("ATTENTION: more than root found, proceeding for all roots");
+                for (Node root : roots) {
+                    tree.listAllNodes().forEach((Node n) -> {
+                        n.modifier = 0;
+                        n.thread = null;
+                        n.ancestor = n;
+                    });
+                    firstWalk(root, 0);
+                    secondWalk(root, 0,0);
+                }
+                return tree;
             }
         }
 

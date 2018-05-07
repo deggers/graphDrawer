@@ -32,5 +32,11 @@ public class Edge {
         this.edgeType = edgeType;
         this.weight = weight;
     }
+
+    @Override
+    public String toString() {
+        return "Edge{" + "start=" + start + ", target=" + target + ", edgeType=" + edgeType + ", weight=" + weight + '}';
+    }
+    
     
 }
