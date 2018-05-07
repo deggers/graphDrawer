@@ -1,6 +1,8 @@
 
 package controller;
 
+import model.GraphMLGraph;
+import model.GraphMLParser;
 import model.Tree;
 import model.TreeParserNewick;
 
@@ -23,10 +25,17 @@ public class ParseController {
         setFile(file);
         String fileName = file.getName();
         String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());
-        if (fileExtension.equals("nh")) {
-            return TreeParserNewick.parseFileToTree(file);
+        if (fileExtension.equalsIgnoreCase("nh")) {
+            Tree newickTree = TreeParserNewick.parseFileToTree(file);
+            setTree(newickTree);
+            return true;
+        } else if (fileExtension.equalsIgnoreCase("graphml")) {
+            GraphMLGraph graphML = GraphMLParser.parseFileToTree(file);
+            setTree(graphML);
+            return true;
+
         } else {
-            System.out.println("Format is not .nh ?!");
+            System.out.println("format is not supported ?!");
             return false;
         }
     }

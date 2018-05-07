@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 public class TreeParserNewick {
     private static int pseudoNode_id = 0;
 
-    public static boolean parseFileToTree(File file) {
+    public static Tree parseFileToTree(File file) {
         try {
             Stream<String> lines = Files.lines(file.toPath());
             String newickString = lines.map(line -> line.replaceAll("\\s+", "")).collect(Collectors.joining()).trim();
@@ -19,16 +19,14 @@ public class TreeParserNewick {
             if (isValidFormat(newickString)) {
                 Node root = buildTreeStructure(newickString);
                 Tree tree = new Tree(root);
-                //fillTree(root, tree); moved to constructor
-                ParseController.getInstance().setTree(tree);
-                return true;
+                return tree;
             } else {
                 System.out.println("format for newick seems to be wrong, daaamn");
-                return false;
+                return null;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return null;
         }
     }
 

@@ -31,12 +31,6 @@ public class Node implements Serializable {
     public Node leftChild, rightChild;
     public double offset=1;
 
-    // for the radialTree 
-    private int angle;
-    private double lowerBisector;
-    private double higherBisector;
-    private double tangentLimit;
-
 
     public Node(String label) {
         this.label = label;
@@ -98,21 +92,6 @@ public class Node implements Serializable {
         return 0;
     }
 
-    public void setAngle(int i) {
-        this.angle = i;
-    }
-
-    public void setLowerBisector(double v) {
-        this.lowerBisector = v;
-    }
-
-    public void setHigherBisector(double v) {
-        this.higherBisector = v;
-    }
-
-    public void setTangentLimit(double v) {
-        this.tangentLimit = v;
-    }
 
     public static int getDepth(Node node) {
         int depth = 0;

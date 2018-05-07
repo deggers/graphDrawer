@@ -1,25 +1,21 @@
 package model;
 
-import controller.ParseController;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.events.*;
 import java.io.File;
 import java.io.FileReader;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.events.*;
-
+import java.util.NoSuchElementException;
 
 
 public class GraphMLParser {
-    
-    public static boolean parseFileToTree(File file) {
+
+    @SuppressWarnings("ConstantConditions")
+    public static GraphMLGraph parseFileToTree(File file) {
         try {
             // Ressourcen anlegen
             GraphMLGraph graph = null;
@@ -29,23 +25,26 @@ public class GraphMLParser {
             Edge edge = null; //brauchen wahrscheinlich edge
             String edgeType = null;
             Double edgeWeight = null;
-            
+
             // Speichern von Knoten, Kanten und Map<Name, Knoten> zum einfachen auffinden
             ArrayList<Node> nodes = new ArrayList<>();
             ArrayList<Edge> edges = new ArrayList<>(); //brauche Edge-Klasse
             LinkedHashMap<String, Node> nodesMap = new LinkedHashMap<>();
-            
+
             // XML-Reader
             XMLInputFactory factory = XMLInputFactory.newInstance();
             XMLEventReader reader = factory.createXMLEventReader(new FileReader(file));
-            
-            while(reader.hasNext()){ //Über Inhalt der XML iterieren
+
+            while (reader.hasNext()) { //Über Inhalt der XML iterieren
                 XMLEvent event = reader.nextEvent();
-                switch (event.getEventType()){
-                    
+                System.out.println("event.getEventType = " + event.getEventType());
+                switch (event.getEventType()) {
+
                     case XMLStreamConstants.START_ELEMENT:
                         StartElement startElement = event.asStartElement();
                         String sName = startElement.getName().getLocalPart();
+                        System.out.println("sName = " + sName);
+                        // key
                         Iterator<Attribute> attributes;
                         switch (sName) {
                             case "graphml":
@@ -55,28 +54,36 @@ public class GraphMLParser {
                                 attributes = startElement.getAttributes();
                                 String id = null;
                                 String ktype = "none";
-                                while (attributes.hasNext()){
-                                    String name = attributes.next().getName().getLocalPart();
-                                    switch (name){
-                                            case "id":
-                                                id = name;
-                                                break;
-                                            case "for":
-                                                if (!name.equalsIgnoreCase("edge")) throw new Exception("Unknown attribute for GraphML key: for=\""+name+"\"");
-                                                break;
-                                            case "attr.name":
-                                                if (!name.equalsIgnoreCase(id)) throw new Exception("GraphML Key id doesn't match attr.name or was not set");
-                                                break;
-                                            case "sttr.type":
-                                                ktype = name;
-                                                System.out.println("Warning: non-standard EdgeType added: " + name);
-                                                break;
-                                            default:
-                                                System.out.println("Unknown attribute type for Key: " + name);
+                                while (attributes.hasNext()) {
+                                    String attributeName = attributes.next().getName().getLocalPart();
+                                    String attributeValue = attributes.next().getValue();
+                                    // attr.name
+                                    switch (attributeName) {
+                                        case "id":
+                                            id = attributeValue;
+                                            break;
+                                        case "for":
+                                            if (!attributeValue.equalsIgnoreCase("edge"))
+                                                throw new Exception("Unknown attribute for GraphML key: for=\"" + attributeName + "\"");
+                                            break;
+                                        case "attr.name":
+                                            if (!attributeValue.equalsIgnoreCase(id))
+                                                throw new Exception("GraphML Key id doesn't match attr.name or was not set");
+                                            break;
+                                        case "attr.type":
+                                            ktype = attributeValue;
+                                            System.out.println("Warning: non-standard EdgeType added: " + attributeName);
+                                            break;
+                                        default:
+                                            System.out.println("Unknown attribute type for Key: " + attributeName);
                                             break;
                                     }
                                 }
                                 graph.addEdgeType(id, ktype);
+
+                                System.out.println("reached!!");
+                                System.out.println("graph = " + graph);
+
                                 break;
                             case "graph"://-----------------------------Graph--------------------------------------
                                 //eigentlich nichts
@@ -85,9 +92,9 @@ public class GraphMLParser {
                                 attributes = startElement.getAttributes();
                                 String label = null;
                                 node = new Node("ich sollte nicht hier sein");
-                                while (attributes.hasNext()){
+                                while (attributes.hasNext()) {
                                     String name = attributes.next().getName().getLocalPart();
-                                    switch (name){
+                                    switch (name) {
                                         case "id":
                                             node.label = name;
                                             break;
@@ -104,9 +111,9 @@ public class GraphMLParser {
                                 break;
                             case "edge": //-----------------------------Edge--------------------------------------
                                 attributes = startElement.getAttributes();
-                                while (attributes.hasNext()){
+                                while (attributes.hasNext()) {
                                     String name = attributes.next().getName().getLocalPart();
-                                    switch (name){
+                                    switch (name) {
                                         case "source":
                                             source = nodesMap.get(name);
                                             break;
@@ -121,9 +128,9 @@ public class GraphMLParser {
                                 break;
                             case "data"://-----------------------------Data--------------------------------------
                                 attributes = startElement.getAttributes();
-                                while (attributes.hasNext()){
+                                while (attributes.hasNext()) {
                                     String name = attributes.next().getName().getLocalPart();
-                                    switch (name){
+                                    switch (name) {
                                         case "key":
                                             edgeType = name;
                                             break;
@@ -134,11 +141,11 @@ public class GraphMLParser {
                                 }
                                 break;
                             default:
-                                System.out.println("Unknown Element ID: " +sName);
+                                System.out.println("Unknown Element ID: " + sName);
                                 break;
                         }
-                        break;
-                        
+                        break; // END-CASE START.ELEMENT
+
                     case XMLStreamConstants.CHARACTERS:
                         Characters characters = event.asCharacters();
                         // Read tag content
@@ -151,7 +158,7 @@ public class GraphMLParser {
                             }
                         }
                         break;
-                        
+
                     case XMLStreamConstants.END_ELEMENT:
                         EndElement endElement = event.asEndElement();
                         String eName = endElement.getName().getLocalPart();
@@ -175,12 +182,12 @@ public class GraphMLParser {
                                     }
                                 }*/
                                 if (/*edgeIsNew*/true) {
-                                edge = new Edge();
-                                edge.start = source;
-                                edge.target = target;
-                                edge.edgeType = edgeType;
-                                edge.weight = edgeWeight;
-                                edges.add(edge);
+                                    edge = new Edge();
+                                    edge.start = source;
+                                    edge.target = target;
+                                    edge.edgeType = edgeType;
+                                    edge.weight = edgeWeight;
+                                    edges.add(edge);
                                 }
                                 break;
                             case "data":
@@ -189,24 +196,30 @@ public class GraphMLParser {
                                 break;
                         }
                         break;
-                        
+
                     default:
                         break;
                 }
             }
             //Postprocessing der erhaltenen Daten
-            if (graph != null){
+            if (graph != null) {
                 graph.addAllNodes(nodes);
                 graph.addAllEdges(edges);
                 graph.finalizeGraphFromParser();
-                ParseController.getInstance().setTree(graph);
+//                ParseController.getInstance().setTree(graph);
+                // der Parse-Controller setzt den jetzt
             }
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Error while parsing GraphML file");
-            return false;
+            return graph;
+        } catch (NoSuchElementException e) {
+//            e.printStackTrace();
+            System.out.println("no such eleement");
+            return null;
+        }
+        catch (Exception e) {
+//            e.printStackTrace();
+            System.out.println("some mistake in GraphML :(");
+            return null;
         }
     }
-    
+
 }
