@@ -42,7 +42,7 @@ public class GraphMLGraph extends Tree{
     }
 
     void finalizeGraphFromParser() {
-        
+        System.out.println("Roots: " + getRoots());
     }
 
     //coppied from MappedTreeStructure for now
@@ -95,7 +95,8 @@ public class GraphMLGraph extends Tree{
     public List<Node> getRoots() {
         List<Node> roots = new LinkedList<>();
         for (Node node : nodeList) {
-            if (!getEdgesIn(node).isEmpty()) {
+            System.out.println(node.label);
+            if (getEdgesIn(node).isEmpty()) {
                 roots.add(node);
             }
         }
