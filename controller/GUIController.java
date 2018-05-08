@@ -185,6 +185,8 @@ public class GUIController {
         String selectedEdgeType = String.valueOf(choiceBoxEdgeType.getSelectionModel().getSelectedItem());
         this.selectedEdgeType = selectedEdgeType;
         this.selectedRoot = null;
+        List<String> rootList = ParseController.getInstance().getGraph().getLabelsFromRoots(selectedEdgeType);
+        choiceBoxRoot.getItems().setAll(rootList);
         drawInit();
     }
 
@@ -211,7 +213,7 @@ public class GUIController {
             choiceBoxRoot.setDisable(true);
             choiceBoxRoot.getItems().clear();
             processTreeAndAlgo();
-        } else if (theGraph != null && selectedEdgeType != null && selectedRoot != null && !selectedRoot.equals("empty")) {
+        } else if (theGraph != null && selectedAlgorithm != null && selectedEdgeType != null && selectedRoot != null && !selectedRoot.equals("empty")) {
             System.out.println("i would like to draw here :)");
             System.out.println("selectedEdgeType = " + selectedEdgeType);
             System.out.println("selectedRoot = " + selectedRoot);
