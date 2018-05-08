@@ -8,32 +8,24 @@ import java.util.List;
 import static java.lang.Math.abs;
 
 public class Reinhold {
+    private double cursep=0;
+    private double rootsep=0;
+    private double loffsum=0;
+    private double roffsum=0;
+    private double minsep= 2;
 
     public static Tree processTree(Tree tree) {
         try {
             Reinhold r = new Reinhold();
             Node root = tree.getRoot();
-            if (isBinaryTree(root)) {
-                r.layout(root);
-                return tree;
-            }
-            return null;
-        } catch (Exception e) {
+             r.layout(root);
+             return tree;
+           }
+        catch (Exception e) {
             System.out.println("Error while running RT Algorithm");
             System.out.println(e);
             return null;
         }
-    }
-
-    public static boolean isBinaryTree(Node root) {
-        if (root.getChildren().size() > 3) {
-            return false;
-        } else {
-            for (Node n : root.getChildren()) {
-                isBinaryTree(n);
-            }
-        }
-        return true;
     }
 
     private void layout(Node root) {
@@ -66,11 +58,15 @@ public class Reinhold {
         if (!node.checked) {
             List<Node> kids = new ArrayList<>();
             node.checked = true;
+            double childLevel= node.y + 1;
             for (Node c : node.getChildren()) {
                 c.parent = node;
-                if ((c.y == (node.y + 1))) { //
+                if ((c.y == (childLevel))) {
                     kids.add(c);
                 }
+//                if(kids.size() > 2){
+//                    return false;
+//                }
 //                if (kids.size() == 0) {
 //                }
                 if (kids.size() == 1) {
@@ -88,16 +84,20 @@ public class Reinhold {
     }
 
     private void setup(Node root, int level, Node rmost, Node lmost) {
-        Node right, left;
         // avoid selecting an extreme
         if (root == null) {
             lmost.level = -1;
             rmost.level = -1;
         } else {
+            Node right= null, left=null;
             Node ll, lr, rr, rl;
-            root.y = level;
-            left = root.leftChild;  // follows contour of left subtree
-            right = root.rightChild;  // follows contour of right subtree
+            //root.y = level;
+            if(root.leftChild!=null){
+                left = root.leftChild;  // follows contour of left subtree
+            }
+            if(root.rightChild!=null){
+                right = root.rightChild;  // follows contour of right subtree
+            }
             ll = getLL(root);
             if (left == null) {
                 lr = root;
@@ -121,11 +121,10 @@ public class Reinhold {
                 lmost.offset = 0;
                 root.offset = 0;
             } else {
-                double minsep = 2;
-                double cursep = minsep;
-                double rootsep = minsep;
-                double loffsum = 0;
-                double roffsum = 0;
+                cursep = minsep;
+                rootsep = minsep;
+                loffsum = 0;
+                roffsum = 0;
                 // consider each level in turn until one subtree ist exhausted, pushing subtrees
                 // apart when neccessary
                 while (left != null && right != null) {
@@ -138,7 +137,7 @@ public class Reinhold {
                         loffsum = loffsum + left.offset;
                         cursep = cursep - left.offset;
                         left = left.rightChild;
-                    } else { //if (left.leftChild!= null){
+                    } else {
                         loffsum = loffsum - left.offset;
                         cursep = cursep + left.offset;
                         left = left.leftChild;
@@ -147,7 +146,7 @@ public class Reinhold {
                         roffsum = roffsum - right.offset;
                         cursep = cursep - right.offset;
                         right = right.leftChild;
-                    } else {//if(right.rightChild!=null) {
+                    } else {
                         roffsum = roffsum + right.offset;
                         cursep = cursep + right.offset;
                         right = right.rightChild;
@@ -210,10 +209,10 @@ public class Reinhold {
                 root.leftChild = null;
             }
             if (root.leftChild != null) {
-                petrify(root.leftChild, xpos - root.offset);
+                petrify(root.leftChild, xpos-root.offset);
             }
             if (root.rightChild != null) {
-                petrify(root.rightChild, xpos + root.offset);
+                petrify(root.rightChild, xpos+root.offset);
             }
         }
     }
