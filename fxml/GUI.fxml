@@ -59,6 +59,18 @@
                </HBox.margin>
             </ChoiceBox>
 
+             <ChoiceBox fx:id="choiceBoxEdgeType" onAction="#choiceBoxEdgeTypeOnAction" prefWidth="150.0">
+                 <HBox.margin>
+                     <Insets left="10.0" right="10.0" />
+                 </HBox.margin>
+             </ChoiceBox>
+
+             <ChoiceBox fx:id="choiceBoxRoot" onAction="#choiceBoxSelectRoot" prefWidth="150.0">
+                 <HBox.margin>
+                     <Insets left="10.0" right="10.0" />
+                 </HBox.margin>
+             </ChoiceBox>
+
             <Button fx:id="exitBtn" contentDisplay="CENTER" mnemonicParsing="false" onAction="#closeButtonAction" text="exit" textAlignment="CENTER" textOverrun="WORD_ELLIPSIS">
                <font>
                   <Font name="Arial Bold" size="12.0" />
