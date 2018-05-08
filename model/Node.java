@@ -70,9 +70,8 @@ public class Node implements Serializable {
     @Override
     public String toString() {
 //        String out = "id: " + label + ", x:" + x + ", y:" + y + ", prelim:" + prelim + ", modifier:" + modifier + ", indexAsChild:" + indexAsChild + ";";
-        String out = "id: " + label + ", x:" + x + ", y:" + y + ";";
-
-        return out;
+        return  "id: " + label + ", x:" + x + ", y:" + y + ";";
+//        return label;
     }
 
     public String toStringWithAllChildren() {
