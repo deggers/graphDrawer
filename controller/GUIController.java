@@ -4,6 +4,7 @@ package controller;
 import draw.RadialTree;
 import draw.Reinhold;
 import draw.WalkerImprovedDraw;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -11,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import model.GraphMLGraph;
 import model.Tree;
 
 import java.io.File;
@@ -24,8 +26,16 @@ import java.util.stream.Collectors;
 
 public class GUIController {
 
+    public void initialize() {
+        nodeSizeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            setNodeSize(newValue.intValue());
+        });
+        choiceBoxEdgeType.setDisable(true); // disable at beginning
+        choiceBoxRoot.setDisable(true); // disable at beginning
+    } // setup observer for nodeSizeSlider
+
     //@formatter:off
-    @FXML    VBox                       vBox;
+    @FXML    private    VBox            vBox;
     @FXML    Button                     exitBtn;
     @FXML    ToggleButton               fullscreenToggle;
     @FXML    Slider                     nodeSizeSlider;
@@ -33,6 +43,9 @@ public class GUIController {
     @FXML    Button                     loadFile;
     @FXML    Button                     nextFile;
     @FXML    Label                      fileNameLabel;
+    @FXML    ChoiceBox                  choiceBoxEdgeType;
+    @FXML    ChoiceBox                  choiceBoxRoot;
+
 
     @FXML    private void               closeButtonAction() {
         Stage stage = (Stage) exitBtn.getScene().getWindow();
@@ -94,12 +107,31 @@ public class GUIController {
             }
         }
     }
+    @FXML    private void               choiceBoxAlgorithmOnAction() {
+        String selectedAlgo = String.valueOf(choiceBoxAlgorithm.getSelectionModel().getSelectedItem());
+        switch (selectedAlgo) {
+            case "Radial":
+                this.selectedAlgorithm = "Radial";
+                break;
+            case "Walker":
+                this.selectedAlgorithm = "Walker";
+                break;
+            case "RT":
+                this.selectedAlgorithm = "RT";
+                break;
+            default:
+                throw new IllegalArgumentException("The algo: " + selectedAlgo + " is not yet implemented");
+        }
+        drawInit();
+    }
+
 
     private PaneController              paneController              = null;
-    private String                      selectedTreeAlgorithm       = null;
+    private String                      selectedAlgorithm           = null;
     private String                      fileName                    = null;
     private ListIterator<File>          filesIter                   = null;
     private List<File>                  filesInFolder               = null;
+
 
     public static   GUIController       getInstance() {
         FXMLLoader loader = new FXMLLoader();
@@ -122,8 +154,11 @@ public class GUIController {
     }
     private static  GUIController       guiInstance                 = null;
 
+
     private int                         nodeSize                    = 8;
     private int                         spaceBetweenRadii           = 0;
+    private String                      selectedRoot                = null;
+    private String                      selectedEdgeType            = null;
 
     public  void                        init()      {
         paneController = PaneController.getInstance();// set ScrollPane
@@ -136,90 +171,133 @@ public class GUIController {
         fileNameLabel.setText(this.fileName);
     }
 
-    @FXML   private void drawInit() {
-        if (ParseController.getInstance().getTree() != null && getSelectedTreeAlgorithm() != null) {
-            cleanPane();
-            setFileLabel();
-            switch (getSelectedTreeAlgorithm()) {
-                case "Walker":
-                    Tree treeWalker = WalkerImprovedDraw.processTreeNodes(ParseController.getInstance().getTree());
-                    nodeSizeSlider.setDisable(false);
-                    paneController.drawTreeStructure(treeWalker);
-                    break;
-                case "Radial":
-                    System.out.println("Selected Radial");
-                    Tree radialTree = RadialTree.processTree(ParseController.getInstance().getTree());
-                    nodeSizeSlider.setDisable(true);
-                    paneController.drawRadialTreeStructure(radialTree);
-                    break;
-                case "RT":
-                    System.out.println("Selected Reinhold");
-                    nodeSizeSlider.setDisable(false);
-                    Tree reinholdTree = Reinhold.processTree(ParseController.getInstance().getTree());
-                    paneController.drawTreeStructure(reinholdTree);
-                    break;
-                default:
-                    throw new IllegalArgumentException("The algo: " + selectedTreeAlgorithm + " is not yet implemented");
-            }
-        }
-    }
-    @FXML   private void choiceBoxAlgorithmOnAction() {
-        String selectedAlgo = String.valueOf(choiceBoxAlgorithm.getSelectionModel().getSelectedItem());
-        switch (selectedAlgo) {
-            case "Radial":
-                this.selectedTreeAlgorithm = "Radial";
-                break;
-            case "Walker":
-                this.selectedTreeAlgorithm = "Walker";
-                break;
-            case "RT":
-                this.selectedTreeAlgorithm = "RT";
-                break;
-            default:
-                throw new IllegalArgumentException("The algo: " + selectedAlgo + " is not yet implemented");
-        }
-        drawInit();
+
+    public void choiceBoxSelectRoot(ActionEvent event) {
+        String selectedRoot =  String.valueOf(choiceBoxRoot.getSelectionModel().getSelectedItem());
+        this.selectedRoot = selectedRoot;
     }
 
-    // SETTER & GETTER AREA
-    public String               getSelectedTreeAlgorithm() {
-        return this.selectedTreeAlgorithm;
+
+    @FXML   private void drawInit() {
+        Tree theTree = ParseController.getInstance().getTree();
+        GraphMLGraph theGraph = ParseController.getInstance().getGraph();
+
+        if (theGraph != null){
+            choiceBoxEdgeType.setDisable(false);
+            choiceBoxEdgeType.getItems().setAll(theGraph.getEdgeTypeLabels());
+            System.out.println(theGraph.getEdgeTypeLabels());
+            addChoiceBoxRootIfNecessary(theGraph);
+        }
+
+        if (theTree != null && selectedAlgorithm != null) {
+            processTreeAndAlgo();
+        } else if (theGraph != null && selectedEdgeType != null && selectedRoot != null) {
+            System.out.println("now i could draw something for real!");
+        }
     }
-    public List<File>           getFilesInFolder() {
+
+    private void addChoiceBoxRootIfNecessary(GraphMLGraph theGraph) {
+        if (selectedEdgeType != null && theGraph != null && selectedRoot == null) {
+            choiceBoxRoot.setDisable(false);
+            List<String> rootList = theGraph.getLabelsFromRoots(selectedEdgeType);
+            choiceBoxRoot.getItems().setAll(rootList);
+            this.selectedRoot = "initial";
+        }
+    }
+
+    //@formatter:on
+
+    // SETTER & GETTER AREA
+    public String getSelectedAlgorithm() {
+        return this.selectedAlgorithm;
+    }
+
+    public List<File> getFilesInFolder() {
         return filesInFolder;
     }
-    public ListIterator<File>   getFilesIter() {
+
+    public ListIterator<File> getFilesIter() {
         return filesIter;
     }
-    public Parent               getRoot() {
+
+    public Parent getRoot() {
         return this.vBox;
     }
 
-    private void                setNodeSize(int nodeSize) {
+    private void setNodeSize(int nodeSize) {
         this.nodeSize = nodeSize;
         drawInit();
     }
-    public int                  getNodeSize() {
+    public int getNodeSize() {
         return this.nodeSize;
     }
-
-    public void                 setFilesInFolder(List<File> filesInFolder) {
+    public void setFilesInFolder(List<File> filesInFolder) {
         this.filesInFolder = filesInFolder;
     }
-    public void                 setFilesIter(ListIterator<File> filesIter) {
+    public void setFilesIter(ListIterator<File> filesIter) {
         this.filesIter = filesIter;
     }
-    public void                 initialize() {
-        nodeSizeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            setNodeSize(newValue.intValue());
-        });
-    } // setup observer for nodeSizeSlider
-    private void                setPane(VBox vBox) {
+
+
+    private void setPane(VBox vBox) {
         this.vBox = vBox;
     }
 
+    public void choiceBoxEdgeTypeOnAction(ActionEvent event) {
+        String selectedEdgeType = String.valueOf(choiceBoxEdgeType.getSelectionModel().getSelectedItem());
+        switch (selectedEdgeType) {
+            case "return-type":
+                this.selectedEdgeType = "return-type";
+                break;
+            case "implementation":
+                this.selectedEdgeType = "implementation";
+                break;
+            case "package":
+                this.selectedEdgeType = "package";
+                break;
+            case "inheritance":
+                this.selectedEdgeType = "inheritance";
+                break;
+            case "throws":
+                this.selectedEdgeType = "throws";
+                break;
+            case "aggregation":
+                this.selectedEdgeType = "aggregation";
+                break;
+            case "method-call":
+                this.selectedEdgeType = "method-call";
+                break;
+            default:
+                throw new IllegalArgumentException(". . . is not yet implemented");
+        }
+        drawInit();
+    }
 
-    //    public void                 setSelectedTreeAlgorithm(String selectedTreeAlgorithm) {
-//        this.selectedTreeAlgorithm = selectedTreeAlgorithm;
-//    }
+    private void processTreeAndAlgo() {
+        cleanPane();
+        setFileLabel();
+        switch (getSelectedAlgorithm()) {  // what about a tree.resizeToScreen() ?
+            case "Walker":
+                Tree treeWalker = WalkerImprovedDraw.processTreeNodes(ParseController.getInstance().getTree());
+                nodeSizeSlider.setDisable(false);
+                paneController.drawTreeStructure(treeWalker);
+                break;
+            case "Radial":
+                System.out.println("Selected Radial");
+                Tree radialTree = RadialTree.processTree(ParseController.getInstance().getTree());
+                nodeSizeSlider.setDisable(true);
+                paneController.drawRadialTreeStructure(radialTree);
+                break;
+            case "RT":
+                System.out.println("Selected Reinhold");
+                nodeSizeSlider.setDisable(false);
+                Tree reinholdTree = Reinhold.processTree(ParseController.getInstance().getTree());
+                paneController.drawTreeStructure(reinholdTree);
+                break;
+            default:
+                throw new IllegalArgumentException("The algo: " + selectedAlgorithm + " is not yet implemented");
+        }
+    }
+
+
 }
