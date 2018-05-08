@@ -47,6 +47,9 @@ public class GraphMLGraph{
                     }
             }
         }
+        if (roots.size() == 0) {
+            roots.add("empty");
+        }
         return roots;
     }
     

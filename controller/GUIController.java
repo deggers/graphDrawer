@@ -26,6 +26,9 @@ import java.util.stream.Collectors;
 
 public class GUIController {
 
+    private boolean choiceBoxEdgeTypeIsSet = false;
+    private boolean choiceBoxRootIsSet = false;
+
     public void initialize() {
         nodeSizeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             setNodeSize(newValue.intValue());
@@ -175,35 +178,47 @@ public class GUIController {
     public void choiceBoxSelectRoot(ActionEvent event) {
         String selectedRoot =  String.valueOf(choiceBoxRoot.getSelectionModel().getSelectedItem());
         this.selectedRoot = selectedRoot;
+        drawInit();
     }
 
+    public void choiceBoxEdgeTypeOnAction(ActionEvent event) {
+        String selectedEdgeType = String.valueOf(choiceBoxEdgeType.getSelectionModel().getSelectedItem());
+        this.selectedEdgeType = selectedEdgeType;
+        this.selectedRoot = null;
+        drawInit();
+    }
 
     @FXML   private void drawInit() {
         Tree theTree = ParseController.getInstance().getTree();
         GraphMLGraph theGraph = ParseController.getInstance().getGraph();
 
-        if (theGraph != null){
+        if (theGraph != null && selectedEdgeType == null && choiceBoxEdgeTypeIsSet == false){
             choiceBoxEdgeType.setDisable(false);
             choiceBoxEdgeType.getItems().setAll(theGraph.getEdgeTypeLabels());
-            System.out.println(theGraph.getEdgeTypeLabels());
-            addChoiceBoxRootIfNecessary(theGraph);
+            choiceBoxEdgeTypeIsSet = true;
         }
 
-        if (theTree != null && selectedAlgorithm != null) {
-            processTreeAndAlgo();
-        } else if (theGraph != null && selectedEdgeType != null && selectedRoot != null) {
-            System.out.println("now i could draw something for real!");
-        }
-    }
-
-    private void addChoiceBoxRootIfNecessary(GraphMLGraph theGraph) {
-        if (selectedEdgeType != null && theGraph != null && selectedRoot == null) {
+        if (theGraph != null && selectedEdgeType != null && choiceBoxRootIsSet == false) {
             choiceBoxRoot.setDisable(false);
             List<String> rootList = theGraph.getLabelsFromRoots(selectedEdgeType);
             choiceBoxRoot.getItems().setAll(rootList);
-            this.selectedRoot = "initial";
+            choiceBoxRootIsSet = true;
+        }
+
+        if (theTree != null && selectedAlgorithm != null) {
+            choiceBoxEdgeType.setDisable(true);
+            choiceBoxEdgeType.getItems().clear();
+            choiceBoxRoot.setDisable(true);
+            choiceBoxRoot.getItems().clear();
+            processTreeAndAlgo();
+        } else if (theGraph != null && selectedEdgeType != null && selectedRoot != null && !selectedRoot.equals("empty")) {
+            System.out.println("i would like to draw here :)");
+            System.out.println("selectedEdgeType = " + selectedEdgeType);
+            System.out.println("selectedRoot = " + selectedRoot);
+
         }
     }
+
 
     //@formatter:on
 
@@ -228,12 +243,15 @@ public class GUIController {
         this.nodeSize = nodeSize;
         drawInit();
     }
+
     public int getNodeSize() {
         return this.nodeSize;
     }
+
     public void setFilesInFolder(List<File> filesInFolder) {
         this.filesInFolder = filesInFolder;
     }
+
     public void setFilesIter(ListIterator<File> filesIter) {
         this.filesIter = filesIter;
     }
@@ -241,36 +259,6 @@ public class GUIController {
 
     private void setPane(VBox vBox) {
         this.vBox = vBox;
-    }
-
-    public void choiceBoxEdgeTypeOnAction(ActionEvent event) {
-        String selectedEdgeType = String.valueOf(choiceBoxEdgeType.getSelectionModel().getSelectedItem());
-        switch (selectedEdgeType) {
-            case "return-type":
-                this.selectedEdgeType = "return-type";
-                break;
-            case "implementation":
-                this.selectedEdgeType = "implementation";
-                break;
-            case "package":
-                this.selectedEdgeType = "package";
-                break;
-            case "inheritance":
-                this.selectedEdgeType = "inheritance";
-                break;
-            case "throws":
-                this.selectedEdgeType = "throws";
-                break;
-            case "aggregation":
-                this.selectedEdgeType = "aggregation";
-                break;
-            case "method-call":
-                this.selectedEdgeType = "method-call";
-                break;
-            default:
-                throw new IllegalArgumentException(". . . is not yet implemented");
-        }
-        drawInit();
     }
 
     private void processTreeAndAlgo() {
