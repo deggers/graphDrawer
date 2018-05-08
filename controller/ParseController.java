@@ -12,6 +12,8 @@ public class ParseController {
 
     private File file;
     private Tree tree;
+
+    private GraphMLGraph graph;
     public static ParseController instance;
 
     public static ParseController getInstance() {
@@ -28,12 +30,13 @@ public class ParseController {
         if (fileExtension.equalsIgnoreCase("nh")) {
             Tree newickTree = TreeParserNewick.parseFileToTree(file);
             setTree(newickTree);
+            setGraph(null);
             return true;
         } else if (fileExtension.equalsIgnoreCase("graphml")) {
-            GraphMLGraph graphML = GraphMLParser.parseFileToTree(file);
-            setTree(graphML);
+            GraphMLGraph graphML = GraphMLParser.parseFileToGraph(file);
+            setGraph(graphML);
+            setTree(null);
             return true;
-
         } else {
             System.out.println("format is not supported ?!");
             return false;
@@ -44,15 +47,18 @@ public class ParseController {
     public void setTree(Tree tree) {
         this.tree = tree;
     }
-
     public Tree getTree() {
         return this.tree;
     }
-
+    public GraphMLGraph getGraph() {
+        return graph;
+    }
+    public void setGraph(GraphMLGraph graph) {
+        this.graph = graph;
+    }
     public File getFile() {
         return file;
     }
-
     public void setFile(File file) {
         this.file = file;
     }
