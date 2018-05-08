@@ -5,7 +5,7 @@ import model.HelperTypes.EdgeType;
 import model.Node;
 // inspired heavily from https://stackoverflow.com/questions/3522454/java-tree-data-structure
 
-public class GraphMLGraph extends Tree{
+public class GraphMLGraph{
     public final LinkedHashSet<Node> nodeList = new LinkedHashSet<>();
     private final HashSet<Edge> edgeList = new HashSet<>();
     private final HashSet<EdgeType> EdgeTypeList = new HashSet<>();
@@ -21,11 +21,33 @@ public class GraphMLGraph extends Tree{
             return false;
         } 
     }
-    public boolean addEdgeType(String id){
-        return addEdgeType(id, "none");
-    }
+//    public boolean addEdgeType(String id){
+//        return addEdgeType(id, "none");
+//    }
     public ArrayList<EdgeType> getEdgeTypes() {
         return new ArrayList<>(EdgeTypeList);
+    }
+
+    public List<String> getEdgeTypeLabels() {
+        List<String> returnList = new LinkedList<>();
+        for (EdgeType edgeType : EdgeTypeList){
+            returnList.add(edgeType.getId());
+        }
+        return returnList;
+    }
+
+    public List<String> getLabelsFromRoots(String selectedEdgeType) {
+        List<String> roots = new LinkedList<>();
+        for (Node node : nodeList) {
+            if (getEdgesIn(node).isEmpty()) {
+                for (Edge outGoingEdges: getEdgesOut(node))
+                    if (outGoingEdges.edgeType.equals(selectedEdgeType)) {
+                        roots.add(node.label);
+                        break;
+                    }
+            }
+        }
+        return roots;
     }
     
     void addAllNodes(ArrayList<Node> nodes) {
@@ -35,10 +57,8 @@ public class GraphMLGraph extends Tree{
     }
 
     void addAllEdges(ArrayList<Edge> edges) {
-        edges.forEach(e -> {
-            edgeList.add(e);
-            //nodeParent.put(e.target, e.source);
-        });
+        //nodeParent.put(e.target, e.source);
+        edgeList.addAll(edges);
     }
 
     void finalizeGraphFromParser() {
@@ -91,11 +111,10 @@ public class GraphMLGraph extends Tree{
         return true;
     }*/
 
-    @Override
     public List<Node> getRoots() {
         List<Node> roots = new LinkedList<>();
         for (Node node : nodeList) {
-            System.out.println(node.label);
+//            System.out.println(node.label);
             if (getEdgesIn(node).isEmpty()) {
                 roots.add(node);
             }
@@ -103,7 +122,19 @@ public class GraphMLGraph extends Tree{
         return roots;
     }
 
-    @Override
+    public Tree getTreeFromNodeLabel(String label){
+        Node particularNode = null;
+        for (Node node : nodeList)
+            if (node.label.equals(label)) particularNode = node;
+
+        if (particularNode != null) return new Tree(particularNode);
+        else System.out.println("somehow could'nt find node for label: " + label);
+
+        return null;
+    }
+
+
+//    @Override
     public List<Node> listAllNodes() {
         //System.out.println("List of all nodes returned");
         return new LinkedList<>(nodeList);
