@@ -37,6 +37,7 @@ public class Edge {
     public String toString() {
         return "Edge{" + "start=" + start + ", target=" + target + ", edgeType=" + edgeType + ", weight=" + weight + '}';
     }
+
     
     
 }
