@@ -8,32 +8,28 @@ import java.util.List;
 import static java.lang.Math.abs;
 
 public class Reinhold {
-    private double cursep=0;
-    private double rootsep=0;
-    private double loffsum=0;
-    private double roffsum=0;
-    private double minsep= 2;
+
 
     public static Tree processTree(Tree tree) {
         try {
             Reinhold r = new Reinhold();
             Node root = tree.getRoot();
-             r.layout(root);
-             return tree;
+            r.layout(root, tree.getTreeDepth());
+            return tree;
            }
         catch (Exception e) {
             System.out.println("Error while running RT Algorithm");
-            System.out.println(e);
+            e.printStackTrace();
             return null;
         }
     }
 
-    private void layout(Node root) {
+    private void layout(Node root, int depth) {
         addYCoords(root, 0);
         setChildrenBinaryTree(root);
-        setup(root, 0, getRR(root), getLL(root));
+        setup(root, 0, new Extreme(getRR(root, depth)), new Extreme(getLL(root, depth)));
         petrify(root, 0);
-        double offset = getLL(root).x;
+        double offset = getLL(root, depth).x;
         petrify(root, -offset);
         stretch(root);
     }
@@ -83,48 +79,37 @@ public class Reinhold {
         }
     }
 
-    private void setup(Node root, int level, Node rmost, Node lmost) {
+    private void setup(Node root, int level, Extreme rmost, Extreme lmost) {
         // avoid selecting an extreme
         if (root == null) {
-            lmost.level = -1;
-            rmost.level = -1;
+            lmost.lev = -1;
+            rmost.lev = -1;
         } else {
             Node right= null, left=null;
-            Node ll, lr, rr, rl;
+            Extreme ll = new Extreme();
+            Extreme lr = new Extreme();
+            Extreme rr = new Extreme();
+            Extreme rl = new Extreme();
             //root.y = level;
-            if(root.leftChild!=null){
-                left = root.leftChild;  // follows contour of left subtree
-            }
-            if(root.rightChild!=null){
-                right = root.rightChild;  // follows contour of right subtree
-            }
-            ll = getLL(root);
-            if (left == null) {
-                lr = root;
-            } else {
-                lr = getRR(left);
-            }
-            rr = getRR(root);
-            if (right == null) {
-                rl = root;
-            } else {
-                rl = getLL(right);
-            }
-
+            left = root.leftChild;  // follows contour of left subtree
+            right = root.rightChild;  // follows contour of right subtree
+//
             setup(left, level + 1, lr, ll); // position subtrees recursively
             setup(right, level + 1, rr, rl); // position subtrees recusively
             if (right == null && left == null) { // leaf
-                rmost = root;
-                lmost = root;
-                rmost.level = level;
-                rmost.offset = 0;
-                lmost.offset = 0;
+                rmost.addr = root;
+                lmost.addr = root;
+                rmost.lev = level;
+                lmost.lev=level;
+                rmost.addr.offset = 0;
+                lmost.addr.offset = 0;
                 root.offset = 0;
             } else {
-                cursep = minsep;
-                rootsep = minsep;
-                loffsum = 0;
-                roffsum = 0;
+                double minsep = 2;
+                double cursep = minsep;
+                double rootsep = minsep;
+                double loffsum = 0;
+                double roffsum = 0;
                 // consider each level in turn until one subtree ist exhausted, pushing subtrees
                 // apart when neccessary
                 while (left != null && right != null) {
@@ -158,38 +143,44 @@ public class Reinhold {
                 roffsum = roffsum + root.offset;
 
                 //UPDATE EXTREME DESCENDANTS INFORMATIONS
-                if (rl.level > ll.level || root.leftChild == null) {
-                    lmost = rl;
-                    lmost.offset += root.offset;
+                if (rl.lev > ll.lev || root.leftChild == null) {
+                    lmost.addr = rl.addr;
+                    lmost.lev = rl.lev;
+                    lmost.off += root.offset;
                 } else {
-                    lmost = ll;
-                    lmost.offset -= root.offset;
+                    lmost.addr = ll.addr;
+                    lmost.lev = ll.lev;
+                    lmost.off -= root.offset;
                 }
-                if (lr.level > rr.level || root.rightChild == null) {
-                    rmost = lr;
-                    rmost.offset -= root.offset;
+                if (lr.lev > rr.lev || root.rightChild == null) {
+                    rmost.addr = lr.addr;
+                    rmost.lev = lr.lev;
+                    rmost.off -= root.offset;
                 } else {
-                    rmost = rr;
-                    rmost.offset += root.offset;
+                    rmost.addr = rr.addr;
+                    rmost.lev = rr.lev;
+                    rmost.off += root.offset;
                 }
 
                 //Threading: if subtrees are of uneven heights
                 if (left != null && left != root.leftChild) {
-                    rr.hasThread = true;
-                    rr.offset = abs(rr.offset + root.offset - loffsum);
-                    if ((loffsum - root.offset) <= rr.offset) {
-                        rr.leftChild = left;
+                    rr.addr.hasThread = true;
+                    rr.addr.offset = abs(rr.off + root.offset - loffsum);
+                    if (((loffsum - root.offset) < rr.off)
+                        || ((loffsum - root.offset) == rr.off)) {
+                        rr.addr.leftChild = left;
                     } else {
-                        rr.rightChild = left;
+                        rr.addr.rightChild = left;
                     }
                 }
                 if ((right != null) && (right != root.rightChild)) {
-                    ll.hasThread = true;
-                    ll.offset = abs(ll.offset - root.offset - roffsum);
-                    if ((roffsum + root.offset) >= ll.offset) {
-                        ll.rightChild = right;
+                    ll.addr.hasThread = true;
+                    ll.addr.offset = abs(ll.off - root.offset - roffsum);
+                    if (((roffsum + root.offset) > ll.off)
+                         || ((roffsum + root.offset) == ll.off)){
+                        ll.addr.rightChild = right;
                     } else {
-                        ll.leftChild = right;
+                        ll.addr.leftChild = right;
                     }
                 }
             }
@@ -218,17 +209,43 @@ public class Reinhold {
     }
 
 
-    private Node getLL(Node node) {
-        while (node != null && !node.isLeaf()) {
-            node = node.leftChild;
+    private Node getLL(Node node, int depth){
+        if (node.isLeaf()) {
+            if (node.y - depth < 0.0001) {
+                return node;
+            } else {
+                return null;
+            }
         }
-        return node;
+        Node leftleft = getLL(node.leftChild, depth);
+        if (leftleft != null) {
+            return leftleft;
+        }
+        return getLL(node.rightChild, depth);
     }
 
-    private Node getRR(Node node) {
-        while (node != null && !node.isLeaf()) {
-            node = node.rightChild;
+    private Node getRR(Node node, int depth){
+        if (node.isLeaf()) {
+            if (node.y - depth < 0.0001) {
+                return node;
+            } else {
+                return null;
+            }
         }
-        return node;
+        Node rightright = getRR(node.rightChild, depth);
+        if (rightright != null) {
+            return rightright;
+        }
+        return getRR(node.leftChild, depth);
+    }
+
+    public static class Extreme {
+        public Extreme(Node n) {
+            addr = n;
+        }
+        public Extreme(){}
+        public Node addr;
+        public int lev = 0;
+        public double off = 0;
     }
 }
