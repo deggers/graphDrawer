@@ -36,6 +36,28 @@ public class GraphMLGraph{
         return returnList;
     }
 
+    public List<String> getEdgeTypeLabelsIfHaveRoot() {
+        List<String> returnList = new LinkedList<>();
+        for (EdgeType edgeType : EdgeTypeList){
+            for (Node node : nodeList) {
+                if (getEdgesIn(node).isEmpty()) {
+                    for (Edge outGoingEdges : getEdgesOut(node)) {
+//                        System.out.println("outGoingEdges = " + outGoingEdges.edgeType);
+//                        System.out.println("edgeType.toString() = " + edgeType.getId());
+                        if (outGoingEdges.edgeType.equals(edgeType.getId())) {
+                            if (!returnList.contains(edgeType.getId())) {
+                                returnList.add(edgeType.getId());
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return returnList;
+    }
+
+
     public List<String> getLabelsFromRoots(String selectedEdgeType) {
         List<String> roots = new LinkedList<>();
         for (Node node : nodeList) {

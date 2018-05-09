@@ -194,9 +194,9 @@ public class GUIController {
         Tree theTree = ParseController.getInstance().getTree();
         GraphMLGraph theGraph = ParseController.getInstance().getGraph();
 
-        if (theGraph != null && selectedEdgeType == null && choiceBoxEdgeTypeIsSet == false){
+        if (theGraph != null && choiceBoxEdgeTypeIsSet == false){
             choiceBoxEdgeType.setDisable(false);
-            choiceBoxEdgeType.getItems().setAll(theGraph.getEdgeTypeLabels());
+            choiceBoxEdgeType.getItems().setAll(theGraph.getEdgeTypeLabelsIfHaveRoot());
             choiceBoxEdgeTypeIsSet = true;
         }
 
