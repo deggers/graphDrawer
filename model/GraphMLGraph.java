@@ -3,13 +3,11 @@ package model;
 import java.util.*;
 import model.HelperTypes.EdgeType;
 import model.Node;
-// inspired heavily from https://stackoverflow.com/questions/3522454/java-tree-data-structure
 
 public class GraphMLGraph{
     public final LinkedHashSet<Node> nodeList = new LinkedHashSet<>();
     private final HashSet<Edge> edgeList = new HashSet<>();
     private final HashSet<EdgeType> EdgeTypeList = new HashSet<>();
-    //Feld nodeParent wird jetzt von Tree geerbt. sollte vielleicht anders gelöst werden
     
     public boolean addEdgeType(String id, String attrType){
         EdgeType et = new EdgeType(id, "double");
@@ -21,9 +19,7 @@ public class GraphMLGraph{
             return false;
         } 
     }
-//    public boolean addEdgeType(String id){
-//        return addEdgeType(id, "none");
-//    }
+
     public ArrayList<EdgeType> getEdgeTypes() {
         return new ArrayList<>(EdgeTypeList);
     }
@@ -90,52 +86,6 @@ public class GraphMLGraph{
         System.out.println("Roots: " + getRoots());
     }
 
-    //coppied from MappedTreeStructure for now
-    /*@Override
-    public boolean add(Node parent, Node node) {
-        checkNotNull(parent, "parent");
-        checkNotNull(node, "node");
-
-        // check for cycles
-        Node current = parent;
-        do {
-            if (node.equals(current)) {
-                throw new IllegalArgumentException(" node must not be the same or an ancestor of the parent");
-            }
-        } while ((current = getParent(current)) != null);
-
-        boolean added = nodeList.add(node);
-        nodeList.add(parent);
-        edgeList.add(new Edge(parent, node));
-        return added;
-    }
-    
-    private void checkNotNull(Node node, String parameterName) {
-        if (node == null)
-            throw new IllegalArgumentException(parameterName + " must not be null");
-    }
-
-    @Override
-    public boolean remove(Node node, boolean cascade) { //nötig bei uns?
-
-        checkNotNull(node, "node");
-
-        if (!nodeList.contains(node)) {
-            return false;
-        }
-        if (cascade) {
-            getChildren(node).forEach((child) -> {
-                remove(child, true);                    //löscht keine Einträge aus nodeParent!
-            });
-        } else {
-            getChildren(node).forEach((child) -> {
-                nodeParent.remove(child);
-            });
-        }
-        nodeList.remove(node);
-        return true;
-    }*/
-
     public List<Node> getRoots() {
         List<Node> roots = new LinkedList<>();
         for (Node node : nodeList) {
@@ -159,19 +109,11 @@ public class GraphMLGraph{
     }
 
 
-//    @Override
     public List<Node> listAllNodes() {
         //System.out.println("List of all nodes returned");
         return new LinkedList<>(nodeList);
     }
 
-    /*@Override
-    public Node getParent(Node node) {
-        checkNotNull(node, "node");
-        return nodeParent.get(node);
-    }*/
-
-    //@Override
     public List<Edge> getEdgesOut(Node node) {
         List<Edge> outgoingEdges = new LinkedList<>();
         for (Edge e : edgeList) {

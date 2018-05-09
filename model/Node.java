@@ -16,7 +16,7 @@ public class Node implements Serializable {
     public double y = 0;
     public double prelim = 0;
     public double modifier = 0;
-    public Node parent;
+    public Node parent = null;
     public Node leftNeighbor = null;
     private final List<Node> children = new ArrayList<>();
     public int indexAsChild = 0;
@@ -65,13 +65,9 @@ public class Node implements Serializable {
         return indexAsChild >= 1;
     }
 
-
-    // der gibt nicht nur den Node aus, sondern alles was am Node dranhängt ?!
     @Override
     public String toString() {
-//        String out = "id: " + label + ", x:" + x + ", y:" + y + ", prelim:" + prelim + ", modifier:" + modifier + ", indexAsChild:" + indexAsChild + ";";
         return  "id: " + label + ", x:" + x + ", y:" + y + ";";
-//        return label;
     }
 
     public String toStringWithAllChildren() {
