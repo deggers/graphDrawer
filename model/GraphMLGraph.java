@@ -109,7 +109,7 @@ public class GraphMLGraph{
     }
     
     private void extractSubtreeFromRootRecursion(Node node, Set<Edge> tset){
-        System.out.println("recursion at node:" + node);
+//        System.out.println("recursion at node:" + node);
         node.resetChildren();
         visitedNodesForExtractSubtreeSet.add(node.label);
         for (Edge edge : tset) {

@@ -180,36 +180,42 @@ public class GUIController {
         this.selectedRoot = selectedRoot;
         GraphMLGraph g = ParseController.getInstance().getGraph();
         ParseController.getInstance().setTree(g.extractSubtreeFromNode(g.labelToNode(selectedRoot), selectedEdgeType));
+        System.out.println(ParseController.getInstance().getTree());
         drawInit();
     }
 
     public void choiceBoxEdgeTypeOnAction(ActionEvent event) {
         String selectedEdgeType = String.valueOf(choiceBoxEdgeType.getSelectionModel().getSelectedItem());
         this.selectedEdgeType = selectedEdgeType;
+
         this.selectedRoot = null;
+        choiceBoxRootIsSet = false;
+        choiceBoxRoot.getItems().clear();
+
         List<String> rootList = ParseController.getInstance().getGraph().getLabelsFromRoots(selectedEdgeType);
         choiceBoxRoot.getItems().setAll(rootList);
         drawInit(); //durch this.selectedRoot = null; kann doch gar nichts gezeichnet werden, oder? --Florian
+        // doch, weil hier wird in der EdgeTypeChoiceBox die root null gesetzt, bevor sie neu berechnet wird (getItems())
     }
 
     @FXML   private void drawInit() {
         Tree theTree = ParseController.getInstance().getTree();
         GraphMLGraph theGraph = ParseController.getInstance().getGraph();
 
-        if (theGraph != null && choiceBoxEdgeTypeIsSet == false){
+        if (theGraph != null && !choiceBoxEdgeTypeIsSet){
             choiceBoxEdgeType.setDisable(false);
             choiceBoxEdgeType.getItems().setAll(theGraph.getEdgeTypeLabelsIfHaveRoot());
             choiceBoxEdgeTypeIsSet = true;
         }
 
-        if (theGraph != null && selectedEdgeType != null && choiceBoxRootIsSet == false) {
+        if (theGraph != null && selectedEdgeType != null && !choiceBoxRootIsSet) {
             choiceBoxRoot.setDisable(false);
             List<String> rootList = theGraph.getLabelsFromRoots(selectedEdgeType);
             choiceBoxRoot.getItems().setAll(rootList);
             choiceBoxRootIsSet = true;
         }
 
-         if (theTree != null && theGraph == null) {
+        if (theTree != null && selectedAlgorithm != null && theGraph == null) {
             choiceBoxEdgeType.setDisable(true);
             choiceBoxRoot.setDisable(true);
         }
@@ -218,12 +224,8 @@ public class GUIController {
             choiceBoxEdgeType.getItems().clear();
             choiceBoxRoot.getItems().clear();
             processTreeAndAlgo();
-            
-        } else if (theGraph != null && selectedAlgorithm != null && selectedEdgeType != null && selectedRoot != null && !selectedRoot.equals("empty")) {
-            System.out.println("i would like to draw here :)");
-            System.out.println("selectedEdgeType = " + selectedEdgeType);
-            System.out.println("selectedRoot = " + selectedRoot);
-
+        } else if (theGraph != null && selectedAlgorithm != null && theTree != null && selectedRoot != null && selectedEdgeType != null) {
+            processTreeAndAlgo();
         }
     }
 
