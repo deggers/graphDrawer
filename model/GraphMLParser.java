@@ -130,11 +130,11 @@ public class GraphMLParser {
                                     String attributeValue = attrib.getValue();
                                     switch (attributeName) {
                                         case "source":
-                                            edge.target = nodesMap.get(attributeValue);
+                                            edge.start = nodesMap.get(attributeValue);
 //                                            System.out.println("edge source: " + edge.start);
                                             break;
                                         case "target":
-                                            edge.start = nodesMap.get(attributeValue);
+                                            edge.target = nodesMap.get(attributeValue);
 //                                            System.out.println("edge target: " + edge.target);
                                             break;
                                         default:

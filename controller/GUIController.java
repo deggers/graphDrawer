@@ -221,9 +221,10 @@ public class GUIController {
         }
             
         if (theTree != null && selectedAlgorithm != null) {
-            choiceBoxEdgeType.getItems().clear();
-            choiceBoxRoot.getItems().clear();
+            //choiceBoxEdgeType.getItems().clear();
+            //choiceBoxRoot.getItems().clear();
             processTreeAndAlgo();
+            
         } else if (theGraph != null && selectedAlgorithm != null && theTree != null && selectedRoot != null && selectedEdgeType != null) {
             processTreeAndAlgo();
         }
