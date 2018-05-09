@@ -6,8 +6,9 @@ import model.Node;
 
 public class GraphMLGraph{
     public final LinkedHashSet<Node> nodeList = new LinkedHashSet<>();
-    private final HashSet<Edge> edgeList = new HashSet<>();
-    private final HashSet<EdgeType> edgeTypeList = new HashSet<>();
+    private final LinkedHashSet<Edge> edgeList = new LinkedHashSet<>();
+    private final LinkedHashSet<EdgeType> edgeTypeList = new LinkedHashSet<>();
+    private LinkedHashSet<String> visitedNodesForExtractSubtreeSet = null;
     
     public boolean addEdgeType(String id, String attrType){
         EdgeType et = new EdgeType(id, "double");
@@ -82,8 +83,10 @@ public class GraphMLGraph{
         edgeList.addAll(edges);
     }
 
-    private Set<String> visitedNodesForExtractSubtreeSet = null;
     public Tree extractSubtreeFromNode(Node root, String edgeType) { //setzt mit hilfe der Edge Liste und des gewählten Edge Types -> Parent und children für alle Noten, überschreibt bestehende Infos, damit konsekutive Auswahlen ihct interferieren
+        if (root == null) {
+            return null;
+        }
         boolean bEdgeTypeValid = false;
         for (EdgeType et : edgeTypeList) {
             if (et.id.equals(edgeType)) {
@@ -103,7 +106,7 @@ public class GraphMLGraph{
             }
         }
         //System.out.println(temporaryEdgeSubset);
-        visitedNodesForExtractSubtreeSet = new HashSet<>();
+        visitedNodesForExtractSubtreeSet = new LinkedHashSet<>();
         extractSubtreeFromRootRecursion(root, temporaryEdgeSubset);
         return new Tree(root);
     }
