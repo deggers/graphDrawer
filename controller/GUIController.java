@@ -209,12 +209,16 @@ public class GUIController {
             choiceBoxRootIsSet = true;
         }
 
-        if (theTree != null && selectedAlgorithm != null) {
+         if (theTree != null && theGraph == null) {
             choiceBoxEdgeType.setDisable(true);
-            choiceBoxEdgeType.getItems().clear();
             choiceBoxRoot.setDisable(true);
+        }
+            
+        if (theTree != null && selectedAlgorithm != null) {
+            choiceBoxEdgeType.getItems().clear();
             choiceBoxRoot.getItems().clear();
             processTreeAndAlgo();
+            
         } else if (theGraph != null && selectedAlgorithm != null && selectedEdgeType != null && selectedRoot != null && !selectedRoot.equals("empty")) {
             System.out.println("i would like to draw here :)");
             System.out.println("selectedEdgeType = " + selectedEdgeType);

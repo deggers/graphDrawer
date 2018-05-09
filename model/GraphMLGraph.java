@@ -57,9 +57,9 @@ public class GraphMLGraph{
     public List<String> getLabelsFromRoots(String selectedEdgeType) {
         List<String> roots = new LinkedList<>();
         for (Node node : nodeList) {
-            if (getEdgesIn(node).isEmpty()) {
-                for (Edge outGoingEdges: getEdgesOut(node))
-                    if (outGoingEdges.edgeType.equals(selectedEdgeType)) {
+            if (getEdgesInWithType(node, selectedEdgeType).isEmpty()) {
+                for (Edge outGoingEdges: getEdgesOutWithType(node, selectedEdgeType))
+                    if (true) {
                         roots.add(node.label);
                         break;
                     }
@@ -82,6 +82,7 @@ public class GraphMLGraph{
         edgeList.addAll(edges);
     }
 
+    private Set<String> visitedNodesForExtractSubtreeSet = null;
     public Tree extractSubtreeFromNode(Node root, String edgeType) { //setzt mit hilfe der Edge Liste und des gewählten Edge Types -> Parent und children für alle Noten, überschreibt bestehende Infos, damit konsekutive Auswahlen ihct interferieren
         boolean bEdgeTypeValid = false;
         for (EdgeType et : edgeTypeList) {
@@ -102,6 +103,7 @@ public class GraphMLGraph{
             }
         }
         //System.out.println(temporaryEdgeSubset);
+        visitedNodesForExtractSubtreeSet = new HashSet<>();
         extractSubtreeFromRootRecursion(root, temporaryEdgeSubset);
         return new Tree(root);
     }
@@ -109,11 +111,15 @@ public class GraphMLGraph{
     private void extractSubtreeFromRootRecursion(Node node, Set<Edge> tset){
         System.out.println("recursion at node:" + node);
         node.resetChildren();
+        visitedNodesForExtractSubtreeSet.add(node.label);
         for (Edge edge : tset) {
             if (edge.start.equals(node)) {
-                node.addChild(edge.target);
-                //tset.remove(edge); throws concurrent modification exception
-                extractSubtreeFromRootRecursion(edge.target, tset);
+                if (!visitedNodesForExtractSubtreeSet.contains(edge.target.label)) {
+                    node.addChild(edge.target);
+                    extractSubtreeFromRootRecursion(edge.target, tset);
+                } else {
+                    System.out.println("Cycle found, I wont search any further.");
+                }
             }
         }
     }
@@ -156,10 +162,30 @@ public class GraphMLGraph{
         return outgoingEdges;
     }
     
+    public List<Edge> getEdgesOutWithType(Node node, String edgeType) {
+        List<Edge> outgoingEdges = new LinkedList<>();
+        for (Edge e : edgeList) {
+            if (e.start.equals(node)&&e.edgeType.equals(edgeType)) {
+                outgoingEdges.add(e);
+            }
+        }
+        return outgoingEdges;
+    }
+    
     public List<Edge> getEdgesIn(Node node) {
         List<Edge> incomingEdges = new LinkedList<>();
         for (Edge e : edgeList) {
             if (e.target.equals(node)) {
+                incomingEdges.add(e);
+            }
+        }
+        return incomingEdges;
+    }
+    
+    public List<Edge> getEdgesInWithType(Node node, String edgeType) {
+        List<Edge> incomingEdges = new LinkedList<>();
+        for (Edge e : edgeList) {
+            if (e.target.equals(node)&&e.edgeType.equals(edgeType)) {
                 incomingEdges.add(e);
             }
         }

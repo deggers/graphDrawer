@@ -130,11 +130,11 @@ public class GraphMLParser {
                                     String attributeValue = attrib.getValue();
                                     switch (attributeName) {
                                         case "source":
-                                            edge.start = nodesMap.get(attributeValue);
+                                            edge.target = nodesMap.get(attributeValue);
 //                                            System.out.println("edge source: " + edge.start);
                                             break;
                                         case "target":
-                                            edge.target = nodesMap.get(attributeValue);
+                                            edge.start = nodesMap.get(attributeValue);
 //                                            System.out.println("edge target: " + edge.target);
                                             break;
                                         default:
@@ -209,7 +209,9 @@ public class GraphMLParser {
                                 }*/
                                 if (/*edgeIsNew*/true) { // checkt aktuell nicht, ob die Kante schon existiert
 //                                    System.out.println("Adding Edge: " + edge);
-                                    edges.add(edge);
+                                    if (!edge.start.label.equals(edge.target.label)) {
+                                        edges.add(edge); //keine Selbstkanten
+                                    }
                                 }
                                 break;
                             case "data":
