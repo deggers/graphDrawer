@@ -35,7 +35,7 @@ public class Edge {
 
     @Override
     public String toString() {
-        return "Edge{" + "start=" + start + ", target=" + target + ", edgeType=" + edgeType + ", weight=" + weight + '}';
+        return "Edge{" + "start=" + start + ",\ttarget=" + target + ",\tedgeType=" + edgeType + ",\tweight=" + weight + '}';
     }
 
     

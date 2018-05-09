@@ -15,21 +15,6 @@ public class WalkerImprovedDraw {
     private static final double siblingSeparation = 3;
     private static final double subtreeSeparation = 4;
 
-    /* walker old
-    private static void initPrevNodeList(){
-
-    }
-
-    private static model.Node getPrevNodeAtLevel(int level){
-        model.Node node = new model.Node("");
-        return node;
-    }
-
-    private static void setPrevNodeAtLevel(int level, model.Node node){
-
-    }
-    */
-
     public static Tree processTreeNodes(Tree tree) {
 
         try {
@@ -113,7 +98,7 @@ public class WalkerImprovedDraw {
         System.out.println("Roots found: " + roots.size() + " as following: " + roots);
         if (roots.size() == 1) {
             Node root = roots.get(0);
-//            System.out.println("Root found:" + root.label);
+            System.out.println("Tree:\n" + tree);
             tree.listAllNodes().forEach((Node n) -> {
                 n.modifier = 0;
                 n.thread = null;
@@ -148,14 +133,9 @@ public class WalkerImprovedDraw {
     }
 
     private static void firstWalk(Node node, int level) {
-        //model.Node leftSibling = null; //braucht Funktion um linkes Geschwister zu finden, zB mit ChildNumber beim bauen
+
         Node defaultAncestor = null;
         double midPoint;
-        /* walker old
-        node.leftNeighbor = getPrevNodeAtLevel(level);
-        setPrevNodeAtLevel(level, node);
-        node.modifier = 0;
-        */
         if (node.isLeaf() || level == maxDepth) {
 //            System.out.println("model.Node is a leaf: " + node);
             if (node.hasLeftSibling()) {
@@ -170,13 +150,6 @@ public class WalkerImprovedDraw {
                 node.prelim = 0;
             }
 
-            /* walker old
-            if (node.hasLeftSibling()) {
-                node.prelim = node.parent.getChild(node.indexAsChild - 1).prelim + siblingSeparation + Meannodesize(leftsibling, node);
-            } else {
-                node.prelim = 0;
-            }
-            */
         } else {
             defaultAncestor = node.getChild(0);
             for (Node child : node.getChildren()) {
@@ -206,34 +179,10 @@ public class WalkerImprovedDraw {
 //                System.out.println("model.Node has no left sibling");
                 node.prelim = midPoint;
             }
-
-            /* walker old
-            node.getChildren().forEach((child) -> {
-                firstWalk(child, level+1);});
-            midPoint = (node.getChild(0).prelim + node.getChild(-1).prelim)/2;
-            if (node.hasLeftSibling()) {
-                node.prelim = node.parent.getChild(node.indexAsChild - 1).prelim + siblingSeparation + Meannodesize(leftsibling, node);
-                node.modifier = node.prelim - midPoint;
-                apportion(node, level);
-            } else {
-                node.prelim = midPoint;
-            } */
         }
-
     }
 
-    private static void secondWalk(Node node, int level, double modsum) /*besonderer Exception Name? */ {
-        /* walker old
-        if (level <= maxDepth){
-            xTemp = xTopAdjust + node.prelim + modsum;
-            yTemp = yTopAdjust + ( level * levelSeparation );
-            //checkBoundary(xTemp, yTemp); //throws outOfDrawingSpaceException oder sowas zum catchen in WalkerMain
-            node.x = xTemp;
-            node.y = yTemp;
-            node.getChildren().forEach((child) -> {
-                secondWalk(child, level + 1, modsum + node.modifier);
-            });
-        }*/
+    private static void secondWalk(Node node, int level, double modsum) {
 //        System.out.println("Second walk called, modsum: " + modsum);
         node.x = node.prelim + modsum;
         node.y = level * 3;
@@ -245,57 +194,7 @@ public class WalkerImprovedDraw {
     }
 
     private static void apportion(Node node, int level, Node defaultAncestor) {
-        /* walker old
-        model.Node leftmost, neighbor, ancestorLeft, ancestorNeighbor, temp;
-        int compareDepth = 1;
-        int depthToStop = maxDepth - level;
-        double leftModsum, rightModsum, moveDistance, portion;
-        int leftSiblings;
-
-        try {
-            leftmost = node.getChild(0);
-            neighbor = leftmost.leftNeighbor;
-        } catch (Exception e) {
-            leftmost = null;
-            neighbor = null;
-        }
-
-        while (leftmost != null && neighbor != null && compareDepth <= depthToStop){
-            leftModsum = 0;
-            rightModsum = 0;
-            ancestorLeft = leftmost;
-            ancestorNeighbor = neighbor;
-            for (int i = 0; i == compareDepth; i++) {
-                ancestorLeft = ancestorLeft.parent;
-                ancestorNeighbor = ancestorNeighbor.parent;
-                rightModsum = rightModsum + ancestorLeft.modifier;
-                leftModsum = leftModsum +ancestorNeighbor.modifier;
-            }
-            moveDistance = neighbor.prelim + leftModsum + subtreeSeparation + Meannodesize(leftsibling, node) - (leftmost.prelim + rightModsum);
-            if (moveDistance > 0) {
-                temp = node;
-                leftSiblings = 0;
-                while(temp != null && temp != ancestorNeighbor){ //durch Buchheim Jünger Leipert Zeug zu ersetzen
-                    leftSiblings++;
-                    //temp = leftSibling(temp);
-                }
-                if (temp != null){
-                    portion = moveDistance/leftSiblings;
-                    temp = node;
-                    while (true) {
-                        // hier Verbesserung zum verschieben der Teilbäume einfügen
-                    }
-                } else {
-                    return;
-                }
-            }
-            compareDepth++;
-            if (leftmost.isLeaf()) {
-                //leftmost = getLeftMost; Verbesserung einfügen
-            } else {
-                leftmost = leftmost.getChild(0);
-            }
-        }*/
+        
         Node vInPLus = null, vInMinus = null, vOutPlus = null, vOutMinus = null;
         double sumInPlus = 0, sumInMinus = 0, sumOutPlus = 0, sumOutMinus = 0;
         double shift;
@@ -314,7 +213,7 @@ public class WalkerImprovedDraw {
                 vOutMinus = nextLeft(vOutMinus);
                 vOutPlus = nextRight(vOutPlus);
                 vOutPlus.ancestor = node;
-                shift = (vInMinus.prelim + sumInMinus) - (vInPLus.prelim + sumInPlus) + subtreeSeparation; //? richtige Distanz
+                shift = (vInMinus.prelim + sumInMinus) - (vInPLus.prelim + sumInPlus) + subtreeSeparation; 
                 if (shift > 0) {
                     moveSubtree(findAncestor(vInMinus, node, defaultAncestor), node, shift);
                     sumInPlus += shift;
@@ -326,7 +225,7 @@ public class WalkerImprovedDraw {
                 sumOutPlus += vOutPlus.modifier;
             }
         }
-        if (nextRight(vInMinus) != null && nextRight(vOutPlus) == null) { //isNull ?
+        if (nextRight(vInMinus) != null && nextRight(vOutPlus) == null) { 
             vOutPlus.thread = nextRight(vInMinus);
             vOutPlus.modifier += sumInMinus - sumOutPlus;
         }

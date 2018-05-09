@@ -207,9 +207,11 @@ public class GraphMLParser {
                                         edgeIsNew = false;
                                     }
                                 }*/
-                                if (/*edgeIsNew*/true) {
+                                if (/*edgeIsNew*/true) { // checkt aktuell nicht, ob die Kante schon existiert
 //                                    System.out.println("Adding Edge: " + edge);
-                                    edges.add(edge);
+                                    if (!edge.start.label.equals(edge.target.label)) {
+                                        edges.add(edge); //keine Selbstkanten
+                                    }
                                 }
                                 break;
                             case "data":
@@ -229,7 +231,7 @@ public class GraphMLParser {
             if (graph != null) {
                 graph.addAllNodes(nodes);
                 graph.addAllEdges(edges);
-                graph.finalizeGraphFromParser();
+                //graph.finalizeGraphFromParser(); nocht nicht gebraucht: erst, wenn root und edgeType eines teilbaumes bekannt
 //                ParseController.getInstance().setTree(graph);
                 // der Parse-Controller setzt den jetzt
             }

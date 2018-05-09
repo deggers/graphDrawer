@@ -5,7 +5,6 @@ import java.util.*;
 
 public class Tree {
 
-    public final Map<Node, Node> nodeParent = new HashMap<>();
     public final LinkedHashSet<Node> nodeList = new LinkedHashSet<>();
     boolean yValuesHasBeenSet = false;
     private int treeDepth = 0;
@@ -15,7 +14,7 @@ public class Tree {
 
     public Tree(Node root) {
         nodeList.add(root); // set root-node
-        fillTree(root);
+        fillTree(root);     // set all .parent values from .children lists, set indexAsChild, fill nodeList
         setLevels(root, 0); // set all level-values
     }
 
@@ -47,13 +46,12 @@ public class Tree {
             int indexAsChildSetter = 0;
             for (Node child : node.getChildren()) {
                 child.parent = node;
-                nodeParent.put(child, node);
                 child.indexAsChild = indexAsChildSetter;
                 indexAsChildSetter++;
                 //System.out.println("added pair (n/p): " + child + e);
                 fillTree(child);
             }
-        } catch (Exception ex) {
+        } catch (Exception e) {
         }
     }
 
@@ -61,28 +59,6 @@ public class Tree {
         if (node == null)
             throw new IllegalArgumentException(parameterName + " must not be null");
     }
-
-
-
-    public boolean add(Node parent, Node node) {
-        checkNotNull(parent, "parent");
-        checkNotNull(node, "node");
-
-        // check for cycles
-        Node current = parent;
-        do {
-            if (node.equals(current)) {
-                throw new IllegalArgumentException(" node must not be the same or an ancestor of the parent");
-            }
-        } while ((current = getParent(current)) != null);
-
-        boolean added = nodeList.add(node);
-        nodeList.add(parent);
-        nodeParent.put(node, parent);
-        return added;
-    }
-
-
 
     public boolean remove(Node node, boolean cascade) { //nötig bei uns?
 
@@ -92,12 +68,12 @@ public class Tree {
             return false;
         }
         if (cascade) {
-            getChildren(node).forEach((child) -> {
+            node.getChildren().forEach((child) -> {
                 remove(child, true);                    //löscht keine Einträge aus nodeParent!
             });
         } else {
-            getChildren(node).forEach((child) -> {
-                nodeParent.remove(child);            // hier löscht er doch nodeParent ?! -dustyn
+            node.getChildren().forEach((child) -> {
+                //nodeParent.remove(child);            // hier löscht er doch nodeParent ?! -dustyn
             });
         }
         nodeList.remove(node);
@@ -106,7 +82,13 @@ public class Tree {
 
 
     public List<Node> getRoots() {
-        return getChildren(null);
+        List<Node> roots = new LinkedList<>();
+        for (Node n : nodeList) {
+            if (n.parent == null) {
+                roots.add(n);
+            }
+        }
+        return roots;
     }
 
     public Node getRoot() {
@@ -118,30 +100,14 @@ public class Tree {
         return new LinkedList<>(nodeList);
     }
 
-
-    public Node getParent(Node node) {
-        checkNotNull(node, "node");
-        return nodeParent.get(node);
-    }
-
-
-    public List<Node> getChildren(Node node) {
-        List<Node> children = new LinkedList<>();
-        for (Node n : nodeList) {
-            Node parent = nodeParent.get(n);
-            if (node == null && parent == null) {
-                children.add(n);
-            } else if (node != null && parent != null && parent.equals(node)) { //parent != 0 redundant für node != 0 && parent.equals(node) ???
-                children.add(n);
-            }
-        }
-        return children;
-    }
-
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        dumpNodeStructure(builder, null, "- ");
+        List<Node> roots = getRoots();
+        if (roots.size()!=1){
+            System.out.println("Warning: more than one root found, toString might not work as expected");
+        }
+        dumpNodeStructure(builder, roots.get(0), "- ");
         return builder.toString();
     }
 
@@ -152,13 +118,13 @@ public class Tree {
             builder.append('\n');
             prefix = "    " + prefix;
         }
-        for (Node child : getChildren(node)) {
+        for (Node child : node.getChildren()) {
             dumpNodeStructure(builder, child, prefix);
         }
     }
 
     public String echoContent() {
-        return nodeList.toString() + "\n" + nodeParent.toString();
+        return nodeList.toString(); //+ "\n" + nodeParent.toString();
     }
 
     public int getTreeDepth() {
@@ -200,9 +166,5 @@ public class Tree {
         }
     }
 
-
-    public Map<Node, Node> getNodeParentsMap() {
-        return this.nodeParent;
-    }
 }
 
