@@ -98,7 +98,7 @@ public class WalkerImprovedDraw {
         System.out.println("Roots found: " + roots.size() + " as following: " + roots);
         if (roots.size() == 1) {
             Node root = roots.get(0);
-//            System.out.println("Root found:" + root.label);
+            System.out.println("Tree:\n" + tree);
             tree.listAllNodes().forEach((Node n) -> {
                 n.modifier = 0;
                 n.thread = null;

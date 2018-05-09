@@ -43,6 +43,10 @@ public class Node implements Serializable {
     public List<Node> getChildren() {
         return children;
     }
+    
+    public void resetChildren(){
+        children.clear();
+    }
 
     public Node getChild(int index) {
         return index >= 0 ? children.get(index) : children.get(children.size() + index);

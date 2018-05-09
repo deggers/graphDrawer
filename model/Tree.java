@@ -14,7 +14,7 @@ public class Tree {
 
     public Tree(Node root) {
         nodeList.add(root); // set root-node
-        fillTree(root);
+        fillTree(root);     // set all .parent values from .children lists, set indexAsChild, fill nodeList
         setLevels(root, 0); // set all level-values
     }
 
@@ -46,13 +46,12 @@ public class Tree {
             int indexAsChildSetter = 0;
             for (Node child : node.getChildren()) {
                 child.parent = node;
-                //nodeParent.put(child, node);
                 child.indexAsChild = indexAsChildSetter;
                 indexAsChildSetter++;
                 //System.out.println("added pair (n/p): " + child + e);
                 fillTree(child);
             }
-        } catch (Exception ex) {
+        } catch (Exception e) {
         }
     }
 
@@ -104,7 +103,11 @@ public class Tree {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        dumpNodeStructure(builder, null, "- ");
+        List<Node> roots = getRoots();
+        if (roots.size()!=1){
+            System.out.println("Warning: more than one root found, toString might not work as expected");
+        }
+        dumpNodeStructure(builder, roots.get(0), "- ");
         return builder.toString();
     }
 

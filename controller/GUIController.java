@@ -178,6 +178,8 @@ public class GUIController {
     public void choiceBoxSelectRoot(ActionEvent event) {
         String selectedRoot =  String.valueOf(choiceBoxRoot.getSelectionModel().getSelectedItem());
         this.selectedRoot = selectedRoot;
+        GraphMLGraph g = ParseController.getInstance().getGraph();
+        ParseController.getInstance().setTree(g.extractSubtreeFromNode(g.labelToNode(selectedRoot), selectedEdgeType));
         drawInit();
     }
 
@@ -187,7 +189,7 @@ public class GUIController {
         this.selectedRoot = null;
         List<String> rootList = ParseController.getInstance().getGraph().getLabelsFromRoots(selectedEdgeType);
         choiceBoxRoot.getItems().setAll(rootList);
-        drawInit();
+        drawInit(); //durch this.selectedRoot = null; kann doch gar nichts gezeichnet werden, oder? --Florian
     }
 
     @FXML   private void drawInit() {
