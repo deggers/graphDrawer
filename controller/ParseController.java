@@ -10,10 +10,10 @@ import java.io.File;
 
 public class ParseController {
 
-    private File file;
-    private Tree tree;
+    private File file = null;
+    private Tree tree = null;
 
-    private GraphMLGraph graph;
+    private GraphMLGraph graph = null;
     public static ParseController instance;
 
     public static ParseController getInstance() {

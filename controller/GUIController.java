@@ -65,10 +65,9 @@ public class GUIController {
     }
     @FXML    private void               setNextFileAsTree() {
         if (filesInFolder != null) { // we selected a file so we have the folder from here on
-            if (getFilesIter() == null || !getFilesIter().hasNext()) {
-                List<File> files = getFilesInFolder();
-                ListIterator<File> filesIter = files.listIterator();
-                setFilesIter(filesIter);
+            if (filesIter == null || !filesIter.hasNext()) {
+                List<File> files = filesInFolder;
+                this.filesIter = files.listIterator();
             }
             ParseController.getInstance().setFile(filesIter.next());
             File file = ParseController.getInstance().getFile();
@@ -94,11 +93,10 @@ public class GUIController {
         if (file != null) {
             this.fileName = file.getName();
             try {
-                filesInFolder = Files.walk(Paths.get(file.getParent()))
+                this.filesInFolder = Files.walk(Paths.get(file.getParent()))
                         .filter(Files::isRegularFile)
                         .map(Path::toFile)
                         .collect(Collectors.toList());
-                setFilesInFolder(filesInFolder);
             } catch (IOException e) {
                 System.out.println("Error in loadFileAction");
                 e.printStackTrace();
@@ -134,6 +132,8 @@ public class GUIController {
     private String                      fileName                    = null;
     private ListIterator<File>          filesIter                   = null;
     private List<File>                  filesInFolder               = null;
+    private GraphMLGraph                theGraph                    = null;
+    private Tree                        theTree                     = null;
 
 
     public static   GUIController       getInstance() {
@@ -178,9 +178,11 @@ public class GUIController {
     public void choiceBoxSelectRoot(ActionEvent event) {
         String selectedRoot =  String.valueOf(choiceBoxRoot.getSelectionModel().getSelectedItem());
         this.selectedRoot = selectedRoot;
-        GraphMLGraph g = ParseController.getInstance().getGraph();
-        ParseController.getInstance().setTree(g.extractSubtreeFromNode(g.labelToNode(selectedRoot), selectedEdgeType));
-        System.out.println(ParseController.getInstance().getTree());
+        if (selectedRoot != null) {
+            ParseController.getInstance().setTree(null);
+            GraphMLGraph theGraph = ParseController.getInstance().getGraph();
+            ParseController.getInstance().setTree(theGraph.extractSubtreeFromNode(theGraph.labelToNode(selectedRoot), selectedEdgeType));
+        }
         drawInit();
     }
 
@@ -189,44 +191,37 @@ public class GUIController {
         this.selectedEdgeType = selectedEdgeType;
 
         this.selectedRoot = null;
-        choiceBoxRootIsSet = false;
+//        choiceBoxRootIsSet = false;
         choiceBoxRoot.getItems().clear();
+        choiceBoxRoot.setDisable(false);
 
-        List<String> rootList = ParseController.getInstance().getGraph().getLabelsFromRoots(selectedEdgeType);
+//        List<String> rootList = ParseController.getInstance().getGraph().getLabelsFromRoots(selectedEdgeType);
+        List<String> rootList = ParseController.getInstance().getGraph().getPossibleRootLabels(selectedEdgeType);
         choiceBoxRoot.getItems().setAll(rootList);
         drawInit(); //durch this.selectedRoot = null; kann doch gar nichts gezeichnet werden, oder? --Florian
         // doch, weil hier wird in der EdgeTypeChoiceBox die root null gesetzt, bevor sie neu berechnet wird (getItems()) //macht sinn, hab nicht dran gedacht, dass die ganze kontrollleiste auch neu gezeichnet wird
     }
 
-    @FXML   private void drawInit() {
+    private void drawInit() {
         Tree theTree = ParseController.getInstance().getTree();
         GraphMLGraph theGraph = ParseController.getInstance().getGraph();
 
         if (theGraph != null && !choiceBoxEdgeTypeIsSet){
             choiceBoxEdgeType.setDisable(false);
-            choiceBoxEdgeType.getItems().setAll(theGraph.getEdgeTypeLabelsIfHaveRoot());
+            choiceBoxEdgeType.getItems().setAll(theGraph.getRelevantEdgeTypeLabels());
             choiceBoxEdgeTypeIsSet = true;
         }
 
-        if (theGraph != null && selectedEdgeType != null && !choiceBoxRootIsSet) {
-            choiceBoxRoot.setDisable(false);
-            List<String> rootList = theGraph.getLabelsFromRoots(selectedEdgeType);
-            choiceBoxRoot.getItems().setAll(rootList);
-            choiceBoxRootIsSet = true;
-        }
-
+            
         if (theTree != null && selectedAlgorithm != null && theGraph == null) {
             choiceBoxEdgeType.setDisable(true);
             choiceBoxRoot.setDisable(true);
-        }
-            
-        if (theTree != null && selectedAlgorithm != null) {
-            //choiceBoxEdgeType.getItems().clear();
-            //choiceBoxRoot.getItems().clear();
+            choiceBoxEdgeType.getItems().clear();
+            choiceBoxRoot.getItems().clear();
             processTreeAndAlgo();
-            
         } else if (theGraph != null && selectedAlgorithm != null && theTree != null && selectedRoot != null && selectedEdgeType != null) {
             processTreeAndAlgo();
+            choiceBoxEdgeType.setDisable(false);
         }
     }
 
@@ -234,18 +229,6 @@ public class GUIController {
     //@formatter:on
 
     // SETTER & GETTER AREA
-    public String getSelectedAlgorithm() {
-        return this.selectedAlgorithm;
-    }
-
-    public List<File> getFilesInFolder() {
-        return filesInFolder;
-    }
-
-    public ListIterator<File> getFilesIter() {
-        return filesIter;
-    }
-
     public Parent getRoot() {
         return this.vBox;
     }
@@ -259,23 +242,16 @@ public class GUIController {
         return this.nodeSize;
     }
 
-    public void setFilesInFolder(List<File> filesInFolder) {
-        this.filesInFolder = filesInFolder;
-    }
-
-    public void setFilesIter(ListIterator<File> filesIter) {
-        this.filesIter = filesIter;
-    }
-
 
     private void setPane(VBox vBox) {
         this.vBox = vBox;
     }
 
     private void processTreeAndAlgo() {
+        System.out.println("i will draw now ! :)");
         cleanPane();
         setFileLabel();
-        switch (getSelectedAlgorithm()) {  // what about a tree.resizeToScreen() ?
+        switch (selectedAlgorithm) {  // what about a tree.resizeToScreen() ?
             case "Walker":
                 Tree treeWalker = WalkerImprovedDraw.processTreeNodes(ParseController.getInstance().getTree());
                 nodeSizeSlider.setDisable(false);

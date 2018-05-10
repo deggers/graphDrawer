@@ -124,23 +124,25 @@ public class PaneController {
     //@formatter:on
 
     public void drawRadialTreeStructure(Tree tree) {
+        Node root = tree.getRoot();
+        radialPositions(tree, root, Math.toRadians(0), Math.toRadians(360));
+        drawRadialTreeEdges(tree);
+
         int halfHeight = (int) scrollPane.getHeight() / 2;
         int halfWidth = (int) scrollPane.getWidth() / 2;
         int level = tree.getTreeDepth();
 
-        int maxRadius = (Math.min(halfHeight, halfWidth)) - (2 * getNodeSize());
+        int maxRadius = (Math.min(halfHeight, halfWidth));
         spaceBetweenRadii = maxRadius / level;
         radialNodeSize = spaceBetweenRadii >> 2;
+        if (radialNodeSize > 16) radialNodeSize = 16;
 
         for (int i = 0; i <= level + 1; i++) {
-            pane.getChildren().add(createGuideline(halfWidth, halfHeight, maxRadius));
+            pane.getChildren().add(createGuideline(halfWidth, halfHeight, maxRadius+radialNodeSize));
             maxRadius -= spaceBetweenRadii;
         }
+        radialPositions(tree, root, Math.toRadians(0), Math.toRadians(360));
 
-        Node root = tree.getRoot();
-        radialPositions(tree, root, Math.toRadians(60), Math.toRadians(360));
-        drawRadialTreeEdges(tree);
-        radialPositions(tree, root, Math.toRadians(60), Math.toRadians(360));
     }
 
     private Tree radialPositions(Tree radialTree, Node node, double alpha, double beta) {
