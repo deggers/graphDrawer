@@ -47,7 +47,9 @@ public class PaneController {
     }
     static int                              spaceBetweenRadii;
     static int                              radialNodeSize;
-
+    static int                              middleOfScreen;
+    static int                              centerY;
+    static int                              centerX;
     // FXML in Pane.fxml
     @FXML   private         ScrollPane      scrollPane;
     @FXML   private         Pane            pane;
@@ -95,8 +97,8 @@ public class PaneController {
         }
     }
 
-    private Circle  createGuideline(int halfWidth, int halfHeight, int decreasingRadius) {
-        Circle node = new Circle(halfWidth, halfHeight, decreasingRadius);
+    private Circle  createGuideline(int width, int height, int decreasingRadius) {
+        Circle node = new Circle(width, height, decreasingRadius);
         node.setFill(Color.TRANSPARENT);
         node.setStroke(RADIAL_LEVEL);
         return node;
@@ -110,7 +112,7 @@ public class PaneController {
         Tooltip.install(circle, tip);
         return circle;
     }
-       private Circle  createRadialNode(Node node) {
+    private Circle  createRadialNode(Node node) {
         Circle circle = new Circle(node.x, node.y, radialNodeSize);
         if (node.isLeaf()) {
             circle.setFill(LEAF_COLOR);
@@ -124,30 +126,40 @@ public class PaneController {
     //@formatter:on
 
     public void drawRadialTreeStructure(Tree tree) {
-        Node root = tree.getRoot();
-        radialPositions(tree, root, Math.toRadians(0), Math.toRadians(360));
-        drawRadialTreeEdges(tree);
-
         int halfHeight = (int) scrollPane.getHeight() / 2;
         int halfWidth = (int) scrollPane.getWidth() / 2;
         int level = tree.getTreeDepth();
+        System.out.println("level = " + level);
 
-        int maxRadius = (Math.min(halfHeight, halfWidth));
-        spaceBetweenRadii = maxRadius / level;
-        radialNodeSize = spaceBetweenRadii >> 2;
-        if (radialNodeSize > 16) radialNodeSize = 16;
+        // check if not suitable for the screenresolution, then allow scrolling
+        int minSpacing = 16;
+        int minNodeSize = 8;
+
+        int optSize = Math.min(halfHeight, halfWidth);
+        int maxRadius = (optSize / level) < minSpacing ? minSpacing * level : optSize;
+        spaceBetweenRadii = (maxRadius / level < minSpacing) ? minSpacing : maxRadius / level;
+        radialNodeSize = spaceBetweenRadii >> 2 > minNodeSize ? minNodeSize : spaceBetweenRadii >> 2;
+        middleOfScreen = maxRadius / 2;
+
+        int paneHalfHeight = (int) scrollPane.getHeight() / 2;
+        int paneHalfWidth = (int) scrollPane.getWidth() / 2;
+
+        centerY = middleOfScreen > paneHalfHeight ? middleOfScreen*2+radialNodeSize : paneHalfHeight + 2*radialNodeSize;
+        centerX = middleOfScreen > paneHalfWidth ? middleOfScreen*2+radialNodeSize : paneHalfWidth + 2* radialNodeSize;
 
         for (int i = 0; i <= level + 1; i++) {
-            pane.getChildren().add(createGuideline(halfWidth, halfHeight, maxRadius+radialNodeSize));
+            pane.getChildren().add(createGuideline(centerX, centerY, maxRadius + radialNodeSize));
             maxRadius -= spaceBetweenRadii;
         }
+
+        Node root = tree.getRoot();
+        radialPositions(tree, root, Math.toRadians(0), Math.toRadians(360));
+        drawRadialTreeEdges(tree);
         radialPositions(tree, root, Math.toRadians(0), Math.toRadians(360));
 
     }
 
     private Tree radialPositions(Tree radialTree, Node node, double alpha, double beta) {
-        int centerY = (int) scrollPane.getHeight() / 2;
-        int centerX = (int) scrollPane.getWidth() / 2;
 
         if (node.parent == null) { // if node is root
             radialTree.setNodeCoords(node, centerX, centerY);
