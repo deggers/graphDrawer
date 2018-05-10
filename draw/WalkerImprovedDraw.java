@@ -6,25 +6,14 @@ import java.util.ListIterator;
 
 public class WalkerImprovedDraw {
 
-    private static int maxDepth = Integer.MAX_VALUE;
-    private static double xTopAdjust;
-    private static double xTemp;
-    private static int levelSeparation;
-    private static int yTopAdjust;
-    private static int yTemp;
-    private static final double siblingSeparation = 3;
-    private static final double subtreeSeparation = 4;
+    private static final double siblingSeparation = 2;
+    private static final double subtreeSeparation = 2;
+    private static double lowestCoord = 0;
 
     public static Tree processTreeNodes(Tree tree) {
 
         try {
-            WalkerImprovedDraw w = new WalkerImprovedDraw();
-            tree = w.treeLayout(tree);
-//            String toProcess = tree.getRoots().toString();
-//            String[] splittedTree = toProcess.substring(1,toProcess.length()-1).split(";");
-////            for (String node: splittedTree){
-////                System.out.println("node = " + node);
-////            }
+            treeLayout(tree);
             return tree;
         } catch(Exception e){
             System.out.println("Error while running Walker Algorithm");
@@ -34,10 +23,12 @@ public class WalkerImprovedDraw {
     }
 
     private static void moveSubtree(Node conflictingAncestor, Node node, double shift) {
-        int subtrees = node.indexAsChild - conflictingAncestor.indexAsChild;
+        System.out.printf("!MoveSubtree called between %s and %s Shift: %f", conflictingAncestor.label, node.label, shift);
+        double subtrees = (double)node.indexAsChild - conflictingAncestor.indexAsChild;
+        System.out.println("number of subtrees: " + subtrees);
         node.change -= (shift / subtrees);
         node.shift += shift;
-        conflictingAncestor.change += (shift / subtrees);
+        conflictingAncestor.change += (shift/subtrees);
         node.prelim += shift;
         node.modifier += shift;
     }
@@ -56,61 +47,104 @@ public class WalkerImprovedDraw {
     }
 
     private static Node nextLeft(Node node) {
+        System.out.printf("nextLeft called for: %s\n", node.label);
         try {
             if (node.isLeaf()) {
+                System.out.println("nextLeft: " + node.thread.label);
                 return node.thread;
             } else {
+                System.out.println("nextLeft: " + node.getChild(0).label);
                 return node.getChild(0);
             }
         } catch (Exception e) {
-//            System.out.println("End of contour");
+            System.out.println("End of contour");
             return null;
         }
 
     }
 
     private static Node nextRight(Node node) {
-//        System.out.println("nextright called");
+        System.out.printf("nextRight called for: %s\n", node.label);
         try {
             if (node.isLeaf()) {
+                System.out.println("nextRight: " + node.thread.label);
                 return node.thread;
             } else {
+                System.out.println("nextRight: " + node.getChild(-1).label);
                 return node.getChild(-1);
             }
         } catch (Exception e) {
-//            System.out.println("End of contour");
+            System.out.println("End of contour");
             return null;
         }
 
     }
 
     private static Node findAncestor(Node leftNode, Node currentNode, Node defaultAncestor) {
-        if (leftNode.parent == currentNode.parent) { //geht das, oder muss man .equals benutzen?
+        System.out.printf("findAncestor called for: %s %s  %s\n", leftNode.label, currentNode.label, defaultAncestor.label);
+        System.out.println("ancestor of left node: " + leftNode.ancestor.label);
+        System.out.println("ancestor of current Node: " + currentNode.parent.label);
+        if (leftNode.ancestor.parent.equals(currentNode.parent)) { 
+            System.out.println("Ancestor: " + leftNode.ancestor.label);
             return leftNode.ancestor;
         } else {
+            System.out.println("DefaultAncestor: " + defaultAncestor.label);
             return defaultAncestor;
         }
     }
 
+    private static void clearCoords(Node node) {
+        node.ancestor = node;
+        node.thread = null;
+        node.modifier = 0;
+        node.prelim = 0;
+        node.shift = 0;
+        node.change = 0;
+        node.x = 0;
+        node.y = 0;
+        node.getChildren().forEach((n) -> {
+            clearCoords(n);
+        });
+    }
 
-    public Tree treeLayout(Tree tree) throws Exception {
+    private static void findLowest(Node root){
+        if (root.x<lowestCoord) lowestCoord=root.x;
+        if (!root.isLeaf()) {
+            for (Node node : root.getChildren()) {
+                findLowest(node);
+            }
+        }
+    }
+    
+    private static void shiftIntoPane(Node root){
+        root.x -= lowestCoord;
+        if (!root.isLeaf()) {
+            for (Node node : root.getChildren()) {
+                shiftIntoPane(node);
+            }
+        }
+    }
+    
+    public static void treeLayout(Tree tree) throws Exception {
         List<Node> roots = tree.getRoots();
         System.out.println("Roots found: " + roots.size() + " as following: " + roots);
         if (roots.size() == 1) {
             Node root = roots.get(0);
             System.out.println("Tree:\n" + tree);
-            tree.listAllNodes().forEach((Node n) -> {
-                n.modifier = 0;
-                n.thread = null;
-                n.ancestor = n;
-            });
-//            System.out.println("Doing First walk Now");
+            clearCoords(root);
+            lowestCoord = 0;
+            System.out.println("Doing First walk Now");
             firstWalk(root, 0);
-//            System.out.println("Doing second walk now");
+            System.out.println("Tree:\n" + tree);
+            System.out.println("Doing second walk now");
 //            secondWalk(root, 0, -root.prelim);
-            secondWalk(root, 0,0);
-//            System.out.println("Second walk completed");
-            return tree;
+            secondWalk(root, 0, 0);
+            findLowest(root);
+            System.out.println("------------------Lowest Coordinate: " + lowestCoord);
+            System.out.println("Second walk completed");
+            shiftIntoPane(root);
+            System.out.println("Tree:\n" + tree);
+            //return tree;
         } else {
             if (roots.isEmpty()) {
                 throw new Exception("No root found");
@@ -126,7 +160,7 @@ public class WalkerImprovedDraw {
                     firstWalk(root, 0);
                     secondWalk(root, 0,0);
                 }
-                return tree;
+                //return tree;
             }
         }
 
@@ -136,8 +170,8 @@ public class WalkerImprovedDraw {
 
         Node defaultAncestor = null;
         double midPoint;
-        if (node.isLeaf() || level == maxDepth) {
-//            System.out.println("model.Node is a leaf: " + node);
+        if (node.isLeaf()) {
+            System.out.println("Node is leaf: " + node.label);
             if (node.hasLeftSibling()) {
 //                System.out.println("model.Node has left sibling");
                 try {
@@ -154,17 +188,14 @@ public class WalkerImprovedDraw {
             defaultAncestor = node.getChild(0);
             for (Node child : node.getChildren()) {
                 firstWalk(child, level + 1);
-//                System.out.println("First walk for node completed: " + node.label);
-                try {
-                    apportion(child, level, defaultAncestor);
-                } catch (Exception e) {
-                    System.out.println("problme with apportion for model.Node: " + child.label + ", with defaultAncestor: " + defaultAncestor);
-                }
-//                System.out.println("Apportion for node completed: " + node.label);
+                //System.out.println("First walk for node completed: " + node.label);
+                defaultAncestor = apportion(child, level, defaultAncestor);
+                //System.out.println("Apportion for node completed: " + node.label);
             }
-//            System.out.println("ready to execute shifts");
+            System.out.println("ready to execute shifts: " + node.label);
             executeShifts(node);
-            midPoint = (node.getChild(0).prelim + node.getChild(-1).prelim) / 2;
+            midPoint = (node.getChild(0).prelim + node.getChild(-1).prelim) / 2.0;
+            System.out.println("Midpoint for: " + node.label + " is: " + midPoint);
             if (node.hasLeftSibling()) {
 //                System.out.println("model.Node has left sibling");
                 try {
@@ -193,12 +224,13 @@ public class WalkerImprovedDraw {
         }
     }
 
-    private static void apportion(Node node, int level, Node defaultAncestor) {
+    private static Node apportion(Node node, int level, Node defaultAncestor) {
         
         Node vInPLus = null, vInMinus = null, vOutPlus = null, vOutMinus = null;
         double sumInPlus = 0, sumInMinus = 0, sumOutPlus = 0, sumOutMinus = 0;
         double shift;
         if (node.hasLeftSibling()) {
+            System.out.println("Doing apportion for: " + node.label + " with defaultAncestor: " + defaultAncestor.label);
             vInPLus = node;
             vOutPlus = node;
             vInMinus = node.parent.getChild(node.indexAsChild - 1);
@@ -208,13 +240,16 @@ public class WalkerImprovedDraw {
             sumInMinus = vInMinus.modifier;
             sumOutMinus = vOutMinus.modifier;
             while (nextRight(vInMinus) != null && nextLeft(vInPLus) != null) {
+                System.out.println("traversing next level");
                 vInMinus = nextRight(vInMinus);
                 vInPLus = nextLeft(vInPLus);
                 vOutMinus = nextLeft(vOutMinus);
                 vOutPlus = nextRight(vOutPlus);
+                System.out.printf("vom/vim/vip/vop: %s  %s  %s  %s\n", vOutMinus.label, vInMinus.label, vInPLus.label, vOutPlus.label);
                 vOutPlus.ancestor = node;
                 shift = (vInMinus.prelim + sumInMinus) - (vInPLus.prelim + sumInPlus) + subtreeSeparation; 
                 if (shift > 0) {
+                    System.out.println("Shift in apportion is positive at nodes: " + "\t" + vInMinus.label + " " + (vInMinus.prelim + sumInMinus) + "\t" + vInPLus.label + " " + (vInPLus.prelim + sumInPlus));
                     moveSubtree(findAncestor(vInMinus, node, defaultAncestor), node, shift);
                     sumInPlus += shift;
                     sumOutPlus += shift;
@@ -224,16 +259,20 @@ public class WalkerImprovedDraw {
                 sumOutMinus += vOutMinus.modifier;
                 sumOutPlus += vOutPlus.modifier;
             }
-        }
-        if (nextRight(vInMinus) != null && nextRight(vOutPlus) == null) { 
+        
+        if (nextRight(vInMinus) != null && nextRight(vOutPlus) == null) {
+            
             vOutPlus.thread = nextRight(vInMinus);
-            vOutPlus.modifier += sumInMinus - sumOutPlus;
+            vOutPlus.modifier = vOutPlus.modifier + sumInMinus - sumOutPlus;
+            System.out.println("Setting up thread from/to/modifier: " + vOutPlus.label + "\t" + vOutPlus.thread.label + "\t" + vOutPlus.modifier);
         }
         if (nextLeft(vInPLus) != null && nextLeft(vOutMinus) == null) {
             vOutMinus.thread = nextLeft(vInPLus);
             vOutMinus.modifier += sumInPlus - sumOutMinus;
-            defaultAncestor = node;
-        }
+            System.out.println("Setting up thread from/to/modifier + default ancestor: " + vOutMinus.label + "\t" + vOutMinus.thread.label + "\t" + vOutMinus.modifier);
+            return node; //set default ancestor for kids on the right
+        }}
+        return defaultAncestor;
     }
 
 }
