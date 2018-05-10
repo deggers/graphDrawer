@@ -42,9 +42,7 @@ public class GraphMLGraph {
     }
 
     void addAllNodes(ArrayList<Node> nodes) {
-        nodes.forEach(n -> {
-            nodeList.add(n);
-        });
+        nodeList.addAll(nodes);
     }
 
     void addAllEdges(ArrayList<Edge> edges) {

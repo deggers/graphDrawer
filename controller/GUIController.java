@@ -92,15 +92,7 @@ public class GUIController {
 
         if (file != null) {
             this.fileName = file.getName();
-            try {
-                this.filesInFolder = Files.walk(Paths.get(file.getParent()))
-                        .filter(Files::isRegularFile)
-                        .map(Path::toFile)
-                        .collect(Collectors.toList());
-            } catch (IOException e) {
-                System.out.println("Error in loadFileAction");
-                e.printStackTrace();
-            }
+            filesInFolder = getFilesFromFolder(file);
             if (ParseController.getInstance().initializeParsing(file)) {
                 drawInit();
             } else {
@@ -108,6 +100,20 @@ public class GUIController {
             }
         }
     }
+
+    public List<File> getFilesFromFolder(File file) {
+        try {
+            return Files.walk(Paths.get(file.getParent()))
+                    .filter(Files::isRegularFile)
+                    .map(Path::toFile)
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            System.out.println("Error in loadFileAction");
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     @FXML    private void               choiceBoxAlgorithmOnAction() {
         String selectedAlgo = String.valueOf(choiceBoxAlgorithm.getSelectionModel().getSelectedItem());
         switch (selectedAlgo) {
@@ -191,11 +197,9 @@ public class GUIController {
         this.selectedEdgeType = selectedEdgeType;
 
         this.selectedRoot = null;
-//        choiceBoxRootIsSet = false;
         choiceBoxRoot.getItems().clear();
         choiceBoxRoot.setDisable(false);
 
-//        List<String> rootList = ParseController.getInstance().getGraph().getLabelsFromRoots(selectedEdgeType);
         List<String> rootList = ParseController.getInstance().getGraph().getPossibleRootLabels(selectedEdgeType);
         choiceBoxRoot.getItems().setAll(rootList);
         drawInit(); //durch this.selectedRoot = null; kann doch gar nichts gezeichnet werden, oder? --Florian
@@ -248,7 +252,7 @@ public class GUIController {
     }
 
     private void processTreeAndAlgo() {
-        System.out.println("i will draw now ! :)");
+        System.out.println("i will now processTreeAndAlgo() ! :)");
         cleanPane();
         setFileLabel();
         switch (selectedAlgorithm) {  // what about a tree.resizeToScreen() ?
@@ -258,13 +262,11 @@ public class GUIController {
                 paneController.drawTreeStructure(treeWalker);
                 break;
             case "Radial":
-                System.out.println("Selected Radial");
                 Tree radialTree = RadialTree.processTree(ParseController.getInstance().getTree());
                 nodeSizeSlider.setDisable(true);
                 paneController.drawRadialTreeStructure(radialTree);
                 break;
             case "RT":
-                System.out.println("Selected Reinhold");
                 nodeSizeSlider.setDisable(false);
                 Tree reinholdTree = Reinhold.processTree(ParseController.getInstance().getTree());
                 paneController.drawTreeStructure(reinholdTree);
@@ -274,5 +276,8 @@ public class GUIController {
         }
     }
 
+    public void setFilesInFolder(List<File> filesInFolder) {
+        this.filesInFolder = filesInFolder;
+    }
 
 }
