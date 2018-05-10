@@ -34,13 +34,12 @@ public class GraphMLGraph {
         return returnList;
     }
 
-    public List<String> getPossibleRootLabels(String edgeType) {
-        List<String> possibleRoots = new LinkedList<>();
+    public List<Tree> getPossibleRootLabels(String edgeType) {
+        List<Tree> possibleRoots = new LinkedList<>();
         for (Node node : nodeList)
             if (getEdgesIn(node).isEmpty() && getEdgesOut(node).toString().contains(edgeType)) {
-                Tree tree = new Tree(node);
-                int depth = tree.getTreeDepth();
-                possibleRoots.add(node.label + "(" + depth + ")");
+                Tree tree = extractSubtreeFromNode(node, edgeType);
+                possibleRoots.add(tree);
             }
         return possibleRoots.size() > 0 ? possibleRoots : null;
     }
@@ -56,6 +55,7 @@ public class GraphMLGraph {
 
     public Tree extractSubtreeFromNode(Node root, String edgeType) { //setzt mit hilfe der Edge Liste und des gewählten Edge Types -> Parent und children für alle Noten, überschreibt bestehende Infos, damit konsekutive Auswahlen ihct interferieren
         if (root == null) {
+            System.out.println("eh, das war ja null!");
             return null;
         }
         boolean bEdgeTypeValid = false;
@@ -92,7 +92,7 @@ public class GraphMLGraph {
                     node.addChild(edge.target);
                     extractSubtreeFromRootRecursion(edge.target, tset);
                 } else {
-                    System.out.println("Cycle found, I wont search any further.");
+//                    System.out.println("Cycle found, I wont search any further.");
                 }
             }
         }
@@ -166,22 +166,23 @@ public class GraphMLGraph {
         return incomingEdges;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        dumpNodeStructure(builder, null, "- ");
-        return builder.toString();
-    }
 
-    private void dumpNodeStructure(StringBuilder builder, Node node, String prefix) {
-        if (node != null) {
-            builder.append(prefix);
-            builder.append(node.toString());
-            builder.append('\n');
-            prefix = "    " + prefix;
-        }
-        for (Node child : node.getChildren()) {
-            dumpNodeStructure(builder, child, prefix);
-        }
-    }
+//    @Override
+//    public String toString() {
+//        StringBuilder builder = new StringBuilder();
+//        dumpNodeStructure(builder, null, "- ");
+//        return builder.toString();
+//    }
+//
+//    private void dumpNodeStructure(StringBuilder builder, Node node, String prefix) {
+//        if (node != null) {
+//            builder.append(prefix);
+//            builder.append(node.toString());
+//            builder.append('\n');
+//            prefix = "    " + prefix;
+//        }
+//        for (Node child : node.getChildren()) {
+//            dumpNodeStructure(builder, child, prefix);
+//        }
+//    }
 }
