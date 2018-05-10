@@ -46,7 +46,8 @@ public class Main extends Application {
 
         ParseController.getInstance().initializeParsing(file);
         GUIController guiInstance = GUIController.getInstance();
-        String fileName = file.getName();
+
+        assert guiInstance != null;
         List<File> filesInFolder = guiInstance.getFilesFromFolder(file);
         guiInstance.setFilesInFolder(filesInFolder);
 
