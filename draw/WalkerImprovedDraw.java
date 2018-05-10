@@ -6,25 +6,14 @@ import java.util.ListIterator;
 
 public class WalkerImprovedDraw {
 
-    private static int maxDepth = Integer.MAX_VALUE;
-    private static double xTopAdjust;
-    private static double xTemp;
-    private static int levelSeparation;
-    private static int yTopAdjust;
-    private static int yTemp;
     private static final double siblingSeparation = 3;
     private static final double subtreeSeparation = 4;
+    private static double lowestCoord = 0;
 
     public static Tree processTreeNodes(Tree tree) {
 
         try {
-            WalkerImprovedDraw w = new WalkerImprovedDraw();
-            tree = w.treeLayout(tree);
-//            String toProcess = tree.getRoots().toString();
-//            String[] splittedTree = toProcess.substring(1,toProcess.length()-1).split(";");
-////            for (String node: splittedTree){
-////                System.out.println("node = " + node);
-////            }
+            treeLayout(tree);
             return tree;
         } catch(Exception e){
             System.out.println("Error while running Walker Algorithm");
@@ -92,25 +81,45 @@ public class WalkerImprovedDraw {
         }
     }
 
+    private static void clearCoords(Node node) {
+        node.ancestor = node;
+        node.thread = null;
+        node.modifier = 0;
+        node.prelim = 0;
+        node.shift = 0;
+        node.change = 0;
+        node.x = 0;
+        node.y = 0;
+        node.getChildren().forEach((n) -> {
+            clearCoords(n);
+        });
+    }
 
-    public Tree treeLayout(Tree tree) throws Exception {
+    private static void findLowest(Node root){
+        if (root.prelim<lowestCoord) lowestCoord=root.prelim;
+        if (!root.isLeaf()) {
+            for (Node node : root.getChildren()) {
+                findLowest(node);
+            }
+        }
+    }
+    
+    public static void treeLayout(Tree tree) throws Exception {
         List<Node> roots = tree.getRoots();
         System.out.println("Roots found: " + roots.size() + " as following: " + roots);
         if (roots.size() == 1) {
             Node root = roots.get(0);
             System.out.println("Tree:\n" + tree);
-            tree.listAllNodes().forEach((Node n) -> {
-                n.modifier = 0;
-                n.thread = null;
-                n.ancestor = n;
-            });
+            clearCoords(root);
+            lowestCoord = 0;
 //            System.out.println("Doing First walk Now");
             firstWalk(root, 0);
 //            System.out.println("Doing second walk now");
 //            secondWalk(root, 0, -root.prelim);
-            secondWalk(root, 0,0);
+            findLowest(root);
+            secondWalk(root, 0, -lowestCoord);
 //            System.out.println("Second walk completed");
-            return tree;
+            //return tree;
         } else {
             if (roots.isEmpty()) {
                 throw new Exception("No root found");
@@ -126,7 +135,7 @@ public class WalkerImprovedDraw {
                     firstWalk(root, 0);
                     secondWalk(root, 0,0);
                 }
-                return tree;
+                //return tree;
             }
         }
 
@@ -136,7 +145,7 @@ public class WalkerImprovedDraw {
 
         Node defaultAncestor = null;
         double midPoint;
-        if (node.isLeaf() || level == maxDepth) {
+        if (node.isLeaf()) {
 //            System.out.println("model.Node is a leaf: " + node);
             if (node.hasLeftSibling()) {
 //                System.out.println("model.Node has left sibling");

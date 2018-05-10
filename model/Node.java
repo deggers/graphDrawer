@@ -10,7 +10,8 @@ public class Node implements Serializable {
     public double weight=0;
     public int level= 0;
     String GraphMLType;
-
+    public static List<Integer> depthList = new ArrayList<>();// muss resetted werden
+    
     //walker
     public double x = 0;
     public double y = 0;
@@ -24,7 +25,6 @@ public class Node implements Serializable {
     public double change = 0;
     public double shift = 0;
     public Node thread = null;
-    public static List<Integer> depthList = new ArrayList<>();// muss resetted werden
 
     // RT
     public boolean checked=false, hasThread=false;

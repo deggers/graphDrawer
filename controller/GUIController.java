@@ -195,7 +195,7 @@ public class GUIController {
         List<String> rootList = ParseController.getInstance().getGraph().getLabelsFromRoots(selectedEdgeType);
         choiceBoxRoot.getItems().setAll(rootList);
         drawInit(); //durch this.selectedRoot = null; kann doch gar nichts gezeichnet werden, oder? --Florian
-        // doch, weil hier wird in der EdgeTypeChoiceBox die root null gesetzt, bevor sie neu berechnet wird (getItems())
+        // doch, weil hier wird in der EdgeTypeChoiceBox die root null gesetzt, bevor sie neu berechnet wird (getItems()) //macht sinn, hab nicht dran gedacht, dass die ganze kontrollleiste auch neu gezeichnet wird
     }
 
     @FXML   private void drawInit() {
