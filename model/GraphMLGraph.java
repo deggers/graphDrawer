@@ -33,7 +33,7 @@ public class GraphMLGraph{
         return returnList;
     }
 
-    public List<String> getEdgeTypeLabelsIfHaveRoot() {
+    public List<String> getRelevantEdgeTypeLabels() {
         List<String> returnList = new LinkedList<>();
         for (EdgeType edgeType : edgeTypeList){
             for (Node node : nodeList) {
@@ -98,7 +98,7 @@ public class GraphMLGraph{
             System.out.println("Error: chosen edgeType: " + edgeType + " not in edgeTypeList");
             return null;
         }
-        root.parent = null;
+         root.parent = null;
         HashSet<Edge> temporaryEdgeSubset = new HashSet<>(); //startlabel, edge
         for (Edge edge : edgeList) { //zum schnelleren finden der Kanten des Teilbaumes
             if (edge.edgeType.equals(edgeType)) {
