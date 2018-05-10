@@ -40,7 +40,7 @@ public class GraphMLGraph {
             if (getEdgesIn(node).isEmpty() && getEdgesOut(node).toString().contains(edgeType)) {
                 Tree tree = extractSubtreeFromNode(node, edgeType);
                 int depth = tree.getTreeDepth();
-                int numNodes = tree.nodeList.size();
+                int numNodes = tree.nodeList.size()-1;
                 possibleRoots.add(node.label + " (" + depth + "|" + numNodes + ")");
             }
         return possibleRoots.size() > 0 ? possibleRoots : null;
