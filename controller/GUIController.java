@@ -12,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import model.GraphMLGraph;
 import model.Tree;
 
@@ -151,7 +152,7 @@ public class GUIController {
 
     private int                         nodeSize                    = 8;
     private int                         spaceBetweenRadii           = 0;
-    private String                      selectedRoot                = null;
+    private Tree                        selectedRoot                = null;
     private String                      selectedEdgeType            = null;
 
     public  void                        init()      {
@@ -179,12 +180,13 @@ public class GUIController {
 
 
     public void choiceBoxSelectRoot(ActionEvent event) {
-        String selectedRoot =  String.valueOf(choiceBoxRoot.getSelectionModel().getSelectedItem());
-        this.selectedRoot = selectedRoot;
-        if (selectedRoot != null) {
+        Tree selectedRootAsTree =  (Tree) choiceBoxRoot.getSelectionModel().getSelectedItem();
+        System.out.println("selectedRootAsTree = " + selectedRootAsTree);
+        this.selectedRoot = selectedRootAsTree;
+        if (selectedRootAsTree != null) {
             ParseController.getInstance().setTree(null);
-            GraphMLGraph theGraph = ParseController.getInstance().getGraph();
-            ParseController.getInstance().setTree(theGraph.extractSubtreeFromNode(theGraph.labelToNode(selectedRoot), selectedEdgeType));
+//            GraphMLGraph theGraph = ParseController.getInstance().getGraph();
+            ParseController.getInstance().setTree(selectedRootAsTree);
         }
         drawInit();
     }
@@ -196,10 +198,20 @@ public class GUIController {
         choiceBoxRoot.getItems().clear();
         choiceBoxRoot.setDisable(false);
 
-        List<String> rootList = ParseController.getInstance().getGraph().getPossibleRootLabels(selectedEdgeType);
+        List<Tree> rootList = ParseController.getInstance().getGraph().getPossibleRootLabels(selectedEdgeType);
         choiceBoxRoot.getItems().setAll(rootList);
-        drawInit(); //durch this.selectedRoot = null; kann doch gar nichts gezeichnet werden, oder? --Florian
-        // doch, weil hier wird in der EdgeTypeChoiceBox die root null gesetzt, bevor sie neu berechnet wird (getItems()) //macht sinn, hab nicht dran gedacht, dass die ganze kontrollleiste auch neu gezeichnet wird
+
+        choiceBoxRoot.setConverter(new StringConverter<Tree>() {
+            @Override
+            public String toString(Tree tree) {
+                return tree.getRoot().label + " (" + tree.getTreeDepth() + ")";
+            }
+            @Override  // not used... but NECESSARY !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            public Tree fromString(String s) {
+                return null ;
+            }
+        });
+        drawInit();
     }
     private void drawInit() {
         Tree theTree = ParseController.getInstance().getTree();
