@@ -1,10 +1,14 @@
 import controller.GUIController;
+import controller.ParseController;
 import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import model.Observe;
+
+import java.io.File;
+import java.util.List;
 
 public class Main extends Application {
 
@@ -22,6 +26,30 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
+        File file;
+        String arg1;
+        if (args.length > 0) {
+            arg1 = args[0];
+        } else  arg1 = "nh";
+
+        switch (arg1) {
+            case "nh":
+                file = new File("C:\\Users\\dusty\\Desktop\\Zeckzer\\Baeume_1\\Baeume\\Data\\Phylogeny-Binaer\\hg38.20way.nh");
+                break;
+            case "graphML":
+                file = new File("C:\\Users\\dusty\\Desktop\\Zeckzer\\Baeume_1\\Baeume\\Data\\Software-Engineering\\Checkstyle-6.5.graphml");
+                break;
+            default:
+                file = null;
+                break;
+        }
+
+        ParseController.getInstance().initializeParsing(file);
+        GUIController guiInstance = GUIController.getInstance();
+        String fileName = file.getName();
+        List<File> filesInFolder = guiInstance.getFilesFromFolder(file);
+        guiInstance.setFilesInFolder(filesInFolder);
+
         launch(args);
     }
 }
