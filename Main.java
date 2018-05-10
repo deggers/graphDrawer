@@ -30,7 +30,7 @@ public class Main extends Application {
         String arg1;
         if (args.length > 0) {
             arg1 = args[0];
-        } else  arg1 = "nh";
+        } else  arg1 = "graphML";
 
         switch (arg1) {
             case "nh":

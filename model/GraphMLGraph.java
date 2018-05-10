@@ -37,7 +37,11 @@ public class GraphMLGraph {
     public List<String> getPossibleRootLabels(String edgeType) {
         List<String> possibleRoots = new LinkedList<>();
         for (Node node : nodeList)
-            if (getEdgesIn(node).isEmpty() && getEdgesOut(node).toString().contains(edgeType)) possibleRoots.add(node.label);
+            if (getEdgesIn(node).isEmpty() && getEdgesOut(node).toString().contains(edgeType)) {
+                Tree tree = new Tree(node);
+                int depth = tree.getTreeDepth();
+                possibleRoots.add(node.label + "(" + depth + ")");
+            }
         return possibleRoots.size() > 0 ? possibleRoots : null;
     }
 
