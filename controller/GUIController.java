@@ -100,20 +100,6 @@ public class GUIController {
             }
         }
     }
-
-    public List<File> getFilesFromFolder(File file) {
-        try {
-            return Files.walk(Paths.get(file.getParent()))
-                    .filter(Files::isRegularFile)
-                    .map(Path::toFile)
-                    .collect(Collectors.toList());
-        } catch (IOException e) {
-            System.out.println("Error in loadFileAction");
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     @FXML    private void               choiceBoxAlgorithmOnAction() {
         String selectedAlgo = String.valueOf(choiceBoxAlgorithm.getSelectionModel().getSelectedItem());
         switch (selectedAlgo) {
@@ -131,7 +117,6 @@ public class GUIController {
         }
         drawInit();
     }
-
 
     private PaneController              paneController              = null;
     private String                      selectedAlgorithm           = null;
@@ -179,6 +164,18 @@ public class GUIController {
     private void                        setFileLabel() {
         fileNameLabel.setText(this.fileName);
     }
+    public List<File>                   getFilesFromFolder(File file) {
+        try {
+            return Files.walk(Paths.get(file.getParent()))
+                    .filter(Files::isRegularFile)
+                    .map(Path::toFile)
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            System.out.println("Error in loadFileAction");
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 
     public void choiceBoxSelectRoot(ActionEvent event) {
@@ -191,7 +188,6 @@ public class GUIController {
         }
         drawInit();
     }
-
     public void choiceBoxEdgeTypeOnAction(ActionEvent event) {
         String selectedEdgeType = String.valueOf(choiceBoxEdgeType.getSelectionModel().getSelectedItem());
         this.selectedEdgeType = selectedEdgeType;
@@ -205,7 +201,6 @@ public class GUIController {
         drawInit(); //durch this.selectedRoot = null; kann doch gar nichts gezeichnet werden, oder? --Florian
         // doch, weil hier wird in der EdgeTypeChoiceBox die root null gesetzt, bevor sie neu berechnet wird (getItems()) //macht sinn, hab nicht dran gedacht, dass die ganze kontrollleiste auch neu gezeichnet wird
     }
-
     private void drawInit() {
         Tree theTree = ParseController.getInstance().getTree();
         GraphMLGraph theGraph = ParseController.getInstance().getGraph();
