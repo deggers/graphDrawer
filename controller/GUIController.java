@@ -65,10 +65,9 @@ public class GUIController {
     }
     @FXML    private void               setNextFileAsTree() {
         if (filesInFolder != null) { // we selected a file so we have the folder from here on
-            if (getFilesIter() == null || !getFilesIter().hasNext()) {
-                List<File> files = getFilesInFolder();
-                ListIterator<File> filesIter = files.listIterator();
-                setFilesIter(filesIter);
+            if (filesIter == null || !filesIter.hasNext()) {
+                List<File> files = filesInFolder;
+                this.filesIter = files.listIterator();
             }
             ParseController.getInstance().setFile(filesIter.next());
             File file = ParseController.getInstance().getFile();
@@ -94,11 +93,10 @@ public class GUIController {
         if (file != null) {
             this.fileName = file.getName();
             try {
-                filesInFolder = Files.walk(Paths.get(file.getParent()))
+                this.filesInFolder = Files.walk(Paths.get(file.getParent()))
                         .filter(Files::isRegularFile)
                         .map(Path::toFile)
                         .collect(Collectors.toList());
-                setFilesInFolder(filesInFolder);
             } catch (IOException e) {
                 System.out.println("Error in loadFileAction");
                 e.printStackTrace();
@@ -134,6 +132,8 @@ public class GUIController {
     private String                      fileName                    = null;
     private ListIterator<File>          filesIter                   = null;
     private List<File>                  filesInFolder               = null;
+    private GraphMLGraph                theGraph                    = null;
+    private Tree                        theTree                     = null;
 
 
     public static   GUIController       getInstance() {
@@ -179,6 +179,7 @@ public class GUIController {
         String selectedRoot =  String.valueOf(choiceBoxRoot.getSelectionModel().getSelectedItem());
         this.selectedRoot = selectedRoot;
         if (selectedRoot != null) {
+            ParseController.getInstance().setTree(null);
             GraphMLGraph theGraph = ParseController.getInstance().getGraph();
             ParseController.getInstance().setTree(theGraph.extractSubtreeFromNode(theGraph.labelToNode(selectedRoot), selectedEdgeType));
         }
@@ -190,16 +191,16 @@ public class GUIController {
         this.selectedEdgeType = selectedEdgeType;
 
         this.selectedRoot = null;
-        choiceBoxRootIsSet = false;
+//        choiceBoxRootIsSet = false;
         choiceBoxRoot.getItems().clear();
         choiceBoxRoot.setDisable(false);
 
-        List<String> rootList = ParseController.getInstance().getGraph().getLabelsFromRoots(selectedEdgeType);
+//        List<String> rootList = ParseController.getInstance().getGraph().getLabelsFromRoots(selectedEdgeType);
+        List<String> rootList = ParseController.getInstance().getGraph().getPossibleRootLabels(selectedEdgeType);
         choiceBoxRoot.getItems().setAll(rootList);
-//        drawInit();
     }
 
-    @FXML   private void drawInit() {
+    private void drawInit() {
         Tree theTree = ParseController.getInstance().getTree();
         GraphMLGraph theGraph = ParseController.getInstance().getGraph();
 
@@ -226,18 +227,6 @@ public class GUIController {
     //@formatter:on
 
     // SETTER & GETTER AREA
-    public String getSelectedAlgorithm() {
-        return this.selectedAlgorithm;
-    }
-
-    public List<File> getFilesInFolder() {
-        return filesInFolder;
-    }
-
-    public ListIterator<File> getFilesIter() {
-        return filesIter;
-    }
-
     public Parent getRoot() {
         return this.vBox;
     }
@@ -251,23 +240,16 @@ public class GUIController {
         return this.nodeSize;
     }
 
-    public void setFilesInFolder(List<File> filesInFolder) {
-        this.filesInFolder = filesInFolder;
-    }
-
-    public void setFilesIter(ListIterator<File> filesIter) {
-        this.filesIter = filesIter;
-    }
-
 
     private void setPane(VBox vBox) {
         this.vBox = vBox;
     }
 
     private void processTreeAndAlgo() {
+        System.out.println("i will draw now ! :)");
         cleanPane();
         setFileLabel();
-        switch (getSelectedAlgorithm()) {  // what about a tree.resizeToScreen() ?
+        switch (selectedAlgorithm) {  // what about a tree.resizeToScreen() ?
             case "Walker":
                 Tree treeWalker = WalkerImprovedDraw.processTreeNodes(ParseController.getInstance().getTree());
                 nodeSizeSlider.setDisable(false);
