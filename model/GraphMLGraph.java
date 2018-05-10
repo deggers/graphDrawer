@@ -35,22 +35,16 @@ public class GraphMLGraph{
 
     public List<String> getRelevantEdgeTypeLabels() {
         List<String> returnList = new LinkedList<>();
-        for (EdgeType edgeType : edgeTypeList){
             for (Node node : nodeList) {
                 if (getEdgesIn(node).isEmpty()) {
                     for (Edge outGoingEdges : getEdgesOut(node)) {
-//                        System.out.println("outGoingEdges = " + outGoingEdges.edgeType);
-//                        System.out.println("edgeType.toString() = " + edgeType.getId());
-                        if (outGoingEdges.edgeType.equals(edgeType.getId())) {
-                            if (!returnList.contains(edgeType.getId())) {
-                                returnList.add(edgeType.getId());
+                            if (!returnList.contains(outGoingEdges.edgeType)) {
+                                returnList.add(outGoingEdges.edgeType);
+                                break;
                             }
-                            break;
                         }
                     }
                 }
-            }
-        }
         return returnList;
     }
 
