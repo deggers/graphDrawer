@@ -38,9 +38,9 @@ public class GraphMLGraph {
         List<String> possibleRoots = new LinkedList<>();
         for (Node node : nodeList)
             if (getEdgesIn(node).isEmpty() && getEdgesOut(node).toString().contains(edgeType)) {
-                Tree tree = new Tree(node);
+                Tree tree = extractSubtreeFromNode(node, edgeType);
                 int depth = tree.getTreeDepth();
-                possibleRoots.add(node.label + "(" + depth + ")");
+                possibleRoots.add(node.label + " (" + depth + ")");
             }
         return possibleRoots.size() > 0 ? possibleRoots : null;
     }
@@ -110,6 +110,11 @@ public class GraphMLGraph {
     }
 
     public Node labelToNode(String label) {
+        // here we need to stripOf the (#TreeDepth)
+        String[] tmp = label.split(" \\(");
+        label = tmp[0];
+        System.out.println("tmp = " + tmp);
+        System.out.println("label = " + label);
         Node particularNode = null;
         for (Node node : nodeList) {
             if (node.label.equals(label)) particularNode = node;
