@@ -45,11 +45,10 @@ public class PaneController {
             return paneInstance;
         }
     }
-    static int                              spaceBetweenRadii;
-    static int                              radialNodeSize;
-    static int                              middleOfScreen;
-    static int                              centerY;
-    static int                              centerX;
+    private static int                      spaceBetweenRadii;
+    private static int                      radialNodeSize;
+    private static int                      centerY;
+    private static int                      centerX;
     // FXML in Pane.fxml
     @FXML   private         ScrollPane      scrollPane;
     @FXML   private         Pane            pane;
@@ -139,13 +138,13 @@ public class PaneController {
         int maxRadius = (optSize / level) < minSpacing ? minSpacing * level : optSize;
         spaceBetweenRadii = (maxRadius / level < minSpacing) ? minSpacing : maxRadius / level;
         radialNodeSize = spaceBetweenRadii >> 2 > minNodeSize ? minNodeSize : spaceBetweenRadii >> 2;
-        middleOfScreen = maxRadius / 2;
+        int middleOfScreen = maxRadius / 2;
 
         int paneHalfHeight = (int) scrollPane.getHeight() / 2;
         int paneHalfWidth = (int) scrollPane.getWidth() / 2;
 
-        centerY = middleOfScreen > paneHalfHeight ? middleOfScreen*2+radialNodeSize : paneHalfHeight + 2*radialNodeSize;
-        centerX = middleOfScreen > paneHalfWidth ? middleOfScreen*2+radialNodeSize : paneHalfWidth + 2* radialNodeSize;
+        centerY = middleOfScreen > paneHalfHeight ? middleOfScreen *2+radialNodeSize : paneHalfHeight + 2*radialNodeSize;
+        centerX = middleOfScreen > paneHalfWidth ? middleOfScreen *2+radialNodeSize : paneHalfWidth + 2* radialNodeSize;
 
         for (int i = 0; i <= level + 1; i++) {
             pane.getChildren().add(createGuideline(centerX, centerY, maxRadius + radialNodeSize));
@@ -156,7 +155,6 @@ public class PaneController {
         radialPositions(tree, root, Math.toRadians(0), Math.toRadians(360));
         drawRadialTreeEdges(tree);
         radialPositions(tree, root, Math.toRadians(0), Math.toRadians(360));
-
     }
 
     private Tree radialPositions(Tree radialTree, Node node, double alpha, double beta) {
