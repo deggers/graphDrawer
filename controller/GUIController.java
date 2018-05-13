@@ -12,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import model.GraphMLGraph;
 import model.Tree;
 
@@ -88,7 +89,7 @@ public class GUIController {
                 new FileChooser.ExtensionFilter("GraphML files (*.graphml)", "*.graphml")
         );
 
-        File file = fileChooser.showOpenDialog(null);
+        File file = fileChooser.showOpenDialog(vBox.getScene().getWindow());
 
         if (file != null) {
             this.fileName = file.getName();
