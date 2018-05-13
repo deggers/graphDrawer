@@ -4,6 +4,7 @@ package controller;
 import draw.RadialTree;
 import draw.Reinhold;
 import draw.WalkerImprovedDraw;
+import draw.exception.NonBinaryTreeException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -263,8 +264,15 @@ public class GUIController {
                 break;
             case "RT":
                 nodeSizeSlider.setDisable(false);
-                Tree reinholdTree = Reinhold.processTree(ParseController.getInstance().getTree());
-                paneController.drawTreeStructure(reinholdTree);
+                try {
+                    Tree reinholdTree = Reinhold.processTree(ParseController.getInstance().getTree());
+                    paneController.drawTreeStructure(reinholdTree);
+                } catch (NonBinaryTreeException e) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Tree can not be drawn");
+                    alert.setContentText("RT requires a binary tree");
+                    alert.showAndWait();
+                }
                 break;
             default:
                 throw new IllegalArgumentException("The algo: " + selectedAlgorithm + " is not yet implemented");
