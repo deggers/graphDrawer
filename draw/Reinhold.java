@@ -1,5 +1,6 @@
 package draw;
 
+import draw.exception.NonBinaryTreeException;
 import model.*;
 
 import java.util.ArrayList;
@@ -11,6 +12,10 @@ public class Reinhold {
 
 
     public static Tree processTree(Tree tree) {
+        if (!tree.isBinary()) {
+            System.out.println("Tree is not binary, running RT not possible!");
+            throw new NonBinaryTreeException("Running RT Algo not possible");
+        }
         try {
             Reinhold r = new Reinhold();
             Node root = tree.getRoot();
@@ -56,7 +61,7 @@ public class Reinhold {
             node.checked = true;
             double childLevel= node.y + 1;
             for (Node c : node.getChildren()) {
-                c.parent = node;
+//                c.parent = node;
                 if ((c.y == (childLevel))) {
                     kids.add(c);
                 }
