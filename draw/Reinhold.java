@@ -11,6 +11,10 @@ public class Reinhold {
 
 
     public static Tree processTree(Tree tree) {
+        if (!tree.isBinary()) {
+            System.out.println("Tree is not binary, running RT not possible!");
+            return null;
+        }
         try {
             Reinhold r = new Reinhold();
             Node root = tree.getRoot();

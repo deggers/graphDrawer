@@ -166,5 +166,23 @@ public class Tree {
         }
     }
 
+    public boolean isBinary(){
+        Node root = this.getRoot();
+        return checkBinary(root);
+    }
+
+    private boolean checkBinary(Node node){
+        if(node.getChildren().size() >2){
+            return false;
+        }
+        for(Node n: node.getChildren()){
+            boolean binary = checkBinary(n);
+            if (!binary) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }
 
