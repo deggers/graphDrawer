@@ -229,6 +229,7 @@ public class GUIController {
     private void drawInit() {
         Tree theTree = ParseController.getInstance().getTree();
         GraphMLGraph theGraph = ParseController.getInstance().getGraph();
+        setFileLabel();
 
         if (theTree != null  && !choiceBoxAlgorithmIsSet) {
             choiceBoxAlgorithm.setDisable(false);
