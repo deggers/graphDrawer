@@ -6,8 +6,9 @@ import java.util.ListIterator;
 
 public class WalkerImprovedDraw {
 
-    private static final double siblingSeparation = 2;
-    private static final double subtreeSeparation = 2;
+    private static final double siblingSeparation = 3;
+    private static final double subtreeSeparation = 4;
+    private static final double levelSeparation = 2.5;
     private static double lowestCoord = 0;
 
     public static Tree processTreeNodes(Tree tree) {
@@ -216,7 +217,7 @@ public class WalkerImprovedDraw {
     private static void secondWalk(Node node, int level, double modsum) {
 //        System.out.println("Second walk called, modsum: " + modsum);
         node.x = node.prelim + modsum;
-        node.y = level * 3;
+        node.y = level * levelSeparation;
         if (!node.isLeaf()) {
             node.getChildren().forEach((c) -> {
                 secondWalk(c, level + 1, modsum + node.modifier);

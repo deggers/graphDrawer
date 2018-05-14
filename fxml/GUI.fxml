@@ -52,6 +52,7 @@
                         <String fx:value="RT"/>
                         <String fx:value="Walker"/>
                         <String fx:value="Radial"/>
+                        <String fx:value="BPlus"/>
                     </FXCollections>
                 </items>
                 <HBox.margin>
