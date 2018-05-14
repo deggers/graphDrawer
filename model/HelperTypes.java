@@ -13,7 +13,37 @@ import java.util.Objects;
  */
 class HelperTypes {
     
-    protected static class EdgeType{
+    protected static class protoNode { //Hält eine kleine Repräsentation eines Knotens in einem GraphML Graphen, die keinerlei Zeichenfunktionalität oder Adjazenzinformationen bereitstellt
+        
+        private final String label;
+        private final String GraphMLType;
+
+        public protoNode(String label) {
+            this.label = label;
+            GraphMLType = null;
+        }
+
+        public protoNode(String label, String GraphMLType) {
+            this.label = label;
+            this.GraphMLType = GraphMLType;
+        }
+        
+        public Node toNode(){
+            Node node = new Node(label);
+            node.GraphMLType = GraphMLType;
+            return node;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public String getGraphMLType() {
+            return GraphMLType;
+        }
+    }
+    
+    protected static class EdgeType{ //Hält einen Kantentyp nach GraphML Spezifikation mit ID und Art des folgenden Attributfeldes (normalerweise double)
     final String id;
     final String attrType;
     
@@ -29,10 +59,6 @@ class HelperTypes {
     public String getAttrType() {
         return attrType; 
     }
-    
-    //public Class<?> getAttrClass() throws ClassNotFoundException {
-    //    return Class.forName(attrType);
-    //} wahrscheinlich braucht keiner reflection
     
     @Override
     public boolean equals(Object obj) {
