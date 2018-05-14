@@ -231,16 +231,10 @@ public class GUIController {
         GraphMLGraph theGraph = ParseController.getInstance().getGraph();
         setFileLabel();
 
-        if (theTree != null  && !choiceBoxAlgorithmIsSet) {
+        if (theTree != null && !choiceBoxAlgorithmIsSet) {
             choiceBoxAlgorithm.setDisable(false);
             choiceBoxAlgorithm.getItems().clear();
-            if (theTree != null && theTree.isBinary()) {
-                List<String> list = Arrays.asList("BPlus", "RT", "Walker", "Radial");
-                choiceBoxAlgorithm.getItems().setAll(list);
-            } else {
-                List<String> list = Arrays.asList("BPlus", "Walker", "Radial");
-                choiceBoxAlgorithm.getItems().setAll(list);
-            }
+            choiceBoxAlgorithm.getItems().setAll(theTree.isBinary() ? Arrays.asList("BPlus", "RT", "Walker", "Radial") : Arrays.asList("BPlus", "Walker", "Radial"));
             choiceBoxAlgorithmIsSet = true;
         }
 
@@ -286,7 +280,6 @@ public class GUIController {
 
     private void processTreeAndAlgo() {
         cleanPane();
-        setFileLabel();
         switch (selectedAlgorithm) {  // what about a tree.resizeToScreen() ?
             case "Walker":
                 Tree treeWalker = WalkerImprovedDraw.processTreeNodes(ParseController.getInstance().getTree());
