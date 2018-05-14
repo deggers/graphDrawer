@@ -4,8 +4,11 @@ package model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Node implements Serializable {
+    
+    public String associatedTree;
     public String label;
     public double weight=0;
     public int level= 0;
@@ -34,6 +37,7 @@ public class Node implements Serializable {
 
     public Node(String label) {
         this.label = label;
+        associatedTree = "default";
     }
 
     public void addChild(Node node) {
@@ -99,5 +103,121 @@ public class Node implements Serializable {
             depth++;
         }
         return depth;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 53 * hash + Objects.hashCode(this.associatedTree);
+        hash = 53 * hash + Objects.hashCode(this.label);
+        hash = 53 * hash + Objects.hashCode(this.GraphMLType);
+        return hash;
+    }
+    
+    public boolean equalsIgnoreCoordinates(Object obj){
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Node other = (Node) obj;
+        if (Double.doubleToLongBits(this.weight) != Double.doubleToLongBits(other.weight)) {
+            return false;
+        }
+        if (!Objects.equals(this.associatedTree, other.associatedTree)) {
+            return false;
+        }
+        if (!Objects.equals(this.label, other.label)) {
+            return false;
+        }
+        if (!Objects.equals(this.GraphMLType, other.GraphMLType)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Node other = (Node) obj;
+        if (Double.doubleToLongBits(this.weight) != Double.doubleToLongBits(other.weight)) {
+            return false;
+        }
+        if (this.level != other.level) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.x) != Double.doubleToLongBits(other.x)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.y) != Double.doubleToLongBits(other.y)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.prelim) != Double.doubleToLongBits(other.prelim)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.modifier) != Double.doubleToLongBits(other.modifier)) {
+            return false;
+        }
+        if (this.indexAsChild != other.indexAsChild) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.change) != Double.doubleToLongBits(other.change)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.shift) != Double.doubleToLongBits(other.shift)) {
+            return false;
+        }
+        if (this.checked != other.checked) {
+            return false;
+        }
+        if (this.hasThread != other.hasThread) {
+            return false;
+        }
+        if (Double.doubleToLongBits(this.offset) != Double.doubleToLongBits(other.offset)) {
+            return false;
+        }
+        if (!Objects.equals(this.associatedTree, other.associatedTree)) {
+            return false;
+        }
+        if (!Objects.equals(this.label, other.label)) {
+            return false;
+        }
+        if (!Objects.equals(this.GraphMLType, other.GraphMLType)) {
+            return false;
+        }
+        if (!Objects.equals(this.parent, other.parent)) {
+            return false;
+        }
+        if (!Objects.equals(this.leftNeighbor, other.leftNeighbor)) {
+            return false;
+        }
+        if (!Objects.equals(this.children, other.children)) {
+            return false;
+        }
+        if (!Objects.equals(this.ancestor, other.ancestor)) {
+            return false;
+        }
+        if (!Objects.equals(this.thread, other.thread)) {
+            return false;
+        }
+        if (!Objects.equals(this.leftChild, other.leftChild)) {
+            return false;
+        }
+        if (!Objects.equals(this.rightChild, other.rightChild)) {
+            return false;
+        }
+        return true;
     }
 }
