@@ -4,17 +4,23 @@ package controller;
 import draw.RadialTree;
 import draw.Reinhold;
 import draw.WalkerImprovedDraw;
+import draw.exception.NonBinaryTreeException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import model.GraphMLGraph;
 import model.Tree;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -23,6 +29,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.stream.Collectors;
+
+import static java.awt.Color.BLACK;
 
 public class GUIController {
 
@@ -33,6 +41,7 @@ public class GUIController {
         nodeSizeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             setNodeSize(newValue.intValue());
         });
+        choiceBoxAlgorithm.setDisable(true);
         choiceBoxEdgeType.setDisable(true); // disable at beginning
         choiceBoxRoot.setDisable(true); // disable at beginning
     } // setup observer for nodeSizeSlider
@@ -204,6 +213,7 @@ public class GUIController {
     private void drawInit() {
         Tree theTree = ParseController.getInstance().getTree();
         GraphMLGraph theGraph = ParseController.getInstance().getGraph();
+        choiceBoxAlgorithm.setDisable(false);
 
         if (theGraph != null && !choiceBoxEdgeTypeIsSet){
             choiceBoxEdgeType.setDisable(false);
@@ -213,6 +223,7 @@ public class GUIController {
 
             
         if (theTree != null && selectedAlgorithm != null && theGraph == null) {
+            choiceBoxAlgorithm.setDisable(false);
             choiceBoxEdgeType.setDisable(true);
             choiceBoxRoot.setDisable(true);
             choiceBoxEdgeType.getItems().clear();
@@ -263,8 +274,17 @@ public class GUIController {
                 break;
             case "RT":
                 nodeSizeSlider.setDisable(false);
-                Tree reinholdTree = Reinhold.processTree(ParseController.getInstance().getTree());
-                paneController.drawTreeStructure(reinholdTree);
+                try{
+                    Tree reinholdTree = Reinhold.processTree(ParseController.getInstance().getTree());
+                    paneController.drawTreeStructure(reinholdTree);
+                } catch (NonBinaryTreeException e){
+                  choiceBoxAlgorithm.getSelectionModel().selectNext();
+                    System.out.print("Tree not binary, choosing next Algo.");
+                    cleanPane();
+                    treeWalker = WalkerImprovedDraw.processTreeNodes(ParseController.getInstance().getTree());
+                    nodeSizeSlider.setDisable(false);
+                    paneController.drawTreeStructure(treeWalker);
+                }
                 break;
             default:
                 throw new IllegalArgumentException("The algo: " + selectedAlgorithm + " is not yet implemented");
