@@ -198,12 +198,12 @@ public class GUIController {
     }
     
     public void choiceBoxEdgeTypeOnAction(ActionEvent event) {
-        String selectedEdgeType;
         try {
             selectedEdgeType = String.valueOf(choiceBoxEdgeType.getSelectionModel().getSelectedItem());
         } catch (NullPointerException e) {
             selectedEdgeType = null;
         }
+
         if (selectedEdgeType != null) {
             this.selectedEdgeType = selectedEdgeType;
             this.selectedRoot = null;
@@ -218,6 +218,11 @@ public class GUIController {
             drawInit(); 
         }      
     }
+
+    public void setChoiceBoxEdgeTypeIsSet(boolean choiceBoxEdgeTypeIsSet) {
+        this.choiceBoxEdgeTypeIsSet = choiceBoxEdgeTypeIsSet;
+    }
+
     private void drawInit() {
         Tree theTree = ParseController.getInstance().getTree();
         GraphMLGraph theGraph = ParseController.getInstance().getGraph();

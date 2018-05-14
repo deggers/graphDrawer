@@ -35,6 +35,7 @@ public class ParseController {
         } else if (fileExtension.equalsIgnoreCase("graphml")) {
             GraphMLGraph graphML = GraphMLParser.parseFileToGraph(file);
             setGraph(graphML);
+            GUIController.getInstance().setChoiceBoxEdgeTypeIsSet(false);
             setTree(null);
             return true;
         } else {
@@ -50,12 +51,14 @@ public class ParseController {
     public Tree getTree() {
         return this.tree;
     }
+
     public GraphMLGraph getGraph() {
         return graph;
     }
     public void setGraph(GraphMLGraph graph) {
         this.graph = graph;
     }
+
     public File getFile() {
         return file;
     }
