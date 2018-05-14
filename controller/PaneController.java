@@ -77,6 +77,24 @@ public class PaneController {
         drawTreeEdges(tree);
         drawTreeNodes(tree);
     }
+    void            drawTreeOrthogonally(Tree tree) {
+        drawEdgesOrthogonally(tree);
+        drawTreeNodes(tree);
+    }
+    private void    drawEdgesOrthogonally(Tree tree) {
+        for (Node child : tree.listAllNodes()) {
+            if (child.parent != null) {
+                Node parent = child.parent;
+                double parentX = scaleCoordinate(parent.x);
+                double parentY = scaleCoordinate(parent.y);
+
+                double childX = scaleCoordinate(child.x);
+                double childY = scaleCoordinate(child.y);
+                pane.getChildren().add(new Line(parentX, parentY, childX, parentY));
+                pane.getChildren().add(new Line(childX, parentY, childX, childY));
+            }
+        }
+    }
     private void    drawTreeNodes(Tree tree) {
         for (Node node : tree.listAllNodes()) {
             pane.getChildren().add(createNode(node));

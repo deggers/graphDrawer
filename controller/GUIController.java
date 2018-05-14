@@ -1,26 +1,23 @@
 
 package controller;
 
+import draw.B_Plus;
 import draw.RadialTree;
 import draw.Reinhold;
 import draw.WalkerImprovedDraw;
 import draw.exception.NonBinaryTreeException;
+import draw.B_Plus;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import model.GraphMLGraph;
 import model.Tree;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -29,8 +26,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.stream.Collectors;
-
-import static java.awt.Color.BLACK;
 
 public class GUIController {
 
@@ -118,6 +113,9 @@ public class GUIController {
             case "Walker":
                 this.selectedAlgorithm = "Walker";
                 break;
+            case "BPlus":
+                this.selectedAlgorithm = "BPlus";
+                break;
             case "RT":
                 this.selectedAlgorithm = "RT";
                 break;
@@ -132,8 +130,6 @@ public class GUIController {
     private String                      fileName                    = null;
     private ListIterator<File>          filesIter                   = null;
     private List<File>                  filesInFolder               = null;
-    private GraphMLGraph                theGraph                    = null;
-    private Tree                        theTree                     = null;
 
 
     public static   GUIController       getInstance() {
@@ -186,30 +182,50 @@ public class GUIController {
         return null;
     }
 
-
     public void choiceBoxSelectRoot(ActionEvent event) {
-        String selectedRoot =  String.valueOf(choiceBoxRoot.getSelectionModel().getSelectedItem());
-        this.selectedRoot = selectedRoot;
-        if (selectedRoot != null) {
-            ParseController.getInstance().setTree(null);
-            GraphMLGraph theGraph = ParseController.getInstance().getGraph();
-            ParseController.getInstance().setTree(theGraph.extractSubtreeFromNode(theGraph.labelToNode(selectedRoot), selectedEdgeType));
+        String selectedRoot;
+        try {
+            selectedRoot =  String.valueOf(choiceBoxRoot.getSelectionModel().getSelectedItem());
+        } catch (NullPointerException e) {
+            selectedRoot = null;
         }
-        drawInit();
+        if (selectedRoot != null) {
+            this.selectedRoot = selectedRoot;
+            //ParseController.getInstance().setTree(null);
+            GraphMLGraph theGraph = ParseController.getInstance().getGraph();
+            if (theGraph != null) {
+                ParseController.getInstance().setTree(theGraph.extractSubtreeFromNode(theGraph.labelToNode(selectedRoot), selectedEdgeType));
+            }
+            drawInit();
+        }
     }
+
     public void choiceBoxEdgeTypeOnAction(ActionEvent event) {
-        String selectedEdgeType = String.valueOf(choiceBoxEdgeType.getSelectionModel().getSelectedItem());
-        this.selectedEdgeType = selectedEdgeType;
+        try {
+            selectedEdgeType = String.valueOf(choiceBoxEdgeType.getSelectionModel().getSelectedItem());
+        } catch (NullPointerException e) {
+            selectedEdgeType = null;
+        }
 
-        this.selectedRoot = null;
-        choiceBoxRoot.getItems().clear();
-        choiceBoxRoot.setDisable(false);
+        if (selectedEdgeType != null) {
+            this.selectedEdgeType = selectedEdgeType;
+            this.selectedRoot = null;
+            choiceBoxRoot.getItems().clear();
+            choiceBoxRoot.setDisable(false);
 
-        List<String> rootList = ParseController.getInstance().getGraph().getPossibleRootLabels(selectedEdgeType);
-        choiceBoxRoot.getItems().setAll(rootList);
-        drawInit(); //durch this.selectedRoot = null; kann doch gar nichts gezeichnet werden, oder? --Florian
-        // doch, weil hier wird in der EdgeTypeChoiceBox die root null gesetzt, bevor sie neu berechnet wird (getItems()) //macht sinn, hab nicht dran gedacht, dass die ganze kontrollleiste auch neu gezeichnet wird
+            GraphMLGraph theGraph = ParseController.getInstance().getGraph();
+            if (theGraph != null) {
+                List<String> rootList = ParseController.getInstance().getGraph().getPossibleRootLabels(selectedEdgeType);
+                choiceBoxRoot.getItems().setAll(rootList);
+            }
+            drawInit();
+        }
     }
+
+    public void setChoiceBoxEdgeTypeIsSet(boolean choiceBoxEdgeTypeIsSet) {
+        this.choiceBoxEdgeTypeIsSet = choiceBoxEdgeTypeIsSet;
+    }
+
     private void drawInit() {
         Tree theTree = ParseController.getInstance().getTree();
         GraphMLGraph theGraph = ParseController.getInstance().getGraph();
@@ -220,7 +236,6 @@ public class GUIController {
             choiceBoxEdgeType.getItems().setAll(theGraph.getRelevantEdgeTypeLabels());
             choiceBoxEdgeTypeIsSet = true;
         }
-
             
         if (theTree != null && selectedAlgorithm != null && theGraph == null) {
             choiceBoxAlgorithm.setDisable(false);
@@ -229,6 +244,7 @@ public class GUIController {
             choiceBoxEdgeType.getItems().clear();
             choiceBoxRoot.getItems().clear();
             processTreeAndAlgo();
+
         } else if (theGraph != null && selectedAlgorithm != null && theTree != null && selectedRoot != null && selectedEdgeType != null) {
             processTreeAndAlgo();
             choiceBoxEdgeType.setDisable(false);
@@ -285,6 +301,11 @@ public class GUIController {
                     nodeSizeSlider.setDisable(false);
                     paneController.drawTreeStructure(treeWalker);
                 }
+                break;
+            case "BPlus":
+                Tree BPlusTree = B_Plus.processTree(ParseController.getInstance().getTree());
+                nodeSizeSlider.setDisable(false);
+                paneController.drawTreeOrthogonally(BPlusTree);
                 break;
             default:
                 throw new IllegalArgumentException("The algo: " + selectedAlgorithm + " is not yet implemented");
