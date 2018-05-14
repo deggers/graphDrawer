@@ -280,24 +280,25 @@ public class GUIController {
 
     private void processTreeAndAlgo() {
         cleanPane();
+        ParseController parseInstance = ParseController.getInstance();
         switch (selectedAlgorithm) {  // what about a tree.resizeToScreen() ?
             case "Walker":
-                Tree treeWalker = WalkerImprovedDraw.processTreeNodes(ParseController.getInstance().getTree());
+                Tree treeWalker = WalkerImprovedDraw.processTreeNodes(parseInstance.getTree());
                 nodeSizeSlider.setDisable(false);
                 paneController.drawTreeStructure(treeWalker);
                 break;
             case "Radial":
-                Tree radialTree = RadialTree.processTree(ParseController.getInstance().getTree());
+                Tree radialTree = RadialTree.processTree(parseInstance.getTree());
                 nodeSizeSlider.setDisable(true);
                 paneController.drawRadialTreeStructure(radialTree);
                 break;
             case "RT":
                 nodeSizeSlider.setDisable(false);
-                Tree reinholdTree = Reinhold.processTree(ParseController.getInstance().getTree());
+                Tree reinholdTree = Reinhold.processTree(parseInstance.getTree());
                 paneController.drawTreeStructure(reinholdTree);
                 break;
             case "BPlus":
-                Tree BPlusTree = B_Plus.processTree(ParseController.getInstance().getTree());
+                Tree BPlusTree = B_Plus.processTree(parseInstance.getTree());
                 nodeSizeSlider.setDisable(false);
                 paneController.drawTreeOrthogonally(BPlusTree);
                 break;
