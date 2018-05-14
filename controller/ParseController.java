@@ -51,10 +51,10 @@ public class ParseController {
     public void setTree(Tree tree) {
         GUIController guiController = GUIController.getInstance();
         if (guiController != null) {
-            guiController.setChoiceBoxAlgorithmIsSet(false);
-            guiController.setChoiceBoxAlgorithm(null);
+            guiController.setChoiceBoxAlgorithmIsSet(false); // new tree new Algorithms possible -> calc new
+            guiController.setChoiceBoxAlgorithm(null); // do not draw the old Algorithm again, new one is necessary
         }
-        if (PaneController.getInstance() != null) guiController.cleanPane();
+        if (PaneController.getInstance() != null) guiController.cleanPane();  // new tree => new drawing => clean old pane
         this.tree = tree;
     }
     public Tree getTree() {
