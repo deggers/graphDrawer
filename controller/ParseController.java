@@ -35,7 +35,6 @@ public class ParseController {
         } else if (fileExtension.equalsIgnoreCase("graphml")) {
             GraphMLGraph graphML = GraphMLParser.parseFileToGraph(file);
             setGraph(graphML);
-            GUIController.getInstance().setChoiceBoxEdgeTypeIsSet(false);
             setTree(null);
             return true;
         } else {
@@ -46,6 +45,7 @@ public class ParseController {
 
     // SETTER & GETTER AREA
     public void setTree(Tree tree) {
+        GUIController.getInstance().setChoiceBoxAlgorithmIsSet(false);
         this.tree = tree;
     }
     public Tree getTree() {
@@ -56,6 +56,7 @@ public class ParseController {
         return graph;
     }
     public void setGraph(GraphMLGraph graph) {
+        GUIController.getInstance().setChoiceBoxAlgorithmIsSet(false);
         this.graph = graph;
     }
 

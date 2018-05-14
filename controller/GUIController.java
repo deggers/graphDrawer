@@ -1,10 +1,10 @@
 
 package controller;
 
+import draw.B_Plus;
 import draw.RadialTree;
 import draw.Reinhold;
 import draw.WalkerImprovedDraw;
-import draw.B_Plus;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.stream.Collectors;
@@ -30,12 +31,19 @@ public class GUIController {
     private boolean choiceBoxEdgeTypeIsSet = false;
     private boolean choiceBoxRootIsSet = false;
 
+    public void setChoiceBoxAlgorithmIsSet(boolean choiceBoxAlgorithmIsSet) {
+        this.choiceBoxAlgorithmIsSet = choiceBoxAlgorithmIsSet;
+    }
+
+    private boolean choiceBoxAlgorithmIsSet = false;
+
     public void initialize() {
         nodeSizeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             setNodeSize(newValue.intValue());
         });
         choiceBoxEdgeType.setDisable(true); // disable at beginning
         choiceBoxRoot.setDisable(true); // disable at beginning
+        choiceBoxAlgorithm.setDisable((true)); // disable at beginning :)
     } // setup observer for nodeSizeSlider
 
     //@formatter:off
@@ -117,7 +125,7 @@ public class GUIController {
                 this.selectedAlgorithm = "RT";
                 break;
             default:
-                throw new IllegalArgumentException("The algo: " + selectedAlgo + " is not yet implemented");
+                break;
         }
         drawInit();
     }
@@ -180,19 +188,13 @@ public class GUIController {
     }
 
     public void choiceBoxSelectRoot(ActionEvent event) {
-        String selectedRoot;
-        try {
-            selectedRoot =  String.valueOf(choiceBoxRoot.getSelectionModel().getSelectedItem());
-        } catch (NullPointerException e) {
-            selectedRoot = null;
-        }
+        selectedRoot =  String.valueOf(choiceBoxRoot.getSelectionModel().getSelectedItem());
         if (selectedRoot != null) {
-            this.selectedRoot = selectedRoot;
-            //ParseController.getInstance().setTree(null);
             GraphMLGraph theGraph = ParseController.getInstance().getGraph();
             if (theGraph != null) {
                 ParseController.getInstance().setTree(theGraph.extractSubtreeFromNode(theGraph.labelToNode(selectedRoot), selectedEdgeType));
             }
+            cleanPane();
             drawInit(); 
         }
     }
@@ -218,36 +220,49 @@ public class GUIController {
             drawInit(); 
         }      
     }
-
     public void setChoiceBoxEdgeTypeIsSet(boolean choiceBoxEdgeTypeIsSet) {
         this.choiceBoxEdgeTypeIsSet = choiceBoxEdgeTypeIsSet;
     }
+
+    //@formatter:on
 
     private void drawInit() {
         Tree theTree = ParseController.getInstance().getTree();
         GraphMLGraph theGraph = ParseController.getInstance().getGraph();
 
-        if (theGraph != null && !choiceBoxEdgeTypeIsSet){
+        if ((theTree != null || theGraph != null) && !choiceBoxAlgorithmIsSet) {
+            choiceBoxAlgorithm.setDisable(false);
+            choiceBoxAlgorithm.getItems().clear();
+            if (theTree != null && theTree.isBinary()) {
+                List<String> list = Arrays.asList("BPlus", "RT", "Walker", "Radial");
+                choiceBoxAlgorithm.getItems().setAll(list);
+            } else {
+                List<String> list = Arrays.asList("BPlus", "Walker", "Radial");
+                choiceBoxAlgorithm.getItems().setAll(list);
+            }
+            choiceBoxAlgorithmIsSet = true;
+        }
+
+        if (theGraph != null && !choiceBoxEdgeTypeIsSet) {
             choiceBoxEdgeType.setDisable(false);
             choiceBoxEdgeType.getItems().setAll(theGraph.getRelevantEdgeTypeLabels());
             choiceBoxEdgeTypeIsSet = true;
         }
-            
+
+
         if (theTree != null && selectedAlgorithm != null && theGraph == null) {
             choiceBoxEdgeType.setDisable(true);
             choiceBoxRoot.setDisable(true);
             choiceBoxEdgeType.getItems().clear();
             choiceBoxRoot.getItems().clear();
             processTreeAndAlgo();
-            
+
         } else if (theGraph != null && selectedAlgorithm != null && theTree != null && selectedRoot != null && selectedEdgeType != null) {
             processTreeAndAlgo();
             choiceBoxEdgeType.setDisable(false);
         }
     }
 
-
-    //@formatter:on
 
     // SETTER & GETTER AREA
     public Parent getRoot() {
@@ -269,7 +284,6 @@ public class GUIController {
     }
 
     private void processTreeAndAlgo() {
-        System.out.println("i will now processTreeAndAlgo() ! :)");
         cleanPane();
         setFileLabel();
         switch (selectedAlgorithm) {  // what about a tree.resizeToScreen() ?
@@ -296,6 +310,7 @@ public class GUIController {
             default:
                 throw new IllegalArgumentException("The algo: " + selectedAlgorithm + " is not yet implemented");
         }
+        selectedAlgorithm = null;
     }
 
     public void setFilesInFolder(List<File> filesInFolder) {

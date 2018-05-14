@@ -47,14 +47,14 @@
             </Slider>
 
             <ChoiceBox fx:id="choiceBoxAlgorithm" onAction="#choiceBoxAlgorithmOnAction" prefWidth="65.0">
-                <items>
-                    <FXCollections fx:factory="observableArrayList">
-                        <String fx:value="RT"/>
-                        <String fx:value="Walker"/>
-                        <String fx:value="Radial"/>
-                        <String fx:value="BPlus"/>
-                    </FXCollections>
-                </items>
+                <!--<items>-->
+                    <!--<FXCollections fx:factory="observableArrayList">-->
+                        <!--<String fx:value="RT"/>-->
+                        <!--<String fx:value="Walker"/>-->
+                        <!--<String fx:value="Radial"/>-->
+                        <!--<String fx:value="BPlus"/>-->
+                    <!--</FXCollections>-->
+                <!--</items>-->
                 <HBox.margin>
                   <Insets left="10.0" right="10.0" />
                </HBox.margin>
