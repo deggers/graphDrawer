@@ -11,6 +11,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.events.*;
 import java.time.Duration;
+import model.HelperTypes.protoNode;
 
 public class GraphMLParser {
 
@@ -20,13 +21,13 @@ public class GraphMLParser {
             long startTime = System.nanoTime();
             long stopTime;
             GraphMLGraph graph = null;
-            Node node = null;
+            protoNode node = null;
             Edge edge = null; //brauchen wahrscheinlich edge
 
             // Speichern von Knoten, Kanten und Map<Name, Knoten> zum einfachen auffinden
-            ArrayList<Node> nodes = new ArrayList<>();
+            ArrayList<protoNode> nodes = new ArrayList<>();
             ArrayList<Edge> edges = new ArrayList<>(); //brauche Edge-Klasse
-            LinkedHashMap<String, Node> nodesMap = new LinkedHashMap<>();
+            LinkedHashMap<String, protoNode> nodesMap = new LinkedHashMap<>();
              
         try {
             
@@ -46,7 +47,7 @@ public class GraphMLParser {
                         Iterator<Attribute> attributes;
                         switch (sName) {
                             case "graphml":
-                                graph = new GraphMLGraph(); //MappedTreeStructure forken, damit mehrere Rootelemente möglich sind
+                                graph = new GraphMLGraph(); 
 //                                System.out.println("found graphml start");
                                 break;
                             case "key"://-----------------------------Key--------------------------------------
@@ -98,7 +99,8 @@ public class GraphMLParser {
                             case "node"://-----------------------------Node--------------------------------------
 //                                System.out.println("found node start");
                                 attributes = startElement.getAttributes();
-                                node = new Node("ich sollte nicht hier sein");
+                                String label = null;
+                                String type = null;
                                 while (attributes.hasNext()) {
                                     Attribute attrib = attributes.next();
                                     String attributeName = attrib.getName().getLocalPart();
@@ -106,19 +108,22 @@ public class GraphMLParser {
                                     switch (attributeName) {
                                         case "id":
 //                                            System.out.println("node id: " + attributeValue);
-                                            node.label = attributeValue;
+                                            label = attributeValue;
                                             break;
                                         case "type":
 //                                            System.out.println("node type: " + attributeValue);
-                                            node.GraphMLType = attributeValue;
+                                            type = attributeValue;
                                             break;
                                         default:
                                             System.out.println("Unknown attribute type for Node: " + attributeName);
                                             break;
                                     }
                                 }
+                                if (type != null && label != null){
+                                    node = new protoNode(label, type);
+                                } else throw new RuntimeException("Exception due to improperly formatted GraphML Node entry: " + startElement.toString());
                                 nodes.add(node);
-                                nodesMap.put(node.label, node);
+                                nodesMap.put(node.getLabel(), node);
                                 break;
                             case "edge": //-----------------------------Edge--------------------------------------
 //                                System.out.println("found edge start");
@@ -209,7 +214,7 @@ public class GraphMLParser {
                                 }*/
                                 if (/*edgeIsNew*/true) { // checkt aktuell nicht, ob die Kante schon existiert
 //                                    System.out.println("Adding Edge: " + edge);
-                                    if (!edge.start.label.equals(edge.target.label)) {
+                                    if (!edge.start.getLabel().equals(edge.target.getLabel())) {
                                         edges.add(edge); //keine Selbstkanten
                                     }
                                 }
