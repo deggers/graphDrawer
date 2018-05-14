@@ -55,8 +55,9 @@ public class PaneController {
 
     // HELPERFUNCTIONS
     void            cleanPane() {
-        this.pane.getChildren().clear();
+        if (pane != null) this.pane.getChildren().clear();
     }
+
     private double  scaleCoordinate(double number) {
         return (number * 2 * getNodeSize()) + OFFSET;
     }

@@ -29,10 +29,14 @@ public class ParseController {
         String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());
         if (fileExtension.equalsIgnoreCase("nh")) {
             Tree newickTree = TreeParserNewick.parseFileToTree(file);
+            // rather "setupNewickConfig()"
+            GUIController.getInstance().choiceBoxEdgeType.setDisable(true);
+            GUIController.getInstance().choiceBoxRoot.setDisable(true);
             setTree(newickTree);
             setGraph(null);
             return true;
         } else if (fileExtension.equalsIgnoreCase("graphml")) {
+            /// rather "setupGraphMLConfig()"
             GraphMLGraph graphML = GraphMLParser.parseFileToGraph(file);
             setGraph(graphML);
             setTree(null);
@@ -45,7 +49,12 @@ public class ParseController {
 
     // SETTER & GETTER AREA
     public void setTree(Tree tree) {
-        GUIController.getInstance().setChoiceBoxAlgorithmIsSet(false);
+        GUIController guiController = GUIController.getInstance();
+        if (guiController != null) {
+            guiController.setChoiceBoxAlgorithmIsSet(false);
+            guiController.setChoiceBoxAlgorithm(null);
+        }
+        if (PaneController.getInstance() != null) guiController.cleanPane();
         this.tree = tree;
     }
     public Tree getTree() {

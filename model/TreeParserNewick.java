@@ -79,7 +79,12 @@ public class TreeParserNewick {
             Node node = new Node("");
             String[] nameSplit = string.split(":");
             node.label = nameSplit[0];
-            node.weight= Double.parseDouble(nameSplit[1]);
+            if (nameSplit.length > 1) {
+                node.weight= Double.parseDouble(nameSplit[1]);
+            } else {
+                node.weight = 0.00;
+            }
+
             return node;
         }
     }

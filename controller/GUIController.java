@@ -168,8 +168,8 @@ public class GUIController {
         paneController = PaneController.getInstance();// set ScrollPane
         vBox.getChildren().add(paneController.getScrollPane());
     }
-    private void                        cleanPane()   {
-        paneController.cleanPane();
+    public void                        cleanPane()   {
+        if (paneController != null) paneController.cleanPane();
     }
     private void                        setFileLabel() {
         fileNameLabel.setText(this.fileName);
@@ -230,7 +230,7 @@ public class GUIController {
         Tree theTree = ParseController.getInstance().getTree();
         GraphMLGraph theGraph = ParseController.getInstance().getGraph();
 
-        if ((theTree != null || theGraph != null) && !choiceBoxAlgorithmIsSet) {
+        if (theTree != null  && !choiceBoxAlgorithmIsSet) {
             choiceBoxAlgorithm.setDisable(false);
             choiceBoxAlgorithm.getItems().clear();
             if (theTree != null && theTree.isBinary()) {
@@ -310,11 +310,14 @@ public class GUIController {
             default:
                 throw new IllegalArgumentException("The algo: " + selectedAlgorithm + " is not yet implemented");
         }
-        selectedAlgorithm = null;
+
     }
 
     public void setFilesInFolder(List<File> filesInFolder) {
         this.filesInFolder = filesInFolder;
     }
 
+    public void setChoiceBoxAlgorithm(String algo) {
+        this.selectedAlgorithm = algo;
+    }
 }
