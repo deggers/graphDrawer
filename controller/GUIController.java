@@ -184,7 +184,7 @@ public class GUIController {
         System.out.println("selectedRootAsTree = " + selectedRootAsTree);
         this.selectedRoot = selectedRootAsTree;
         if (selectedRootAsTree != null) {
-            ParseController.getInstance().setTree(null);
+//            ParseController.getInstance().setTree(null);
 //            GraphMLGraph theGraph = ParseController.getInstance().getGraph();
             ParseController.getInstance().setTree(selectedRootAsTree);
         }
