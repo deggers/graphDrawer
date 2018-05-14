@@ -215,6 +215,9 @@ public class Reinhold {
 
 
     private Node getLL(Node node, int depth){
+        if(node == null){
+            return null;
+        }
         if (node.isLeaf()) {
             if (node.y - depth < 0.0001) {
                 return node;
@@ -229,7 +232,11 @@ public class Reinhold {
         return getLL(node.rightChild, depth);
     }
 
-    private Node getRR(Node node, int depth){
+    // was wenn baum nur aus einem knoten besteht oder aus root und einem knoten? der ist dann links
+        private Node getRR(Node node, int depth){
+        if(node == null){
+            return null;
+        }
         if (node.isLeaf()) {
             if (node.y - depth < 0.0001) {
                 return node;
@@ -245,7 +252,7 @@ public class Reinhold {
     }
 
     public static class Extreme {
-        public Extreme(Node n) {
+        Extreme(Node n) {
             addr = n;
         }
         public Extreme(){}
