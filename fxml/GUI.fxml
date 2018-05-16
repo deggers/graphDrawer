@@ -60,13 +60,13 @@
                </HBox.margin>
             </ChoiceBox>
 
-             <ChoiceBox fx:id="choiceBoxEdgeType" onAction="#choiceBoxEdgeTypeOnAction" prefWidth="110.0">
+             <ChoiceBox fx:id="choiceBoxEdgeType" onAction="#cb_EdgeTypeOnAction" prefWidth="110.0">
                  <HBox.margin>
                      <Insets left="10.0" right="10.0" />
                  </HBox.margin>
              </ChoiceBox>
 
-             <ChoiceBox fx:id="choiceBoxRoot" onAction="#choiceBoxSelectRoot" prefWidth="150.0">
+             <ChoiceBox fx:id="choiceBoxRoot" onAction="#cb_SelectRootOnAction" prefWidth="150.0">
                  <HBox.margin>
                      <Insets left="10.0" right="10.0" />
                  </HBox.margin>
