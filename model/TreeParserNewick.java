@@ -84,7 +84,6 @@ public class TreeParserNewick {
             } else {
                 node.weight = 0.00;
             }
-
             return node;
         }
     }
