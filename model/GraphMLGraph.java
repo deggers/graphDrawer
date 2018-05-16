@@ -93,7 +93,7 @@ public class GraphMLGraph {
                     node.addChild(edge.target);
                     extractSubtreeFromRootRecursion(edge.target, tset);
                 } else {
-                    System.out.println("Cycle found, I wont search any further.");
+//                    System.out.println("Cycle found, I wont search any further.");
                 }
             }
         }
