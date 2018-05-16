@@ -1,10 +1,7 @@
 
 package controller;
 
-import draw.B_Plus;
-import draw.RadialTree;
-import draw.Reinhold;
-import draw.WalkerImprovedDraw;
+import draw.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -27,6 +24,9 @@ import java.util.ListIterator;
 import java.util.stream.Collectors;
 
 public class GUIController {
+
+    public static final String PARSE_WHOLE_GRAPH = "WHOLE GRAPH";
+
 
     private boolean choiceBoxEdgeTypeIsSet = false;
     private boolean choiceBoxRootIsSet = false;
@@ -110,23 +110,7 @@ public class GUIController {
         }
     }
     @FXML    private void               choiceBoxAlgorithmOnAction() {
-        String selectedAlgo = String.valueOf(choiceBoxAlgorithm.getSelectionModel().getSelectedItem());
-        switch (selectedAlgo) {
-            case "Radial":
-                this.selectedAlgorithm = "Radial";
-                break;
-            case "Walker":
-                this.selectedAlgorithm = "Walker";
-                break;
-            case "BPlus":
-                this.selectedAlgorithm = "BPlus";
-                break;
-            case "RT":
-                this.selectedAlgorithm = "RT";
-                break;
-            default:
-                break;
-        }
+        this.selectedAlgorithm = String.valueOf(choiceBoxAlgorithm.getSelectionModel().getSelectedItem());
         drawInit();
     }
 
@@ -168,13 +152,13 @@ public class GUIController {
         paneController = PaneController.getInstance();// set ScrollPane
         vBox.getChildren().add(paneController.getScrollPane());
     }
-    public void                        cleanPane()   {
+    void                                cleanPane()   {
         if (paneController != null) paneController.cleanPane();
     }
     private void                        setFileLabel() {
         fileNameLabel.setText(this.fileName);
     }
-    public List<File>                   getFilesFromFolder(File file) {
+    private List<File>                  getFilesFromFolder(File file) {
         try {
             return Files.walk(Paths.get(file.getParent()))
                     .filter(Files::isRegularFile)
@@ -187,27 +171,10 @@ public class GUIController {
         return null;
     }
 
-    public void choiceBoxSelectRoot(ActionEvent event) {
-        selectedRoot =  String.valueOf(choiceBoxRoot.getSelectionModel().getSelectedItem());
-        if (selectedRoot != null) {
-            GraphMLGraph theGraph = ParseController.getInstance().getGraph();
-            if (theGraph != null) {
-                ParseController.getInstance().setTree(theGraph.extractSubtreeFromNode(theGraph.labelToNode(selectedRoot), selectedEdgeType));
-            }
-            cleanPane();
-            drawInit(); 
-        }
-    }
-    
-    public void choiceBoxEdgeTypeOnAction(ActionEvent event) {
-        try {
-            selectedEdgeType = String.valueOf(choiceBoxEdgeType.getSelectionModel().getSelectedItem());
-        } catch (NullPointerException e) {
-            selectedEdgeType = null;
-        }
+    public void cb_EdgeTypeOnAction(ActionEvent event) {
+        this.selectedEdgeType = String.valueOf(choiceBoxEdgeType.getSelectionModel().getSelectedItem());
 
         if (selectedEdgeType != null) {
-            this.selectedEdgeType = selectedEdgeType;
             this.selectedRoot = null;
             choiceBoxRoot.getItems().clear();
             choiceBoxRoot.setDisable(false);
@@ -216,45 +183,113 @@ public class GUIController {
             if (theGraph != null) {
                 List<String> rootList = ParseController.getInstance().getGraph().getPossibleRootLabels(selectedEdgeType);
                 choiceBoxRoot.getItems().setAll(rootList);
-            }            
-            drawInit(); 
-        }      
+                choiceBoxRoot.getItems().add(0,PARSE_WHOLE_GRAPH);
+            }
+            drawInit();
+        }
     }
-    public void setChoiceBoxEdgeTypeIsSet(boolean choiceBoxEdgeTypeIsSet) {
-        this.choiceBoxEdgeTypeIsSet = choiceBoxEdgeTypeIsSet;
+    public void cb_SelectRootOnAction(ActionEvent event) {
+        this.selectedRoot     = String.valueOf(choiceBoxRoot.getSelectionModel().getSelectedItem());
+        GraphMLGraph    theGraph        = ParseController.getInstance().getGraph();
+        ParseController parseController = ParseController.getInstance();
+
+        boolean willBeTree = (selectedRoot != null) && (theGraph != null) && !selectedRoot.equals(PARSE_WHOLE_GRAPH);
+        boolean isWholeGraph = (selectedRoot != null) && (theGraph != null) && selectedRoot.equals(PARSE_WHOLE_GRAPH);
+
+        if (willBeTree) {
+            System.out.println("Will be a tree");
+            Tree extractedTreeFromNode = theGraph.extractSubtreeFromNode(theGraph.labelToNode(selectedRoot), selectedEdgeType);
+            parseController.setTree(extractedTreeFromNode);
+        }
+        else if (isWholeGraph) {
+            System.out.println("wanna be a graph");
+             parseController.setGraph(theGraph);
+             parseController.setTree(null);
+        }
+        cleanPane();
+        drawInit();
+    }
+
+
+
+    private void processAlgo() {
+        cleanPane();
+        nodeSizeSlider.setDisable(false);
+        ParseController parseInstance = ParseController.getInstance();
+        switch (selectedAlgorithm) {  // what about a tree.resizeToScreen() ?
+            case "Walker":
+                Tree treeWalker = WalkerImprovedDraw.processTreeNodes(parseInstance.getTree());
+                paneController.drawTreeStructure(treeWalker);
+                break;
+            case "Radial":
+                Tree radialTree = RadialTree.processTree(parseInstance.getTree());
+                nodeSizeSlider.setDisable(true);
+                paneController.drawRadialTreeStructure(radialTree);
+                break;
+            case "RT":
+                Tree reinholdTree = Reinhold.processTree(parseInstance.getTree());
+                paneController.drawTreeStructure(reinholdTree);
+                break;
+            case "BPlus":
+                Tree BPlusTree = B_Plus.processTree(parseInstance.getTree());
+                paneController.drawTreeOrthogonally(BPlusTree);
+                break;
+            case "Random":
+                System.out.println("selected Random");
+                if (parseInstance.getGraph() != null) {
+                    GraphMLGraph randomGraph = RandomAlgo.processGraph(parseInstance.getGraph());
+                } else if (parseInstance.getTree() != null) {
+                    Tree randomTree = RandomAlgo.processTree(parseInstance.getTree());
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("The algo: " + selectedAlgorithm + " is not yet implemented");
+        }
+
     }
 
     //@formatter:on
 
     private void drawInit() {
+        setFileLabel();
         Tree theTree = ParseController.getInstance().getTree();
         GraphMLGraph theGraph = ParseController.getInstance().getGraph();
-        setFileLabel();
+        boolean treeOrGraph = (theTree != null || theGraph != null);
 
-        if (theTree != null && !choiceBoxAlgorithmIsSet) {
+        setupChoiceBoxAlgorithms(theTree,theGraph, treeOrGraph);
+        setupChoiceBoxEdgeType(theGraph);
+
+        if (treeOrGraph && selectedAlgorithm != null && !selectedAlgorithm.equals("null")) {
+            if (theGraph == null) {
+                choiceBoxEdgeType.setDisable(true);
+                choiceBoxRoot.setDisable(true);
+                choiceBoxEdgeType.getItems().clear();
+                choiceBoxRoot.getItems().clear();
+                processAlgo();
+            } else {
+                processAlgo();
+            }
+        }
+    }
+
+    private boolean setupChoiceBoxAlgorithms(Tree theTree, GraphMLGraph theGraph, boolean treeOrGraph) {
+        List<String> allAlgos = Arrays.asList("BPlus", "RT", "Walker", "Radial", "Random");
+        List<String> reducedAlgos = Arrays.asList("BPlus", "Walker", "Radial", "Random");
+        List<String> graphMLAlgos = Arrays.asList("Random");
+
+        if (treeOrGraph && !choiceBoxAlgorithmIsSet) {
+            choiceBoxAlgorithmIsSet = true;
             choiceBoxAlgorithm.setDisable(false);
             choiceBoxAlgorithm.getItems().clear();
-            choiceBoxAlgorithm.getItems().setAll(theTree.isBinary() ? Arrays.asList("BPlus", "RT", "Walker", "Radial") : Arrays.asList("BPlus", "Walker", "Radial"));
-            choiceBoxAlgorithmIsSet = true;
+            choiceBoxAlgorithm.getItems().setAll(theTree != null ? theTree.isBinary() ? allAlgos : reducedAlgos : graphMLAlgos);
         }
-
+        return treeOrGraph;
+    }
+    private void setupChoiceBoxEdgeType(GraphMLGraph theGraph) {
         if (theGraph != null && !choiceBoxEdgeTypeIsSet) {
             choiceBoxEdgeType.setDisable(false);
             choiceBoxEdgeType.getItems().setAll(theGraph.getRelevantEdgeTypeLabels());
             choiceBoxEdgeTypeIsSet = true;
-        }
-
-
-        if (theTree != null && selectedAlgorithm != null && theGraph == null) {
-            choiceBoxEdgeType.setDisable(true);
-            choiceBoxRoot.setDisable(true);
-            choiceBoxEdgeType.getItems().clear();
-            choiceBoxRoot.getItems().clear();
-            processTreeAndAlgo();
-
-        } else if (theGraph != null && selectedAlgorithm != null && theTree != null && selectedRoot != null && selectedEdgeType != null) {
-            processTreeAndAlgo();
-            choiceBoxEdgeType.setDisable(false);
         }
     }
 
@@ -269,50 +304,21 @@ public class GUIController {
         drawInit();
     }
 
-    public int getNodeSize() {
+    int getNodeSize() {
         return this.nodeSize;
     }
-
 
     private void setPane(VBox vBox) {
         this.vBox = vBox;
     }
 
-    private void processTreeAndAlgo() {
-        cleanPane();
-        ParseController parseInstance = ParseController.getInstance();
-        switch (selectedAlgorithm) {  // what about a tree.resizeToScreen() ?
-            case "Walker":
-                Tree treeWalker = WalkerImprovedDraw.processTreeNodes(parseInstance.getTree());
-                nodeSizeSlider.setDisable(false);
-                paneController.drawTreeStructure(treeWalker);
-                break;
-            case "Radial":
-                Tree radialTree = RadialTree.processTree(parseInstance.getTree());
-                nodeSizeSlider.setDisable(true);
-                paneController.drawRadialTreeStructure(radialTree);
-                break;
-            case "RT":
-                nodeSizeSlider.setDisable(false);
-                Tree reinholdTree = Reinhold.processTree(parseInstance.getTree());
-                paneController.drawTreeStructure(reinholdTree);
-                break;
-            case "BPlus":
-                Tree BPlusTree = B_Plus.processTree(parseInstance.getTree());
-                nodeSizeSlider.setDisable(false);
-                paneController.drawTreeOrthogonally(BPlusTree);
-                break;
-            default:
-                throw new IllegalArgumentException("The algo: " + selectedAlgorithm + " is not yet implemented");
-        }
-
+    void setChoiceBoxAlgorithm(String algo) {
+        this.selectedAlgorithm = algo;
     }
 
     public void setFilesInFolder(List<File> filesInFolder) {
         this.filesInFolder = filesInFolder;
     }
 
-    public void setChoiceBoxAlgorithm(String algo) {
-        this.selectedAlgorithm = algo;
-    }
+
 }
