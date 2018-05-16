@@ -25,8 +25,7 @@ import java.util.stream.Collectors;
 
 public class GUIController {
 
-    public static final String PARSE_WHOLE_GRAPH = "WHOLE GRAPH";
-
+    private static final String PARSE_WHOLE_GRAPH = "WHOLE GRAPH";
 
     private boolean choiceBoxEdgeTypeIsSet = false;
     private boolean choiceBoxRootIsSet = false;
@@ -210,8 +209,6 @@ public class GUIController {
         drawInit();
     }
 
-
-
     private void processAlgo() {
         cleanPane();
         nodeSizeSlider.setDisable(false);
@@ -237,9 +234,10 @@ public class GUIController {
             case "Random":
                 System.out.println("selected Random");
                 if (parseInstance.getGraph() != null) {
-                    GraphMLGraph randomGraph = RandomAlgo.processGraph(parseInstance.getGraph());
+                    GraphMLGraph randomGraph = NaiveDraw.processGraph(parseInstance.getGraph());
+                    paneController.drawGraph(randomGraph);
                 } else if (parseInstance.getTree() != null) {
-                    Tree randomTree = RandomAlgo.processTree(parseInstance.getTree());
+                    Tree randomTree = NaiveDraw.processTree(parseInstance.getTree());
                 }
                 break;
             default:
@@ -256,7 +254,7 @@ public class GUIController {
         GraphMLGraph theGraph = ParseController.getInstance().getGraph();
         boolean treeOrGraph = (theTree != null || theGraph != null);
 
-        setupChoiceBoxAlgorithms(theTree,theGraph, treeOrGraph);
+        setupChoiceBoxAlgorithms(theTree, theGraph, treeOrGraph);
         setupChoiceBoxEdgeType(theGraph);
 
         if (treeOrGraph && selectedAlgorithm != null && !selectedAlgorithm.equals("null")) {

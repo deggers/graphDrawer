@@ -9,6 +9,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import model.GraphMLGraph;
 import model.Node;
 import model.Tree;
 
@@ -26,7 +27,7 @@ public class PaneController {
 
     // Other variables
     private static          PaneController  paneInstance = null;
-    static                  PaneController  getInstance() {
+    static  public          PaneController  getInstance() {
         if (paneInstance == null) {
             FXMLLoader loader = new FXMLLoader();
             try {
@@ -162,8 +163,8 @@ public class PaneController {
         int paneHalfHeight = (int) scrollPane.getHeight() / 2;
         int paneHalfWidth = (int) scrollPane.getWidth() / 2;
 
-        centerY = middleOfScreen > paneHalfHeight ? middleOfScreen *2+radialNodeSize : paneHalfHeight + 2*radialNodeSize;
-        centerX = middleOfScreen > paneHalfWidth ? middleOfScreen *2+radialNodeSize : paneHalfWidth + 2* radialNodeSize;
+        centerY = middleOfScreen > paneHalfHeight ? middleOfScreen * 2 + radialNodeSize : paneHalfHeight + 2 * radialNodeSize;
+        centerX = middleOfScreen > paneHalfWidth ? middleOfScreen * 2 + radialNodeSize : paneHalfWidth + 2 * radialNodeSize;
 
         for (int i = 0; i <= level + 1; i++) {
             pane.getChildren().add(createGuideline(centerX, centerY, maxRadius + radialNodeSize));
@@ -227,4 +228,22 @@ public class PaneController {
             }
         }
     }
+
+    public void drawGraph(GraphMLGraph theGraph) {
+        for (Node node : theGraph.nodeList) {
+            if (node.parent == null) {
+                pane.getChildren().add(createNode(node));
+
+            }
+        }
+    }
+
+    public int getPaneHeight() {
+        return pane == null ? 0 : (int) pane.getHeight();
+    }
+
+    public int getPaneWidth() {
+        return pane == null ? 0 : (int) pane.getWidth();
+    }
+
 }
