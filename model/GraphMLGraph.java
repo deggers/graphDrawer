@@ -11,7 +11,7 @@ public class GraphMLGraph {
     private LinkedHashSet<String> visitedNodesForExtractSubtreeSet = null;
 
     public boolean addEdgeType(String id, String attrType) {
-        EdgeType et = new EdgeType(id, "double");
+        EdgeType et = new EdgeType(id, attrType);
         if (!edgeTypeList.contains(et)) {
             edgeTypeList.add(et);
             return true;
@@ -26,24 +26,24 @@ public class GraphMLGraph {
     }
 
 
-    public List<String> getRelevantEdgeTypeLabels() {
+    /*public List<String> getRelevantEdgeTypeLabels() {
         List<String> returnList = new LinkedList<>();
         for (Node node : nodeList)
             if (getEdgesIn(node).isEmpty()) for (Edge outGoingEdge : getEdgesOut(node))
                 if (!returnList.contains(outGoingEdge.edgeType)) returnList.add(outGoingEdge.edgeType);
-        return returnList;
-    }
+        return returnList; 
+    }*/ //wofür gibts denn die Liste edgeTypeList--Florian
 
     public List<String> getPossibleRootLabels(String edgeType) {
         List<String> possibleRoots = new LinkedList<>();
         for (Node node : nodeList)
-            if (getEdgesIn(node).isEmpty() && getEdgesOut(node).toString().contains(edgeType)) {
+            if (getEdgesInWithType(node, edgeType).isEmpty() && !getEdgesOutWithType(node, edgeType).isEmpty()) {
                 Tree tree = extractSubtreeFromNode(node, edgeType);
                 int depth = tree.getTreeDepth();
                 int numNodes = tree.nodeList.size()-1;
                 possibleRoots.add(node.label + " (" + depth + "|" + numNodes + ")");
             }
-        return possibleRoots.size() > 0 ? possibleRoots : null;
+        return possibleRoots;//.size() > 0 ? possibleRoots : null;
     }
 
     void addAllNodes(ArrayList<Node> nodes) {

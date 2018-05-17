@@ -286,7 +286,7 @@ public class GUIController {
     private void setupChoiceBoxEdgeType(GraphMLGraph theGraph) {
         if (theGraph != null && !choiceBoxEdgeTypeIsSet) {
             choiceBoxEdgeType.setDisable(false);
-            choiceBoxEdgeType.getItems().setAll(theGraph.getRelevantEdgeTypeLabels());
+            choiceBoxEdgeType.getItems().setAll(theGraph.getEdgeTypes());
             choiceBoxEdgeTypeIsSet = true;
         }
     }

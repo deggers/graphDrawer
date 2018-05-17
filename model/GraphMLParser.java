@@ -4,13 +4,16 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.NoSuchElementException;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.events.*;
 import java.time.Duration;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class GraphMLParser {
 
@@ -26,7 +29,7 @@ public class GraphMLParser {
             // Speichern von Knoten, Kanten und Map<Name, Knoten> zum einfachen auffinden
             ArrayList<Node> nodes = new ArrayList<>();
             ArrayList<Edge> edges = new ArrayList<>(); //brauche Edge-Klasse
-            LinkedHashMap<String, Node> nodesMap = new LinkedHashMap<>();
+            HashMap<String, Node> nodesMap = new HashMap<>();
              
         try {
             
@@ -229,8 +232,44 @@ public class GraphMLParser {
             }
             //Postprocessing der erhaltenen Daten
             if (graph != null) {
-                graph.addAllNodes(nodes);
+                HashSet<Node> missingNodes = new HashSet<>();
+                HashMap<String,Node> mapMissingNodes = new HashMap<>();
+                StringBuilder sb;
+                String s;
+                for (Node mn : nodes) { // add missing nodes for package hierarchy
+                    sb = new StringBuilder(mn.label);
+                    sb.delete(sb.lastIndexOf("."),sb.length());
+                    s = sb.toString();
+                    if (!nodesMap.containsKey(s) && !mapMissingNodes.containsKey(s)) {
+                        for (String par : makeListOfPackageParents(s)) {
+                            if (!nodesMap.containsKey(par) && !mapMissingNodes.containsKey(par)) {
+                                Node tmpnd = new Node(par);
+                                tmpnd.GraphMLType = "package";
+                                missingNodes.add(tmpnd);
+                                mapMissingNodes.put(tmpnd.label, tmpnd);
+                            }
+                        }
+                    }
+                }
+                nodes.addAll(missingNodes);
+                nodesMap.putAll(mapMissingNodes);
+                if (graph.addEdgeType("package_hierarchy", "double")) { //add package hierachy edges
+                    for (Node n : nodes) { //package parent von n.label suchen
+                        try {
+                            sb = new StringBuilder(n.label);
+                            sb.delete(sb.lastIndexOf("."),sb.length());
+                            s = sb.toString();
+                            //System.out.printf("parent for %s is %s\n", n.label, s);
+                            if (nodesMap.containsKey(s)) {
+                                edges.add(new Edge(nodesMap.get(s), n, "package_hierarchy", 1.0));
+                            }
+                        } catch (Exception e) {
+                        }
+                    }
+                }
                 graph.addAllEdges(edges);
+                graph.addAllNodes(nodes);
+
                 //graph.finalizeGraphFromParser(); nocht nicht gebraucht: erst, wenn root und edgeType eines teilbaumes bekannt
 //                ParseController.getInstance().setTree(graph);
                 // der Parse-Controller setzt den jetzt
@@ -242,7 +281,7 @@ public class GraphMLParser {
             return graph;
         } catch (NoSuchElementException e) {
 //            e.printStackTrace();
-            System.out.println("no such eleement");
+            System.out.println("no such element");
             return null;
         }
         catch (Exception e) {
@@ -251,5 +290,22 @@ public class GraphMLParser {
             return null;
         }
     }
+
+    private static ArrayList<String> makeListOfPackageParents(String s) {
+        ArrayList<String> returnList = new ArrayList<>();
+        returnList.add(s);
+        StringBuilder sb = new StringBuilder(s);
+        do {            
+            int punkt = sb.lastIndexOf(".");
+            if (punkt<0) {
+                break;
+            }
+            sb.delete(punkt,sb.length());
+            returnList.add(sb.toString());
+        } while (true);
+        return returnList;        
+    }
+
+    
 
 }

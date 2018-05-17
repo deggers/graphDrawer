@@ -25,6 +25,11 @@ class HelperTypes {
     public String getId() {
         return id; 
     }
+
+    @Override
+    public String toString() {
+        return id;
+    }
     
     public String getAttrType() {
         return attrType; 
