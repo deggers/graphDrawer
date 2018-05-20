@@ -70,11 +70,11 @@ public class GraphMLParser {
                                             break;
                                         case "for":
 //                                            System.out.println("found for");
-                                            if (attributeValue.equalsIgnoreCase("edge")) {
-//                                                System.out.println("inside if clause");
-                                            } else {
-                                                throw new Exception("Unknown attribute for GraphML key: for=\"" + attributeValue + "\"");
-                                            }
+//                                            if (attributeValue.equalsIgnoreCase("edge")) {
+////                                                System.out.println("inside if clause");
+//                                            } else {
+//                                                throw new Exception("Unknown attribute for GraphML key: for=\"" + attributeValue + "\"");
+//                                            }
                                             break;
                                         case "attr.name":
                                             if (!attributeValue.equalsIgnoreCase(id))

@@ -29,6 +29,7 @@ public class GUIController {
 
     private boolean choiceBoxEdgeTypeIsSet = false;
     private boolean choiceBoxRootIsSet = false;
+    private File    fileHandle         = null;
 
     public void setChoiceBoxAlgorithmIsSet(boolean choiceBoxAlgorithmIsSet) {
         this.choiceBoxAlgorithmIsSet = choiceBoxAlgorithmIsSet;
@@ -38,7 +39,7 @@ public class GUIController {
 
     public void initialize() {
         nodeSizeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            setNodeSize(newValue.intValue());
+            setNodeSize(newValue.doubleValue());
         });
         choiceBoxEdgeType.setDisable(true); // disable at beginning
         choiceBoxRoot.setDisable(true); // disable at beginning
@@ -97,6 +98,7 @@ public class GUIController {
         );
 
         File file = fileChooser.showOpenDialog(null);
+        this.fileHandle = file;
 
         if (file != null) {
             this.fileName = file.getName();
@@ -142,7 +144,7 @@ public class GUIController {
     private static  GUIController       guiInstance                 = null;
 
 
-    private int                         nodeSize                    = 8;
+    private double                      nodeSize                    = 8;
     private int                         spaceBetweenRadii           = 0;
     private String                      selectedRoot                = null;
     private String                      selectedEdgeType            = null;
@@ -220,7 +222,8 @@ public class GUIController {
                 break;
             case "Radial":
                 Tree radialTree = RadialTree.processTree(parseInstance.getTree());
-                nodeSizeSlider.setDisable(true);
+//                nodeSizeSlider.setDisable(true);
+
                 paneController.drawRadialTreeStructure(radialTree);
                 break;
             case "RT":
@@ -297,12 +300,12 @@ public class GUIController {
         return this.vBox;
     }
 
-    private void setNodeSize(int nodeSize) {
+    private void setNodeSize(double nodeSize) {
         this.nodeSize = nodeSize;
         drawInit();
     }
 
-    int getNodeSize() {
+    double getNodeSize() {
         return this.nodeSize;
     }
 
@@ -318,5 +321,7 @@ public class GUIController {
         this.filesInFolder = filesInFolder;
     }
 
-
+    public File getFileHandle() {
+        return fileHandle;
+    }
 }
