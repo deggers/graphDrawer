@@ -1,38 +1,32 @@
 package model;
 
-import java.io.File;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.HashMap;
-import java.util.NoSuchElementException;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.events.*;
+import java.io.File;
+import java.io.FileReader;
 import java.time.Duration;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 public class GraphMLParser {
 
     @SuppressWarnings("ConstantConditions")
     public static GraphMLGraph parseFileToGraph(File file) {
         // Ressourcen anlegen
-            long startTime = System.nanoTime();
-            long stopTime;
-            GraphMLGraph graph = null;
-            Node node = null;
-            Edge edge = null; //brauchen wahrscheinlich edge
+        long startTime = System.nanoTime();
+        long stopTime;
+        GraphMLGraph graph = null;
+        Node node = null;
+        Edge edge = null; //brauchen wahrscheinlich edge
 
-            // Speichern von Knoten, Kanten und Map<Name, Knoten> zum einfachen auffinden
-            ArrayList<Node> nodes = new ArrayList<>();
-            ArrayList<Edge> edges = new ArrayList<>(); //brauche Edge-Klasse
-            HashMap<String, Node> nodesMap = new HashMap<>();
-             
+        // Speichern von Knoten, Kanten und Map<Name, Knoten> zum einfachen auffinden
+        ArrayList<Node> nodes = new ArrayList<>();
+        ArrayList<Edge> edges = new ArrayList<>(); //brauche Edge-Klasse
+        HashMap<String, Node> nodesMap = new HashMap<>();
+
         try {
-            
+
             // XML-Reader
             XMLInputFactory factory = XMLInputFactory.newInstance();
             XMLEventReader reader = factory.createXMLEventReader(new FileReader(file));
@@ -79,7 +73,7 @@ public class GraphMLParser {
                                         case "attr.name":
                                             if (!attributeValue.equalsIgnoreCase(id))
                                                 //throw new Exception("GraphML Key id doesn't match attr.name or was not set");
-                                            break;
+                                                break;
                                         case "attr.type":
                                             ktype = attributeValue;
                                             if (!attributeValue.equalsIgnoreCase("double")) {
@@ -212,9 +206,8 @@ public class GraphMLParser {
                                 }*/
                                 if (/*edgeIsNew*/true) { // checkt aktuell nicht, ob die Kante schon existiert
 //                                    System.out.println("Adding Edge: " + edge);
-                                    if (!edge.start.label.equals(edge.target.label)) {
+                                    if (!edge.start.label.equals(edge.target.label))
                                         edges.add(edge); //keine Selbstkanten
-                                    }
                                 }
                                 break;
                             case "data":
@@ -225,7 +218,6 @@ public class GraphMLParser {
                                 break;
                         }
                         break;
-
                     default:
                         break;
                 }
@@ -233,12 +225,12 @@ public class GraphMLParser {
             //Postprocessing der erhaltenen Daten
             if (graph != null) {
                 HashSet<Node> missingNodes = new HashSet<>();
-                HashMap<String,Node> mapMissingNodes = new HashMap<>();
+                HashMap<String, Node> mapMissingNodes = new HashMap<>();
                 StringBuilder sb;
                 String s;
                 for (Node mn : nodes) { // add missing nodes for package hierarchy
                     sb = new StringBuilder(mn.label);
-                    sb.delete(sb.lastIndexOf("."),sb.length());
+                    sb.delete(sb.lastIndexOf("."), sb.length());
                     s = sb.toString();
                     if (!nodesMap.containsKey(s) && !mapMissingNodes.containsKey(s)) {
                         for (String par : makeListOfPackageParents(s)) {
@@ -253,18 +245,16 @@ public class GraphMLParser {
                 }
                 nodes.addAll(missingNodes);
                 nodesMap.putAll(mapMissingNodes);
-                if (graph.addEdgeType("package_hierarchy", "double")) { //add package hierachy edges
-                    for (Node n : nodes) { //package parent von n.label suchen
-                        try {
-                            sb = new StringBuilder(n.label);
-                            sb.delete(sb.lastIndexOf("."),sb.length());
-                            s = sb.toString();
-                            //System.out.printf("parent for %s is %s\n", n.label, s);
-                            if (nodesMap.containsKey(s)) {
-                                edges.add(new Edge(nodesMap.get(s), n, "package_hierarchy", 1.0));
-                            }
-                        } catch (Exception e) {
+                for (Node n : nodes) { //package parent von n.label suchen
+                    try {
+                        sb = new StringBuilder(n.label);
+                        sb.delete(sb.lastIndexOf("."), sb.length());
+                        s = sb.toString();
+                        //System.out.printf("parent for %s is %s\n", n.label, s);
+                        if (nodesMap.containsKey(s)) {
+                            edges.add(new Edge(nodesMap.get(s), n, "package", 1.0));
                         }
+                    } catch (Exception e) {
                     }
                 }
                 graph.addAllEdges(edges);
@@ -276,15 +266,14 @@ public class GraphMLParser {
             }
             System.out.println("Parsing finished!");
             stopTime = System.nanoTime();
-            Duration dur = Duration.ofNanos(startTime-stopTime);
+            Duration dur = Duration.ofNanos(startTime - stopTime);
             System.out.println("Estimated elapsed time: " + (dur));
             return graph;
         } catch (NoSuchElementException e) {
 //            e.printStackTrace();
             System.out.println("no such element");
             return null;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             //e.printStackTrace();
             System.out.println("some mistake in GraphML: " + e);
             return null;
@@ -293,19 +282,24 @@ public class GraphMLParser {
 
     private static ArrayList<String> makeListOfPackageParents(String s) {
         ArrayList<String> returnList = new ArrayList<>();
-        returnList.add(s);
         StringBuilder sb = new StringBuilder(s);
-        do {            
-            int punkt = sb.lastIndexOf(".");
-            if (punkt<0) {
-                break;
-            }
-            sb.delete(punkt,sb.length());
-            returnList.add(sb.toString());
-        } while (true);
-        return returnList;        
+        returnList.add(s);
+//        do {
+//            int punkt = sb.lastIndexOf(".");
+//            if (punkt < 0) {
+//                break;
+//            }
+//            sb.delete(punkt, sb.length());
+//            returnList.add(sb.toString());
+//        } while (true);
+
+//        more compact ?
+        while (sb.lastIndexOf(".") > 0) {
+            returnList.add(sb.delete(sb.lastIndexOf("."), sb.length()).toString());
+        }
+
+        return returnList;
     }
 
-    
 
 }
