@@ -82,7 +82,7 @@ public class TreeParserNewick {
             if (nameSplit.length > 1) {
                 node.weight= Double.parseDouble(nameSplit[1]);
             } else {
-                node.weight = 0.00;
+                node.weight = 1.00;
             }
             return node;
         }
