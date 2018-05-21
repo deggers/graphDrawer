@@ -13,8 +13,8 @@ public class NaiveDraw {
     public static GraphMLGraph processGraph(GraphMLGraph theGraph) {
         PaneController paneInstance = PaneController.getInstance();
         if (paneInstance != null) {
-            int paneHeight = PaneController.getInstance().getPaneHeight();
-            int paneWidth = PaneController.getInstance().getPaneWidth();
+            int paneHeight = PaneController.getInstance().getScrollPaneHeight();
+            int paneWidth = PaneController.getInstance().getScrollPaneWidth();
 
             int minHeight = 0;
             int minWidth = 0;

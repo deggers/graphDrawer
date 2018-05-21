@@ -284,16 +284,6 @@ public class GraphMLParser {
         ArrayList<String> returnList = new ArrayList<>();
         StringBuilder sb = new StringBuilder(s);
         returnList.add(s);
-//        do {
-//            int punkt = sb.lastIndexOf(".");
-//            if (punkt < 0) {
-//                break;
-//            }
-//            sb.delete(punkt, sb.length());
-//            returnList.add(sb.toString());
-//        } while (true);
-
-//        more compact ?
         while (sb.lastIndexOf(".") > 0) {
             returnList.add(sb.delete(sb.lastIndexOf("."), sb.length()).toString());
         }

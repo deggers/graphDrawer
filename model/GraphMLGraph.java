@@ -36,13 +36,21 @@ public class GraphMLGraph {
 
     public List<String> getPossibleRootLabels(String edgeType) {
         List<String> possibleRoots = new LinkedList<>();
-        for (Node node : nodeList)
-            if (getEdgesInWithType(node, edgeType).isEmpty() && !getEdgesOutWithType(node, edgeType).isEmpty()) {
+        boolean bTest;
+        for (Node node : nodeList) {
+            if (edgeType.equals("package")) {
+                bTest = (!getEdgesOutWithType(node, edgeType).isEmpty() && node.GraphMLType.equals("package"));
+            } else {
+                bTest = (getEdgesInWithType(node, edgeType).isEmpty() && !getEdgesOutWithType(node, edgeType).isEmpty());
+            }
+            if (bTest) {
                 Tree tree = extractSubtreeFromNode(node, edgeType);
                 int depth = tree.getTreeDepth();
                 int numNodes = tree.nodeList.size()-1;
                 possibleRoots.add(node.label + " (" + depth + "|" + numNodes + ")");
             }
+        }
+        possibleRoots.sort(null);
         return possibleRoots;//.size() > 0 ? possibleRoots : null;
     }
 

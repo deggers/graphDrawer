@@ -162,7 +162,7 @@ public class PaneController {
 
 //        centerY =  (int) (middleOfScreen > paneHalfHeight ? middleOfScreen : paneHalfHeight);
 //        centerX = (int) (middleOfScreen > paneHalfWidth ? middleOfScreen : paneHalfWidth);
-        double paneDiffWidth = (getScollPaneWidth() - maxPaneRadius);
+        double paneDiffWidth = (getScrollPaneWidth() - maxPaneRadius);
         double paneDiffHeight = (getScrollPaneHeight() - maxPaneRadius);
 
         centerX = (int) (maxPaneRadius + 2 *radialNodeSize);
@@ -250,7 +250,7 @@ public class PaneController {
         return scrollPane == null ? 0 : (int) scrollPane.getHeight();
     }
 
-    public int getScollPaneWidth() {
+    public int getScrollPaneWidth() {
         return scrollPane == null ? 0 : (int) scrollPane.getWidth();
     }
 
