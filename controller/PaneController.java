@@ -10,7 +10,7 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import model.GraphMLGraph;
-import model.Node;
+import model.TreeNode;
 import model.Tree;
 
 import java.io.IOException;
@@ -84,9 +84,9 @@ public class PaneController {
         drawTreeNodes(tree);
     }
     private void    drawEdgesOrthogonally(Tree tree) {
-        for (Node child : tree.listAllNodes()) {
+        for (TreeNode child : tree.listAllNodes()) {
             if (child.parent != null) {
-                Node parent = child.parent;
+                TreeNode parent = child.parent;
                 double parentX = scaleCoordinate(parent.x);
                 double parentY = scaleCoordinate(parent.y);
 
@@ -98,14 +98,14 @@ public class PaneController {
         }
     }
     private void    drawTreeNodes(Tree tree) {
-        for (Node node : tree.listAllNodes()) {
+        for (TreeNode node : tree.listAllNodes()) {
             pane.getChildren().add(createNode(node,"tree"));
         }
     }
     private void    drawTreeEdges(Tree tree) {
-        for (Node child : tree.listAllNodes()) {
+        for (TreeNode child : tree.listAllNodes()) {
             if (child.parent != null) {
-                Node parent = child.parent;
+                TreeNode parent = child.parent;
                 double parentX = scaleCoordinate(parent.x);
                 double parentY = scaleCoordinate(parent.y);
 
@@ -122,7 +122,7 @@ public class PaneController {
         node.setStroke(RADIAL_LEVEL);
         return node;
     }
-    private Circle  createNode(Node node, String type) {
+    private Circle  createNode(TreeNode node, String type) {
         Circle circle;
         if (type.equalsIgnoreCase("radial"))
             circle = new Circle(node.x, node.y, radialNodeSize);
@@ -174,7 +174,7 @@ public class PaneController {
             maxPaneRadius -= spaceBetweenRadii;
         }
 
-        Node root = tree.getRoot();
+        TreeNode root = tree.getRoot();
         radialPositions(tree, root, Math.toRadians(0), Math.toRadians(360));
         drawRadialTreeEdges(tree);
 //        radialPositions(tree, root, Math.toRadians(0), Math.toRadians(360));
@@ -188,7 +188,7 @@ public class PaneController {
         return ((angle > 360) || (angle <= 0)) ? 0 : ((2 * pi * radius) * (angle / 360.0));
     }
 
-    private Tree radialPositions(Tree radialTree, Node node, double alpha, double beta) {
+    private Tree radialPositions(Tree radialTree, TreeNode node, double alpha, double beta) {
 
         if (node.parent == null) { // if node is root
             radialTree.setNodeCoords(node, centerX, centerY);
@@ -201,7 +201,7 @@ public class PaneController {
         // number of leaves for the subtree rooted in v
         int k = radialTree.getLeavesOfNode(node);
 //        System.out.println("got " + (beta - alpha) / k + " radians per node");
-        for (Node child : node.getChildren()) {
+        for (TreeNode child : node.getChildren()) {
             int lambda = radialTree.getLeavesOfNode(child);
             double mi = theta + (((double) lambda / k) * (beta - alpha));
 //            System.out.println("space " + mi + " for " + child.label);
@@ -224,9 +224,9 @@ public class PaneController {
     }
 
     public void drawRadialTreeEdges(Tree tree) {
-        for (Node child : tree.listAllNodes()) {
+        for (TreeNode child : tree.listAllNodes()) {
             if (child.parent != null) {
-                Node parent = child.parent;
+                TreeNode parent = child.parent;
                 double parentX = parent.x;
                 double parentY = parent.y;
 
@@ -238,13 +238,13 @@ public class PaneController {
         }
     }
 
-    public void drawGraph(GraphMLGraph theGraph) {
-        for (Node node : theGraph.nodeList) {
+    /*public void drawGraph(GraphMLGraph theGraph) {
+        for (TreeNode node : theGraph.nodeList) {
             if (node.parent == null) {
                 pane.getChildren().add(createNode(node, "graph"));
             }
         }
-    }
+    }*/
 
     public int getScrollPaneHeight() {
         return scrollPane == null ? 0 : (int) scrollPane.getHeight();

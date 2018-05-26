@@ -199,7 +199,7 @@ public class GUIController {
 
         if (willBeTree) {
             System.out.println("Will be a tree");
-            Tree extractedTreeFromNode = theGraph.extractSubtreeFromNode(theGraph.labelToNode(selectedRoot), selectedEdgeType);
+            Tree extractedTreeFromNode = theGraph.extractSubtreeFromProtoNode(theGraph.labelToProtoNode(selectedRoot), selectedEdgeType);
             parseController.setTree(extractedTreeFromNode);
         }
         else if (isWholeGraph) {
@@ -238,7 +238,7 @@ public class GUIController {
                 System.out.println("selected Random");
                 if (parseInstance.getGraph() != null) {
                     GraphMLGraph randomGraph = NaiveDraw.processGraph(parseInstance.getGraph());
-                    paneController.drawGraph(randomGraph);
+                    //paneController.drawGraph(randomGraph);
                 } else if (parseInstance.getTree() != null) {
                     Tree randomTree = NaiveDraw.processTree(parseInstance.getTree());
                 }

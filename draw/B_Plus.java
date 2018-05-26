@@ -1,6 +1,6 @@
 package draw;
 
-import model.Node;
+import model.TreeNode;
 import model.Tree;
 
 public class B_Plus {
@@ -12,7 +12,7 @@ public class B_Plus {
     
     public static Tree processTree(Tree tree) {
         try {
-            Node root = tree.getRoot();
+            TreeNode root = tree.getRoot();
             lowestlevel = 0;
             setLevel(root, 0);
             dropLeaves(root);
@@ -28,7 +28,7 @@ public class B_Plus {
         }
     }
 
-    private static void setLevel(Node root, int level) {
+    private static void setLevel(TreeNode root, int level) {
         root.y = level * levelSeparation;
         if (lowestlevel<level) lowestlevel = level;
         if (!root.isLeaf()) {
@@ -36,7 +36,7 @@ public class B_Plus {
         }
     }
 
-    private static void dropLeaves(Node root) {
+    private static void dropLeaves(TreeNode root) {
         if (root.isLeaf()) {
             root.y = lowestlevel * levelSeparation;
         } else {
@@ -44,7 +44,7 @@ public class B_Plus {
         }
     }
 
-    private static void setX(Node root) {
+    private static void setX(TreeNode root) {
         if (root.isLeaf()) {
             //set to next available coordinate
             root.x = leaveCoordCounter * nodeSeparation;

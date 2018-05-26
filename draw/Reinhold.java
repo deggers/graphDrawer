@@ -18,7 +18,7 @@ public class Reinhold {
         }
         try {
             Reinhold r = new Reinhold();
-            Node root = tree.getRoot();
+            TreeNode root = tree.getRoot();
             r.layout(root, tree.getTreeDepth());
             return tree;
            }
@@ -29,7 +29,7 @@ public class Reinhold {
         }
     }
 
-    private void layout(Node root, int depth) {
+    private void layout(TreeNode root, int depth) {
         addYCoords(root, 0);
         setChildrenBinaryTree(root);
         setup(root, 0, new Extreme(getRR(root, depth)), new Extreme(getLL(root, depth)));
@@ -39,28 +39,28 @@ public class Reinhold {
         stretch(root);
     }
 
-    private void stretch(Node node) {
+    private void stretch(TreeNode node) {
         node.y *= 3;
-        for (Node n : node.getChildren()) {
+        for (TreeNode n : node.getChildren()) {
             stretch(n);
         }
     }
 
     //step 1
-    private void addYCoords(Node node, double level) {
+    private void addYCoords(TreeNode node, double level) {
         node.y = level;
-        for (Node child : node.getChildren()) {
+        for (TreeNode child : node.getChildren()) {
             addYCoords(child, level + 1);
         }
     }
 
     // set right, left, parent
-    private void setChildrenBinaryTree(Node node) {
+    private void setChildrenBinaryTree(TreeNode node) {
         if (!node.checked) {
-            List<Node> kids = new ArrayList<>();
+            List<TreeNode> kids = new ArrayList<>();
             node.checked = true;
             double childLevel= node.y + 1;
-            for (Node c : node.getChildren()) {
+            for (TreeNode c : node.getChildren()) {
 //                c.parent = node;
                 if ((c.y == (childLevel))) {
                     kids.add(c);
@@ -84,13 +84,14 @@ public class Reinhold {
         }
     }
 
-    private void setup(Node root, int level, Extreme rmost, Extreme lmost) {
+    private void setup(TreeNode root, int level, Extreme rmost, Extreme lmost) {
         // avoid selecting an extreme
         if (root == null) {
             lmost.lev = -1;
             rmost.lev = -1;
         } else {
-            Node right= null, left=null;
+            TreeNode right = null;
+            TreeNode left = null;
             Extreme ll = new Extreme();
             Extreme lr = new Extreme();
             Extreme rr = new Extreme();
@@ -195,7 +196,7 @@ public class Reinhold {
     //Procedure PETRIFY converts relative positionings (offsets) to absolute coordinates.
     //preorder traversal of tree
 
-    private void petrify(Node root, double xpos) {
+    private void petrify(TreeNode root, double xpos) {
         if (root != null) {
             root.x = xpos;
 
@@ -214,7 +215,7 @@ public class Reinhold {
     }
 
 
-    private Node getLL(Node node, int depth){
+    private TreeNode getLL(TreeNode node, int depth){
         if(node == null){
             return null;
         }
@@ -225,7 +226,7 @@ public class Reinhold {
                 return null;
             }
         }
-        Node leftleft = getLL(node.leftChild, depth);
+        TreeNode leftleft = getLL(node.leftChild, depth);
         if (leftleft != null) {
             return leftleft;
         }
@@ -233,7 +234,7 @@ public class Reinhold {
     }
 
     // was wenn baum nur aus einem knoten besteht oder aus root und einem knoten? der ist dann links
-        private Node getRR(Node node, int depth){
+        private TreeNode getRR(TreeNode node, int depth){
         if(node == null){
             return null;
         }
@@ -244,7 +245,7 @@ public class Reinhold {
                 return null;
             }
         }
-        Node rightright = getRR(node.rightChild, depth);
+        TreeNode rightright = getRR(node.rightChild, depth);
         if (rightright != null) {
             return rightright;
         }
@@ -252,11 +253,11 @@ public class Reinhold {
     }
 
     public static class Extreme {
-        Extreme(Node n) {
+        Extreme(TreeNode n) {
             addr = n;
         }
         public Extreme(){}
-        public Node addr;
+        public TreeNode addr;
         public int lev = 0;
         public double off = 0;
     }

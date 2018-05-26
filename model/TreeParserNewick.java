@@ -17,7 +17,7 @@ public class TreeParserNewick {
             String newickString = lines.map(line -> line.replaceAll("\\s+", "")).collect(Collectors.joining()).trim();
 
             if (isValidFormat(newickString)) {
-                Node root = buildTreeStructure(newickString);
+                TreeNode root = buildTreeStructure(newickString);
                 Tree tree = new Tree(root);
                 return tree;
             } else {
@@ -30,7 +30,7 @@ public class TreeParserNewick {
         }
     }
 
-    public static Node parseStringToTree(String newickString) {
+    public static TreeNode parseStringToTree(String newickString) {
 
         newickString = newickString.replace(" ", "");
         newickString = newickString.replace("\t", "");
@@ -48,17 +48,16 @@ public class TreeParserNewick {
     }
 
 // Problem: es müssen noch die längen der kanten der pseudoknoten gespeichert werden!
-    private static Node buildTreeStructure(String string) {
+    private static TreeNode buildTreeStructure(String string) {
 
         try {  // try to find branch
             int rightPar = getClosingParenthesis(string);
             int nodeId = pseudoNode_id++;
             String toProcess = string.substring(1, rightPar);
             String[] splitArray = splitToBranches(toProcess);
-            Node currentNode = new Node("");
-            currentNode.label = Integer.toString(nodeId);
+            TreeNode currentNode = new TreeNode(Integer.toString(nodeId));
             for (String branch : splitArray) {
-                Node child = buildTreeStructure(branch);
+                TreeNode child = buildTreeStructure(branch);
                 currentNode.addChild(child);
 
 //                if(currentNode.children.isEmpty()){ // klappt nicht, wird immer right da
@@ -76,9 +75,8 @@ public class TreeParserNewick {
 //            System.out.println("i guess we have a leaf here");
 
             // problem: if node has name but is no leaf saved as label= id instead of label= name
-            Node node = new Node("");
             String[] nameSplit = string.split(":");
-            node.label = nameSplit[0];
+            TreeNode node = new TreeNode(nameSplit[0]);
             if (nameSplit.length > 1) {
                 node.weight= Double.parseDouble(nameSplit[1]);
             } else {

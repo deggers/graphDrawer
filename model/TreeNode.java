@@ -1,58 +1,51 @@
-
 package model;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Node implements Serializable {
-    public String label;
+public class TreeNode extends AbstractNode {
     public double weight=0;
-    public int level= 0;
-    String GraphMLType;
-    public static List<Integer> depthList = new ArrayList<>();// muss resetted werden
-    
+    public static List<Integer> depthList = new ArrayList<>();    
     //walker
-    public double x = 0;
-    public double y = 0;
+    // muss resetted werden
     public double prelim = 0;
     public double modifier = 0;
-    public Node parent = null;
-    public Node leftNeighbor = null;
-    private final List<Node> children = new ArrayList<>();
+    private final List<TreeNode> children = new ArrayList<>();
+    public TreeNode parent = null;
+    public TreeNode leftNeighbor = null;
     public int indexAsChild = 0;
-    public Node ancestor = null;
+    public TreeNode ancestor = null;
     public double change = 0;
     public double shift = 0;
-    public Node thread = null;
+    public TreeNode thread = null;
 
     // RT
     public boolean checked=false, hasThread=false;
-    public Node leftChild, rightChild;
+    public TreeNode leftChild, rightChild;
     public double offset=1;
 
 
-    public Node(String label) {
-        this.label = label;
+    public TreeNode(String label) {
+        super(label);
     }
 
-    public void addChild(Node node) {
-        children.add(node);
-    }
-
-    public List<Node> getChildren() {
+    public List<TreeNode> getChildren() {
         return children;
+    }
+    
+    public void addChild(TreeNode node){
+        children.add(node);
     }
     
     public void resetChildren(){
         children.clear();
     }
 
-    public Node getChild(int index) {
+    public TreeNode getChild(int index) {
         return index >= 0 ? children.get(index) : children.get(children.size() + index);
     }
 
-    public static int getTreeDepth(Node root) {
+    public static int getTreeDepth(TreeNode root) {
         getListOfDepths(root, 0);
         int max = 0;
         for (Integer count : depthList) {
@@ -76,15 +69,15 @@ public class Node implements Serializable {
 
     public String toStringWithAllChildren() {
         String out = "id: " + label + ", x:" + x + ", y:" + y + ", prelim:" + prelim + ", modifier:" + modifier + ", indexAsChild:" + indexAsChild + ";";
-        for (Node c : children) {
+        for (TreeNode c : children) {
             out = out + "\t" + c.toString();
         }
         return out;
     }
 
-    public static int getListOfDepths(Node node, int count) {
+    public static int getListOfDepths(TreeNode node, int count) {
         if (node == null) return 0;
-        for (Node child : node.getChildren()) {
+        for (TreeNode child : node.getChildren()) {
             depthList.add(++count);
             getListOfDepths(child, count);
         }
@@ -92,7 +85,7 @@ public class Node implements Serializable {
     }
 
 
-    public static int getDepth(Node node) {
+    public static int getDepth(TreeNode node) {
         int depth = 0;
         while (node.parent != null) {
             depth++;
