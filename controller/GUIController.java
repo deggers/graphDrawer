@@ -1,4 +1,4 @@
-
+// just wanted to test :sunrise: :-D
 package controller;
 
 import draw.*;
@@ -273,7 +273,7 @@ public class GUIController {
         }
     }
 
-    private boolean setupChoiceBoxAlgorithms(Tree theTree, GraphMLGraph theGraph, boolean treeOrGraph) {
+    private void setupChoiceBoxAlgorithms(Tree theTree, GraphMLGraph theGraph, boolean treeOrGraph) {
         List<String> allAlgos = Arrays.asList("BPlus", "RT", "Walker", "Radial", "Random");
         List<String> reducedAlgos = Arrays.asList("BPlus", "Walker", "Radial", "Random");
         List<String> graphMLAlgos = Arrays.asList("Random");
@@ -284,7 +284,6 @@ public class GUIController {
             choiceBoxAlgorithm.getItems().clear();
             choiceBoxAlgorithm.getItems().setAll(theTree != null ? theTree.isBinary() ? allAlgos : reducedAlgos : graphMLAlgos);
         }
-        return treeOrGraph;
     }
     private void setupChoiceBoxEdgeType(GraphMLGraph theGraph) {
         if (theGraph != null && !choiceBoxEdgeTypeIsSet) {
