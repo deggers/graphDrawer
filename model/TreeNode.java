@@ -54,6 +54,7 @@ public class TreeNode extends AbstractNode {
         return max;
     }
 
+    @Override
     public boolean isLeaf() {
         return children.isEmpty();
     }

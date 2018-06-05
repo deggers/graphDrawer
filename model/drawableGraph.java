@@ -2,13 +2,14 @@ package model;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import model.HelperTypes.protoNode;
 
 public class drawableGraph {
     
-    public final LinkedHashSet<GraphNode> nodeList;
+    private final LinkedHashSet<GraphNode> nodeList;
 
     public drawableGraph(GraphMLGraph graph, String edgeType) throws Exception { //sollte einziger Konstruktor bleiben
         Set<Edge> relevantEdges = new LinkedHashSet<>();
@@ -39,8 +40,30 @@ public class drawableGraph {
             start.addChild(target);
             target.addParent(start);
         } //alle Knoten initialisiert und Adjazenzinformationen in den Knoten;
-        
-        //Azyklisch machen
     }
     
+    public LinkedHashSet<GraphNode> getNodes(){
+        LinkedHashSet<GraphNode> returnset = new LinkedHashSet<>(nodeList);
+        return returnset; //returns a copy of the nodeList
+    }
+    
+    public LinkedList<GraphNode> getRoots(){
+        LinkedList<GraphNode> returnlist = new LinkedList<>();
+        for (GraphNode graphNode : nodeList) {
+            if (graphNode.isRoot()) {
+                returnlist.add(graphNode);
+            }
+        }
+        return returnlist;
+    }
+    
+    public LinkedList<GraphNode> getLeaves(){
+        LinkedList<GraphNode> returnlist = new LinkedList<>();
+        for (GraphNode graphNode : nodeList) {
+            if (graphNode.isLeaf()) {
+                returnlist.add(graphNode);
+            }
+        }
+        return returnlist;
+    }
 }

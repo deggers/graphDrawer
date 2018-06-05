@@ -11,9 +11,9 @@ import java.util.Objects;
  *
  * @author gross
  */
-class HelperTypes {
+public class HelperTypes {
     
-    protected static class protoNode { //Hält eine kleine Repräsentation eines Knotens in einem GraphML Graphen, die keinerlei Zeichenfunktionalität oder Adjazenzinformationen bereitstellt
+    public static class protoNode { //Hält eine kleine Repräsentation eines Knotens in einem GraphML Graphen, die keinerlei Zeichenfunktionalität oder Adjazenzinformationen bereitstellt
         
         private final String label;
         private final String GraphMLType;
@@ -47,7 +47,7 @@ class HelperTypes {
         }
     }
     
-    protected static class EdgeType{
+    public static class EdgeType{
         final String id;
         final String attrType;
 
