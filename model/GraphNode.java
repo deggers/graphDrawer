@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class GraphNode extends AbstractNode {
@@ -61,7 +62,22 @@ public class GraphNode extends AbstractNode {
 
     @Override
     public String toString() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return String.format("label: %s parents: %s children: %s", label,parentLabels(),childrenLabels());
+    }
+    private List<String> parentLabels(){
+        List<String> returnlist = new LinkedList<>();
+        for (GraphNode node : parents) {
+            returnlist.add(node.label);
+        }
+        return returnlist;
+    }
+
+    private List<String> childrenLabels(){
+        List<String> returnlist = new LinkedList<>();
+        for (GraphNode node : children) {
+            returnlist.add(node.label);
+        }
+        return returnlist;
     }
 
     public void removeChild(GraphNode node) {

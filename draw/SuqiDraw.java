@@ -22,7 +22,7 @@ public class SuqiDraw {
             return null;
         }
         //Azyklisieren
-        dfsCycleBreaker(g);
+//        dfsCycleBreaker(g);
         //Layering
         
         //DummyKnoten
@@ -35,43 +35,5 @@ public class SuqiDraw {
         return g;
     }
 
-    private static void dfsCycleBreaker(drawableGraph g) {
-        //Tiefensuche um Zyklen zu entfernen
-        Iterator<GraphNode> iter = g.getNodes().iterator();
-        while (iter.hasNext()){
-            GraphNode startNode = iter.next();
-            if (startNode.getDfsStatus()=='u') {
-                dfsRec(startNode);
-            }
-        }
-    }
-    private static void dfsRec(GraphNode node){
-        if (node.isLeaf()) {
-            node.setDfsStatus('f');
-        } else {
-            node.setDfsStatus('v');
-            for (GraphNode graphNode : node.getChildren()) {
-                if (graphNode.getDfsStatus()=='v') {
-                    if (verbose==true) {
-                        System.out.printf("Cycle found, turning edge from %s to %s \n", node.label, graphNode.label);
-                    }
-                    graphNode.removeParent(node);
-                    graphNode.addChild(node);
-                    node.removeChild(graphNode);
-                    node.addParent(graphNode);
-                    turnedEdges.add(new Edge(new protoNode(graphNode.label), new protoNode(node.label)));
-                } else {
-                    if (graphNode.getDfsStatus()=='u') {
-                        dfsRec(graphNode);
-                    } else {
-                        //Node has been finalized, nothing to do
-                    }
-                }
-
-            }
-            node.setDfsStatus('f');
-        }
-        
-    }
     
 }

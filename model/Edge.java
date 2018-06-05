@@ -1,25 +1,25 @@
 package model;
 
-import model.HelperTypes.protoNode;
+import model.HelperTypes.ProtoNode;
 
 public class Edge {
 
-    protoNode start;
-    protoNode target;
+    ProtoNode start;
+    ProtoNode target;
     String edgeType;
     Double weight;
 
     public Edge() {
     }
 
-    public Edge(protoNode start, protoNode target) {
+    public Edge(ProtoNode start, ProtoNode target) {
         this.start = start;
         this.target = target;
         edgeType = "none";
         weight = 1.0;
     }
 
-    public Edge(protoNode start, protoNode target, String edgeType, Double weight) {
+    public Edge(ProtoNode start, ProtoNode target, String edgeType, Double weight) {
         this.start = start;
         this.target = target;
         this.edgeType = edgeType;

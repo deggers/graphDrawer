@@ -5,15 +5,15 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
-import model.HelperTypes.protoNode;
+import model.HelperTypes.ProtoNode;
 
 public class drawableGraph {
-    
-    private final LinkedHashSet<GraphNode> nodeList;
+
+    private final LinkedHashSet<GraphNode> nodeList = new LinkedHashSet<>();
 
     public drawableGraph(GraphMLGraph graph, String edgeType) throws Exception { //sollte einziger Konstruktor bleiben
         Set<Edge> relevantEdges = new LinkedHashSet<>();
-        Set<protoNode> relevantNodes = new LinkedHashSet<>();
+        Set<ProtoNode> relevantNodes = new LinkedHashSet<>();
         //relavante Nodes Erzeugen und Adjazenzinformationen aus Edges extrahieren.
         if (!graph.getEdgeTypes().contains(new HelperTypes.EdgeType(edgeType))) {
             throw new Exception("Chosen EdgeType: " + edgeType + " not in Graphs EdgeTypeList");
@@ -27,9 +27,8 @@ public class drawableGraph {
                 relevantNodes.add(e.target);
             }
         }
-        nodeList = new LinkedHashSet<>();
         Map<String, GraphNode> nodesMap = new HashMap<>();
-        for (protoNode relevantNode : relevantNodes) {
+        for (ProtoNode relevantNode : relevantNodes) {
             GraphNode newNode = relevantNode.toGraphNode();
             nodeList.add(newNode);
             nodesMap.put(newNode.label, newNode);
@@ -66,4 +65,12 @@ public class drawableGraph {
         }
         return returnlist;
     }
+
+    public GraphNode getNode(String id) {
+        for (GraphNode node : nodeList) {
+            if (node.label.equals(id)) return node;
+        }
+        return null;
+    }
+
 }

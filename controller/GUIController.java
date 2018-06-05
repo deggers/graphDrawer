@@ -159,7 +159,7 @@ public class GUIController {
     private void                        setFileLabel() {
         fileNameLabel.setText(this.fileName);
     }
-    private List<File>                  getFilesFromFolder(File file) {
+    public List<File>                  getFilesFromFolder(File file) {
         try {
             return Files.walk(Paths.get(file.getParent()))
                     .filter(Files::isRegularFile)
@@ -198,12 +198,10 @@ public class GUIController {
         boolean isWholeGraph = (selectedRoot != null) && (theGraph != null) && selectedRoot.equals(PARSE_WHOLE_GRAPH);
 
         if (willBeTree) {
-            System.out.println("Will be a tree");
             Tree extractedTreeFromNode = theGraph.extractSubtreeFromProtoNode(theGraph.labelToProtoNode(selectedRoot), selectedEdgeType);
             parseController.setTree(extractedTreeFromNode);
         }
         else if (isWholeGraph) {
-            System.out.println("wanna be a graph");
              parseController.setGraph(theGraph);
              parseController.setTree(null);
         }
@@ -223,7 +221,6 @@ public class GUIController {
             case "Radial":
                 Tree radialTree = RadialTree.processTree(parseInstance.getTree());
 //                nodeSizeSlider.setDisable(true);
-
                 paneController.drawRadialTreeStructure(radialTree);
                 break;
             case "RT":
@@ -235,10 +232,14 @@ public class GUIController {
                 paneController.drawTreeOrthogonally(BPlusTree);
                 break;
             case "Random":
-                System.out.println("selected Random");
                 if (parseInstance.getGraph() != null) {
-                    GraphMLGraph randomGraph = NaiveDraw.processGraph(parseInstance.getGraph());
-                    //paneController.drawGraph(randomGraph);
+                    try {
+                        GraphMLGraph randomGraph = NaiveDraw.processGraph(parseInstance.getGraph());
+//                    paneController.drawGraph(randomGraph);
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 } else if (parseInstance.getTree() != null) {
                     Tree randomTree = NaiveDraw.processTree(parseInstance.getTree());
                 }
@@ -268,7 +269,7 @@ public class GUIController {
                 choiceBoxRoot.getItems().clear();
                 processAlgo();
             } else {
-                processAlgo();
+                if (selectedEdgeType != null) processAlgo();
             }
         }
     }
@@ -322,5 +323,13 @@ public class GUIController {
 
     public File getFileHandle() {
         return fileHandle;
+    }
+
+    public String getSelectedAlgo() {
+        return selectedAlgorithm;
+    }
+
+    public String getSelectedEdgeType() {
+        return selectedEdgeType;
     }
 }

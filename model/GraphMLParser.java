@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.time.Duration;
 import java.util.*;
-import model.HelperTypes.protoNode;
+import model.HelperTypes.ProtoNode;
 
 public class GraphMLParser {
 
@@ -18,13 +18,13 @@ public class GraphMLParser {
         long startTime = System.nanoTime();
         long stopTime;
         GraphMLGraph graph = null;
-        protoNode node = null;
+        ProtoNode node = null;
         Edge edge = null; //brauchen wahrscheinlich edge
 
         // Speichern von Knoten, Kanten und Map<Name, Knoten> zum einfachen auffinden
-        ArrayList<protoNode> nodes = new ArrayList<>();
+        ArrayList<ProtoNode> nodes = new ArrayList<>();
         ArrayList<Edge> edges = new ArrayList<>(); //brauche Edge-Klasse
-        HashMap<String, protoNode> nodesMap = new HashMap<>();
+        HashMap<String, ProtoNode> nodesMap = new HashMap<>();
 
         try {
 
@@ -117,7 +117,7 @@ public class GraphMLParser {
                                     }
                                 }
                                 if (type != null && label != null){
-                                    node = new protoNode(label, type);
+                                    node = new ProtoNode(label, type);
                                 } else throw new RuntimeException("Exception due to improperly formatted GraphML Node entry: " + startElement.toString());
                                 nodes.add(node);
                                 nodesMap.put(node.getLabel(), node);
@@ -229,18 +229,18 @@ public class GraphMLParser {
             }
             //Postprocessing der erhaltenen Daten
             if (graph != null) {
-                HashSet<protoNode> missingNodes = new HashSet<>();
-                HashMap<String, protoNode> mapMissingNodes = new HashMap<>();
+                HashSet<ProtoNode> missingNodes = new HashSet<>();
+                HashMap<String, ProtoNode> mapMissingNodes = new HashMap<>();
                 StringBuilder sb;
                 String s;
-                for (protoNode mn : nodes) { // add missing nodes for package hierarchy
+                for (ProtoNode mn : nodes) { // add missing nodes for package hierarchy
                     sb = new StringBuilder(mn.getLabel());
                     sb.delete(sb.lastIndexOf("."), sb.length());
                     s = sb.toString();
                     if (!nodesMap.containsKey(s) && !mapMissingNodes.containsKey(s)) {
                         for (String par : makeListOfPackageParents(s)) {
                             if (!nodesMap.containsKey(par) && !mapMissingNodes.containsKey(par)) {
-                                protoNode tmpnd = new protoNode(par, "package");
+                                ProtoNode tmpnd = new ProtoNode(par, "package");
                                 missingNodes.add(tmpnd);
                                 mapMissingNodes.put(tmpnd.getLabel(), tmpnd);
                             }
@@ -249,7 +249,7 @@ public class GraphMLParser {
                 }
                 nodes.addAll(missingNodes);
                 nodesMap.putAll(mapMissingNodes);
-                for (protoNode n : nodes) { //package parent von n.label suchen
+                for (ProtoNode n : nodes) { //package parent von n.label suchen
                     try {
                         sb = new StringBuilder(n.getLabel());
                         sb.delete(sb.lastIndexOf("."), sb.length());

@@ -13,17 +13,17 @@ import java.util.Objects;
  */
 public class HelperTypes {
     
-    public static class protoNode { //Hält eine kleine Repräsentation eines Knotens in einem GraphML Graphen, die keinerlei Zeichenfunktionalität oder Adjazenzinformationen bereitstellt
+    public static class ProtoNode { //Hält eine kleine Repräsentation eines Knotens in einem GraphML Graphen, die keinerlei Zeichenfunktionalität oder Adjazenzinformationen bereitstellt
         
         private final String label;
         private final String GraphMLType;
 
-        public protoNode(String label) {
+        public ProtoNode(String label) {
             this.label = label;
             GraphMLType = null;
         }
 
-        public protoNode(String label, String GraphMLType) {
+        public ProtoNode(String label, String GraphMLType) {
             this.label = label;
             this.GraphMLType = GraphMLType;
         }
