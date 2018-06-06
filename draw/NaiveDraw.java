@@ -2,28 +2,18 @@ package draw;
 
 import controller.GUIController;
 import model.*;
-import model.HelperTypes.ProtoNode;
 
 public class NaiveDraw {
 
     public static GraphMLGraph processGraph(GraphMLGraph theGraph) throws Exception {
-
         String selectedEdgeType = GUIController.getInstance().getSelectedEdgeType();
         drawableGraph drawableGraph = new drawableGraph(theGraph,selectedEdgeType);
 
-        System.out.println("before");
-//        System.out.println(drawableGraph.getNode("1"));
-//        System.out.println(drawableGraph.getNode("2"));
-//        System.out.println(drawableGraph.getNode("3"));
-
-        CycleBreaker.dfsCycleBreaker(drawableGraph);
-
-        System.out.println("after");
-//        System.out.println(drawableGraph.getNode("1"));
-//        System.out.println(drawableGraph.getNode("2"));
-//        System.out.println(drawableGraph.getNode("3"));
+        CycleBreaker.Eades_Dustyn(drawableGraph);
 
 
+//   2.  Layer Assignment: Vertices are assigned to layers.
+//       drawableGraph = LayerAssignment(theGraphtoBedrawn, "LayerAlgo");
       return theGraph;
     }
 

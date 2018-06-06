@@ -211,7 +211,9 @@ public class GraphMLParser {
                                 }*/
                                 if (/*edgeIsNew*/true) { // checkt aktuell nicht, ob die Kante schon existiert
 //                                    System.out.println("Adding Edge: " + edge);
-                                    if (!edge.start.getLabel().equals(edge.target.getLabel()))
+                                    ProtoNode startNode = (ProtoNode) edge.start;
+                                    ProtoNode targetNode = (ProtoNode) edge.target;
+                                    if (!startNode.getLabel().equals(targetNode.getLabel()))
                                         edges.add(edge); //keine Selbstkanten
                                 }
                                 break;
@@ -229,38 +231,38 @@ public class GraphMLParser {
             }
             //Postprocessing der erhaltenen Daten
             if (graph != null) {
-                HashSet<ProtoNode> missingNodes = new HashSet<>();
-                HashMap<String, ProtoNode> mapMissingNodes = new HashMap<>();
-                StringBuilder sb;
-                String s;
-                for (ProtoNode mn : nodes) { // add missing nodes for package hierarchy
-                    sb = new StringBuilder(mn.getLabel());
-                    sb.delete(sb.lastIndexOf("."), sb.length());
-                    s = sb.toString();
-                    if (!nodesMap.containsKey(s) && !mapMissingNodes.containsKey(s)) {
-                        for (String par : makeListOfPackageParents(s)) {
-                            if (!nodesMap.containsKey(par) && !mapMissingNodes.containsKey(par)) {
-                                ProtoNode tmpnd = new ProtoNode(par, "package");
-                                missingNodes.add(tmpnd);
-                                mapMissingNodes.put(tmpnd.getLabel(), tmpnd);
-                            }
-                        }
-                    }
-                }
-                nodes.addAll(missingNodes);
-                nodesMap.putAll(mapMissingNodes);
-                for (ProtoNode n : nodes) { //package parent von n.label suchen
-                    try {
-                        sb = new StringBuilder(n.getLabel());
-                        sb.delete(sb.lastIndexOf("."), sb.length());
-                        s = sb.toString();
-                        //System.out.printf("parent for %s is %s\n", n.label, s);
-                        if (nodesMap.containsKey(s)) {
-                            edges.add(new Edge(nodesMap.get(s), n, "package", 1.0));
-                        }
-                    } catch (Exception e) {
-                    }
-                }
+//                HashSet<ProtoNode> missingNodes = new HashSet<>();
+//                HashMap<String, ProtoNode> mapMissingNodes = new HashMap<>();
+//                StringBuilder sb;
+//                String s;
+//                for (ProtoNode mn : nodes) { // add missing nodes for package hierarchy
+//                    sb = new StringBuilder(mn.getLabel());
+//                    sb.delete(sb.lastIndexOf("."), sb.length());
+//                    s = sb.toString();
+//                    if (!nodesMap.containsKey(s) && !mapMissingNodes.containsKey(s)) {
+//                        for (String par : makeListOfPackageParents(s)) {
+//                            if (!nodesMap.containsKey(par) && !mapMissingNodes.containsKey(par)) {
+//                                ProtoNode tmpnd = new ProtoNode(par, "package");
+//                                missingNodes.add(tmpnd);
+//                                mapMissingNodes.put(tmpnd.getLabel(), tmpnd);
+//                            }
+//                        }
+//                    }
+//                }
+//                nodes.addAll(missingNodes);
+//                nodesMap.putAll(mapMissingNodes);
+//                for (ProtoNode n : nodes) { //package parent von n.label suchen
+//                    try {
+//                        sb = new StringBuilder(n.getLabel());
+//                        sb.delete(sb.lastIndexOf("."), sb.length());
+//                        s = sb.toString();
+//                        //System.out.printf("parent for %s is %s\n", n.label, s);
+//                        if (nodesMap.containsKey(s)) {
+//                            edges.add(new Edge(nodesMap.get(s), n, "package", 1.0));
+//                        }
+//                    } catch (Exception e) {
+//                    }
+//                }
                 graph.addAllEdges(edges);
                 graph.addAllNodes(nodes);
 

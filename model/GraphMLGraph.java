@@ -1,7 +1,7 @@
 package model;
 
-import controller.GUIController;
-import model.HelperTypes.*;
+import model.HelperTypes.EdgeType;
+import model.HelperTypes.ProtoNode;
 
 import java.util.*;
 
@@ -39,7 +39,7 @@ public class GraphMLGraph {
             if (bTest) {
                 Tree tree = extractSubtreeFromProtoNode(node, edgeType);
                 int depth = tree.getTreeDepth();
-                int numNodes = tree.nodeList.size()-1;
+                int numNodes = tree.nodeList.size() - 1;
                 possibleRoots.add(node.getLabel() + " (" + depth + "|" + numNodes + ")");
             }
         }
@@ -91,13 +91,13 @@ public class GraphMLGraph {
         node.resetChildren();
         visitedNodesForExtractSubtreeSet.add(node.label);
         for (Edge edge : temporaryEdgeSubset) {
-            if (edge.start.getLabel().equals(node.label)) {
-                if (!visitedNodesForExtractSubtreeSet.contains(edge.target.getLabel())) {
-                    TreeNode child = edge.target.toTreeNode();
+            ProtoNode startNode = (ProtoNode) edge.start;
+            if (startNode.getLabel().equals(node.label)) {
+                ProtoNode targetNode = (ProtoNode) edge.target;
+                if (!visitedNodesForExtractSubtreeSet.contains(targetNode.getLabel())) {
+                    TreeNode child = targetNode.toTreeNode();
                     node.addChild(child);
                     extractSubtreeFromRootRecursion(child);
-                } else {
-//                    System.out.println("Cycle found, I wont search any further.");
                 }
             }
         }
@@ -173,7 +173,7 @@ public class GraphMLGraph {
         return incomingEdges;
     }
 
-    public List<Edge> getEdgesOfType(String edgeType){
+    public List<Edge> getEdgesOfType(String edgeType) {
         List<Edge> relevantEdges = new LinkedList<>();
         for (Edge e : edgeList) {
             if (e.edgeType.equals(edgeType)) {
