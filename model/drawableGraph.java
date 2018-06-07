@@ -8,14 +8,14 @@ import java.util.*;
 public class drawableGraph {
     private LinkedHashSet<GraphNode>        nodeList            = new LinkedHashSet<>();
     private LinkedHashSet<Edge>             edgeList            = new LinkedHashSet<>();
-    private LinkedHashMap<GraphNode,LinkedList<Edge>> nodeToOutgoingEdges = new LinkedHashMap<>();
-    private LinkedHashMap<GraphNode,LinkedList<Edge>> nodeToIngoingEdges  = new LinkedHashMap<>();
+    private LinkedHashMap<GraphNode,LinkedList<Edge>> nodeToEdgesOut = new LinkedHashMap<>();
+    private LinkedHashMap<GraphNode,LinkedList<Edge>> nodeToEdgesIn  = new LinkedHashMap<>();
 
     LinkedHashMap<GraphNode, LinkedList<Edge>> getHashmap_nodeToOutgoingEdges(){
-        return nodeToOutgoingEdges;
+        return nodeToEdgesOut;
     }
     LinkedHashMap<GraphNode, LinkedList<Edge>> getHashmap_nodeToIngoingEdges(){
-        return nodeToIngoingEdges;
+        return nodeToEdgesIn;
     }
 
     public drawableGraph(GraphMLGraph graph, String edgeType) throws Exception { //sollte einziger Konstruktor bleiben
@@ -89,11 +89,11 @@ public class drawableGraph {
 
 
 //    added by dustyn
-    private drawableGraph(LinkedHashSet<GraphNode> nodeSet, LinkedHashSet<Edge> edgeSet, LinkedHashMap<GraphNode,LinkedList<Edge>> nodeToIngoingEdges, LinkedHashMap<GraphNode,LinkedList<Edge>> nodeToOutgoingEdges  ){
+    private drawableGraph(LinkedHashSet<GraphNode> nodeSet, LinkedHashSet<Edge> edgeSet, LinkedHashMap<GraphNode,LinkedList<Edge>> nodeToEdgesIn, LinkedHashMap<GraphNode,LinkedList<Edge>> nodeToEdgesOut  ){
         this.edgeList = new LinkedHashSet<>(edgeSet);
         this.nodeList = new LinkedHashSet<>(nodeSet);
-        this.nodeToIngoingEdges = new LinkedHashMap<>(nodeToIngoingEdges);
-        this.nodeToOutgoingEdges = new LinkedHashMap<>(nodeToOutgoingEdges);
+        this.nodeToEdgesIn = new LinkedHashMap<>(nodeToEdgesIn);
+        this.nodeToEdgesOut = new LinkedHashMap<>(nodeToEdgesOut);
 }
     drawableGraph           copy(drawableGraph graph) {
         LinkedHashSet<GraphNode>    copyNodes   = new LinkedHashSet<>();
@@ -131,16 +131,16 @@ public class drawableGraph {
             GraphNode v = (GraphNode) e.target;
 
             LinkedList<Edge> edgeSetIn = new LinkedList<>();
-            if (nodeToIngoingEdges.containsKey(v)){
-                edgeSetIn.addAll(nodeToIngoingEdges.get(v));}
+            if (nodeToEdgesIn.containsKey(v)){
+                edgeSetIn.addAll(nodeToEdgesIn.get(v));}
             edgeSetIn.add(e);
-            nodeToIngoingEdges.put(v, edgeSetIn);
+            nodeToEdgesIn.put(v, edgeSetIn);
 
             LinkedList<Edge> edgeSetOut = new LinkedList<>();
-            if (nodeToOutgoingEdges.containsKey(u)){
-                edgeSetOut.addAll(nodeToOutgoingEdges.get(u));}
+            if (nodeToEdgesOut.containsKey(u)){
+                edgeSetOut.addAll(nodeToEdgesOut.get(u));}
             edgeSetOut.add(e);
-            nodeToOutgoingEdges.put(u, edgeSetOut);
+            nodeToEdgesOut.put(u, edgeSetOut);
 
 
             // fill node to Outgoing Edges
@@ -148,7 +148,7 @@ public class drawableGraph {
 
 
 
-        return new drawableGraph(copyNodes,copyEdges, nodeToIngoingEdges,nodeToOutgoingEdges);
+        return new drawableGraph(copyNodes,copyEdges, nodeToEdgesIn,nodeToEdgesOut);
     }
     LinkedHashSet<Edge>     getEdgeList() {
         return edgeList;
@@ -179,17 +179,17 @@ public class drawableGraph {
 
     private int getOutdegree(GraphNode node) {
         int size = 0;
-        if (nodeToOutgoingEdges.containsKey(node))
+        if (nodeToEdgesOut.containsKey(node))
         {
-            size = nodeToOutgoingEdges.get(node).size();
+            size = nodeToEdgesOut.get(node).size();
         }
         return size;
     }
     private int getIndegree(GraphNode node) {
         int size = 0;
-        if (nodeToIngoingEdges.containsKey(node))
+        if (nodeToEdgesIn.containsKey(node))
         {
-            size = nodeToIngoingEdges.get(node).size();
+            size = nodeToEdgesIn.get(node).size();
         }
         return size;
     }
@@ -203,27 +203,27 @@ public class drawableGraph {
 
 
     void removeIngoingEdges(GraphNode node) {
-        edgeList.removeAll(nodeToIngoingEdges.get(node));
-        LinkedList<Edge> edgesToBeRemoved = new LinkedList<>(nodeToIngoingEdges.get(node));
+        edgeList.removeAll(nodeToEdgesIn.get(node));
+        LinkedList<Edge> edgesToBeRemoved = new LinkedList<>(nodeToEdgesIn.get(node));
         for (Edge edgeToBeRemoved : edgesToBeRemoved) {
             GraphNode startNode = (GraphNode) edgeToBeRemoved.start;
-            LinkedList<Edge> modifiedListOut = nodeToOutgoingEdges.get(startNode);
+            LinkedList<Edge> modifiedListOut = nodeToEdgesOut.get(startNode);
             if (!modifiedListOut.remove(edgeToBeRemoved)) System.out.println("Error");
-            nodeToOutgoingEdges.put(startNode, modifiedListOut);
+            nodeToEdgesOut.put(startNode, modifiedListOut);
         }
-        nodeToIngoingEdges.keySet().removeIf(entry -> entry == node);
+        nodeToEdgesIn.keySet().removeIf(entry -> entry == node);
     }
 
     void removeOutgoingEdges(GraphNode node) {
-        edgeList.removeAll(nodeToOutgoingEdges.get(node));
-        LinkedList<Edge> edgesToBeRemoved = new LinkedList<>(nodeToOutgoingEdges.get(node));
+        edgeList.removeAll(nodeToEdgesOut.get(node));
+        LinkedList<Edge> edgesToBeRemoved = new LinkedList<>(nodeToEdgesOut.get(node));
         for (Edge edgeToBeRemoved : edgesToBeRemoved) {
             GraphNode targetNode = (GraphNode) edgeToBeRemoved.target;
-            LinkedList<Edge> modifiedListOut = nodeToIngoingEdges.get(targetNode);
+            LinkedList<Edge> modifiedListOut = nodeToEdgesIn.get(targetNode);
             if (!modifiedListOut.remove(edgeToBeRemoved)) System.out.println("Error");
-            nodeToIngoingEdges.put(targetNode, modifiedListOut);
+            nodeToEdgesIn.put(targetNode, modifiedListOut);
         }
-        nodeToOutgoingEdges.keySet().removeIf(entry -> entry == node);
+        nodeToEdgesOut.keySet().removeIf(entry -> entry == node);
     }
 
     public GraphNode getNodeWithMaxDiffDegree() {

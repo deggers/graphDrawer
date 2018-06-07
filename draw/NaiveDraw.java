@@ -10,6 +10,7 @@ public class NaiveDraw {
         drawableGraph drawableGraph = new drawableGraph(theGraph,selectedEdgeType);
 
         CycleBreaker.Eades_Dustyn(drawableGraph);
+        CycleBreaker.DFS_Florian(drawableGraph);
 
 
 //   2.  Layer Assignment: Vertices are assigned to layers.
