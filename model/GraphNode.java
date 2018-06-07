@@ -7,8 +7,8 @@ import java.util.List;
 
 public class GraphNode extends AbstractNode {
 
-    private List<GraphNode> children = new LinkedList<>();
-    private List<GraphNode> parents = new LinkedList<>();
+    private LinkedHashSet<GraphNode> children = new LinkedHashSet<>();
+    private LinkedHashSet<GraphNode> parents = new LinkedHashSet<>();
     private boolean dummyNode = false;
 
     private char dfsStatus = 'u'; //unvisited, visited, final
@@ -27,8 +27,8 @@ public class GraphNode extends AbstractNode {
         super(label);
         this.GraphMLType = type;
         this.dummyNode = isDummyNode;
-        children = new ArrayList<>();
-        parents = new ArrayList<>();
+        children = new LinkedHashSet<>();
+        parents = new LinkedHashSet<>();
     }
     GraphNode(String label) {
         super(label);
@@ -39,10 +39,10 @@ public class GraphNode extends AbstractNode {
         return this.label;
     }
     public List<GraphNode> getChildren() {
-        return children;
+        return new LinkedList<>(children);
     }
     public List<GraphNode> getParents() {
-        return parents;
+        return new LinkedList<>(parents);
     }
 
 
@@ -64,14 +64,14 @@ public class GraphNode extends AbstractNode {
 //        return String.format("label: %s parents: %s children: %s \n", label,parentLabels(),childrenLabels());
         return String.format("%s", label);
     }
-    private List<String> parentLabels(){
+     List<String> parentLabels(){
         List<String> returnlist = new LinkedList<>();
         for (GraphNode node : parents) {
             returnlist.add(node.label);
         }
         return returnlist;
     }
-    private List<String> childrenLabels(){
+     List<String> childrenLabels(){
         List<String> returnlist = new LinkedList<>();
         for (GraphNode node : children) {
             returnlist.add(node.label);

@@ -11,7 +11,7 @@ public class NaiveDraw {
         System.out.println("drawGraph got " + drawGraph);
 
 //      1. Remove all Cycles
-        CycleBreaker.GreedyCycleRemoval(drawGraph);
+        CycleBreaker.DFS_Florian(drawGraph);
         System.out.println("drawGraph got " + drawGraph);
 
 //      2.  Layer Assignment: Vertices are assigned to layers.

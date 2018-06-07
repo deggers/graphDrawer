@@ -13,7 +13,7 @@ set of all edges in the cycle is a FAS but not a FS.*/
 public class CycleBreaker {
     /*    Returns the edges of a cycle found via a directed, depth-first traversal. */
     private static final boolean verbose = true;
-    private static HashSet<Edge> turnedEdges = new LinkedHashSet<>(); //in their turned form, hence start and target must be interchanged before drawing
+    private static HashSet<Edge> turnedEdges = new LinkedHashSet<>(); //in their original form
 
 
     // TODO: 07.06.2018 : Add Constructor which build drawableGraph from listOfEdges
@@ -77,7 +77,6 @@ return null;
         }
 
         for (Edge edge : turnedEdges) {
-            // turn me on!! no ,reverse me!
             GraphNode startNode = (GraphNode) edge.start;
             GraphNode start = namesMap.get(startNode.getLabel());
 
@@ -98,7 +97,11 @@ return null;
             node.setDfsStatus('f');
         } else {
             node.setDfsStatus('v');
-            for (GraphNode graphNode : node.getChildren()) {
+            if (verbose == true) {
+                System.out.printf("Current Node: %s \n\t\twith children: %s \n",node.getLabel() ,node.childrenLabels().toString());
+            }
+            for (Iterator<GraphNode> it = node.getChildren().iterator(); it.hasNext();) {
+                GraphNode graphNode = it.next();
                 if (graphNode.getDfsStatus() == 'v') {
                     if (verbose == true) {
                         System.out.printf("Cycle found, turning edge from %s to %s \n", node.label, graphNode.label);
@@ -115,7 +118,6 @@ return null;
                         //Node has been finalized, nothing to do
                     }
                 }
-
             }
             node.setDfsStatus('f');
         }
