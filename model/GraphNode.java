@@ -78,7 +78,7 @@ public class GraphNode extends AbstractNode {
     @Override
     public String toString() {
 //        return String.format("label: %s parents: %s children: %s \n", label,parentLabels(),childrenLabels());
-        return String.format("%s", label);
+        return String.format("%s,level:%s", label, layer);
     }
      List<String> parentLabels(){
         List<String> returnlist = new LinkedList<>();
@@ -95,17 +95,18 @@ public class GraphNode extends AbstractNode {
         return returnlist;
     }
 
-    void addChild(GraphNode node){
-        children.add(node);
+    boolean addChild(GraphNode node){
+        return children.add(node);
     }
-    void removeChild(GraphNode node) {
-        children.remove(node);
+    boolean removeChild(GraphNode node) {
+        return children.remove(node);
     }
-    void addParent(GraphNode node){
-        parents.add(node);
+
+    boolean addParent(GraphNode node){
+        return parents.add(node);
     }
-    void removeParent(GraphNode node) {
-        parents.remove(node);
+    boolean removeParent(GraphNode node) {
+        return parents.remove(node);
     }
     
     

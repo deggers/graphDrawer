@@ -16,9 +16,7 @@ public class CycleBreaker {
     private static HashSet<Edge> turnedEdges = new LinkedHashSet<>(); //in their original form
 
 
-    // TODO: 07.06.2018 : Add Constructor which build drawableGraph from listOfEdges
-
-    public static drawableGraph GreedyCycleRemoval(drawableGraph g){
+    public static void GreedyCycleRemoval(drawableGraph g){
 /*        The first polynomial-time algorithm for solving the minimum FAS problem with an approximation
           ratio less than 2 in the worst case */
         drawableGraph copyG = g.copy(g);
@@ -31,13 +29,12 @@ public class CycleBreaker {
                 GraphNode sink = copyG.getSink();
                 safeEdges.addAll(nodeToEdgeIn.get(sink));
                 copyG.justRemoveNode(sink);
-                copyG.removeIngoingEdges(sink); }
+                copyG.removeIngoingEdges(sink);}
 
             copyG.getIsolatedNodes().forEach(copyG::justRemoveNode);
 
             while (copyG.getSource() != null){
                 GraphNode source = copyG.getSource();
-//                System.out.println("source = " + source);
                 LinkedList<Edge> edgeSetOfV = nodeToEdgeOut.get(source);
                 safeEdges.addAll(edgeSetOfV);
                 copyG.justRemoveNode(source);
@@ -52,10 +49,7 @@ public class CycleBreaker {
                 copyG.removeIngoingEdges(v); }
         }
         if  (copyG.copyNodeSet().size() >0 || copyG.copyEdgeSet().size() > 0) System.out.println("something wrong in Greedy Cycle Removal - got left Nodes or Edges");
-        return g;
     }
-
-
     public static void DFS_Florian(drawableGraph g) {
         //Tiefensuche um Zyklen zu entfernen
         HashMap<String, GraphNode> namesMap = new HashMap<>();
@@ -67,23 +61,9 @@ public class CycleBreaker {
                 dfsRec(startNode);
             }
         }
-
-        for (Edge edge : turnedEdges) {
-            GraphNode startNode = (GraphNode) edge.start;
-            GraphNode start = namesMap.get(startNode.getLabel());
-
-            GraphNode targetNode = (GraphNode) edge.target;
-            GraphNode target = namesMap.get(targetNode.getLabel());
-
-            start.removeChild(target);
-            start.addParent(target);
-            target.removeParent(start);
-            target.addChild(start);
-        }
-
-
+        // i hope my lambdaExpression is fine :)
+        turnedEdges.forEach(g::reverseEdge);
     }
-
     private static void dfsRec(GraphNode node) {
         if (node.isLeaf()) {
             node.setDfsStatus('f');
@@ -115,8 +95,6 @@ public class CycleBreaker {
         }
 
     }
-
-
 }
 
 

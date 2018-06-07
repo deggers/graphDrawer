@@ -21,15 +21,16 @@ public class AssignLayer {
 //    right now not working
     public static void longestPath(drawableGraph g) {
         final boolean optionalCheck = true;
-        
+
         LinkedHashSet<GraphNode> U = new LinkedHashSet<>(); // set of nodes that will get a layer in this step
         LinkedHashSet<GraphNode> Z = new LinkedHashSet<>(); // set of all parents of nodes in U
         int currentLayer = 1;
         drawableGraph layeredGraph = g.copy(g);
-        layeredGraph.deleteIsolatedNodes(); //hope this works
+//        layeredGraph.deleteIsolatedNodes(); //hope this works
+        layeredGraph.getIsolatedNodes().forEach(layeredGraph::justRemoveNode);
         // nodes without a layer have layer set to -1 by default now (any number that can't be a proper layer is ok)
         U = new LinkedHashSet<>(layeredGraph.getAllSinks()); // start U with all the sinks in the graph
-        while (!U.isEmpty()) {            
+        while (!U.isEmpty()) {
             for (GraphNode node : U) {
                 node.setLayer(currentLayer); // set all nodes in U to currentLayer
                 Z.addAll(node.getParents()); // compute the union of all parents of nodes in U
@@ -46,7 +47,7 @@ public class AssignLayer {
                     U.add(graphNode); // add all nodes to U, for which all children have a proper layer assigned
                 }
             }
-            currentLayer++; // repeat with next layer, as long as there are nodes that can be assigned a layer 
+            currentLayer++; // repeat with next layer, as long as there are nodes that can be assigned a layer
         }
         //all nodes should be layered now, optional check
         if (optionalCheck) {
@@ -56,37 +57,42 @@ public class AssignLayer {
                     throw new Error("LongestPath Layering produced an error, as some nodes in the graph remained unlayered. Check for correctness, solitary nodes or disable this check!");
                 }
             }
-            // nothing threw, so everythings fine
         }
         //one should potentially turn the layering around now, so that the upmost node is at level 0 or 1 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         //time to add dummy nodes
         layeredGraph.addDummies();
         g = layeredGraph; // copy layered graph to g (necessary)
     }
-
-
     public static void topologicalPath(drawableGraph g) {
         int level = 1;
-        System.out.println("got following edges: " + g.copyEdgeSet());
         drawableGraph copyG = g.copy(g);
-        System.out.println("got copied    edges: " + copyG.copyEdgeSet());
         LinkedHashMap<Integer, LinkedList<GraphNode>> sorted = new LinkedHashMap<>();
-        LinkedList<GraphNode> sinks = copyG.getAllSinks();
+        LinkedList<GraphNode> sinks;
 
-        while (!sinks.isEmpty()) {
-            System.out.println("will remove sinks!");
-            System.out.println("sinks = " + sinks);
+        while (!copyG.getAllSinks().isEmpty()) {
+            sinks = copyG.getAllSinks();
             sorted.put(level, sinks);
             sinks.forEach(copyG::removeIngoingEdges);
-            sinks = copyG.getAllSinks();
+            sinks.forEach(copyG::justRemoveNode);
             level += 1;
-            if (level == g.copyNodeSet().size()) System.out.println("Way to many levels..");
+            if (level == g.getNodeSet().size()) System.out.println("Way to many levels..");
         }
-        System.out.println("sorted = " + sorted);
+        sorted.put(level, copyG.getIsolatedNodes());
+        sorted.forEach((key, value) -> {value.forEach(node -> node.setLayer(key));});
+
+//        System.out.println("print g orig");
+//        g.getNodeSet().forEach(System.out::println);
+//        System.out.println("print g copied");
+//        copyG.copyNodeSet().forEach(System.out::println);
+
+        g.addDummies();
+        System.out.println(g);
+        System.out.println(g.getEdgeSet());
+        System.out.println("g.getNodeSet() = " + g.getNodeSet());
     }
 
 //  All the HELPER-Functions
-    
+
     private LinkedList<GraphNode> getNodesFromLevel(Integer level) {
         return layering.get(level);
     }

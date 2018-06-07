@@ -26,6 +26,8 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
+        String username = System.getProperty("user.name");
+
         File file;
         String arg1;
         if (args.length > 0) {
@@ -37,7 +39,12 @@ public class Main extends Application {
                 file = new File("C:\\Users\\gross\\Desktop\\Programmierung\\BioVis\\BioVis18\\Baeume\\Data\\Phylogeny\\DTListenerTest.nh");
                 break;
             case "graphML":
-                file = new File("C:\\Users\\gross\\Desktop\\Programmierung\\BioVis\\BioVis18\\Baeume\\Data\\Software-Engineering\\test.graphml");
+                if (username.equals("dusty")) {
+                    file = new File("C:\\Users\\dusty\\Desktop\\Zeckzer\\Vorlesung\\Baeume_1\\Baeume\\Data\\Software-Engineering\\test.graphml");
+                }
+                else {
+                    file = new File("C:\\Users\\gross\\Desktop\\Programmierung\\BioVis\\BioVis18\\Baeume\\Data\\Software-Engineering\\test.graphml");
+                }
                 break;
             default:
                 file = null;

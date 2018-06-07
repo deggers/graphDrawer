@@ -17,7 +17,7 @@ public class drawableGraph {
     LinkedHashMap<GraphNode, LinkedList<Edge>> getHashmap_nodeToEdgeIn(){
         return nodeToEdgesIn;
     }
-    
+
     public drawableGraph(GraphMLGraph graph, String edgeType) throws Exception { //sollte einziger Konstruktor bleiben
         Set<Edge> relevantEdges = new LinkedHashSet<>();
         Set<ProtoNode> relevantNodes = new LinkedHashSet<>();
@@ -155,7 +155,7 @@ public class drawableGraph {
         }
         return isolatedNodes;
     }
-    
+
     void                    deleteIsolatedNodes(){
         LinkedList<GraphNode> n = getIsolatedNodes();
         System.out.printf("Found %d isolated nodes: %s\n",n.size(), n.toString());
@@ -163,24 +163,21 @@ public class drawableGraph {
             justRemoveNode(graphNode);
         }
     }
-    
+
     GraphNode               getSink () {
-            for (GraphNode node : this.nodeSet) {
-                if (getOutdegree(node) == 0 && getIndegree(node) >= 1) {
-                    return node;
-                }
-            }
-            return null;
-        }
+            for (GraphNode node : this.nodeSet)
+                if (getOutdegree(node) == 0 && getIndegree(node) > 0) return node;
+            return null;}
     GraphNode               getSource () {
             for (GraphNode node : this.nodeSet)
-                if (getIndegree(node) == 0 && getOutdegree(node) >= 1) return node;
-            return null; }
+                if (getIndegree(node) == 0) return node;
+            return null;}
 
-    void        justRemoveNode  (GraphNode node){
-        /* will only remove this node, nothin else */
-        this.nodeSet.remove(node);
-        }
+    void        justRemoveNode  (GraphNode removeMe){
+        /* will only remove this node, and children/parents references, nothin else */
+        removeMe.getChildren().forEach(child -> child.removeParent(removeMe));
+        removeMe.getParents().forEach(parent -> parent.removeChild(removeMe));
+        this.nodeSet.remove(removeMe); }
     private int getOutdegree    (GraphNode node) {
         int size = 0;
         if (nodeToEdgesOut.containsKey(node))
@@ -212,7 +209,7 @@ public class drawableGraph {
     void removeIngoingEdges(GraphNode node) {
         edgeSet.removeAll(nodeToEdgesIn.get(node));
         LinkedList<Edge> edgesToBeRemoved = new LinkedList<>(nodeToEdgesIn.get(node));
-        System.out.println("edgesToBeRemoved = " + edgesToBeRemoved);
+
         for (Edge edgeToBeRemoved : edgesToBeRemoved) {
             GraphNode startNode = (GraphNode) edgeToBeRemoved.start;
             LinkedList<Edge> modifiedListOut = nodeToEdgesOut.get(startNode);
@@ -221,7 +218,6 @@ public class drawableGraph {
         }
         nodeToEdgesIn.keySet().removeIf(entry -> entry == node);
     }
-
     void removeOutgoingEdges(GraphNode node) {
         edgeSet.removeAll(nodeToEdgesOut.get(node));
         LinkedList<Edge> edgesToBeRemoved = new LinkedList<>(nodeToEdgesOut.get(node));
@@ -266,24 +262,39 @@ public class drawableGraph {
         }
         return allSinks;
     }
-    
+    boolean reverseEdge(Edge edge) {
+        GraphNode u = (GraphNode) edge.start;
+        GraphNode v = (GraphNode) edge.target;
+
+        boolean status1 = u.removeChild(v);
+        boolean status2 = u.addParent(v);
+        boolean status3 = v.removeParent(u);
+        boolean status4 = v.addChild(v);
+
+        return status1 && status2 && status3 && status4;
+    }
+
+
     void addDummies(){
+        LinkedList<Edge> edgesToDelete = new LinkedList<>();
         for (Edge edge : edgeSet) {
             GraphNode start = (GraphNode) edge.start;
             GraphNode target = (GraphNode) edge.target;
-            int spanningLevels = start.getLayer()-target.getLayer();
-            spanningLevels = (Integer.signum(spanningLevels)*spanningLevels)-1; // keine ahnung wie man sonst das vorzeichen entfernt
-            if (spanningLevels>0) { // precondition for adding dummies
-                deleteEdge(edge);
+            int spanningLevels = Math.abs(start.getLayer() - target.getLayer());
+//            spanningLevels = Math.abs(spanningLevels * spanningLevels -1); // keine ahnung wie man sonst das vorzeichen entfernt
+            if (spanningLevels > 1) { // precondition for adding dummies
+                edgesToDelete.add(edge);
+//                if (!deleteEdge(edge)) System.out.println("couldnt delete edge in addDummies");
                 List<GraphNode> block = new LinkedList<>();
                 block.add(start);
                 for (int i = spanningLevels; i > 0; i--) { // for every additional spanned level
-                    String label = "Dummy" + i + start.label + target.label;
+                    String label = "Dummy-" + i + "; from: " + start.label + " to: " + target.label+"|";
                     GraphNode node = new GraphNode(label, "Dummy", true); // create a dummy with a proper label
                     nodeSet.add(node); // add to NodeSet
                     block.add(node); // add to block to find parent/children
                 }
                 block.add(target);
+
                 for (int i = 0; i < block.size(); i++) { // hoffe das wirft keinen outOfBounds
                     if (!block.get(i).equals(target)) block.get(i).addChild(block.get(i+1)); // except for at start Node, add children
                     if (!block.get(i).equals(start)) block.get(i).addParent(block.get(i-1)); // except for at target Node, add parents
@@ -291,8 +302,8 @@ public class drawableGraph {
             }
         }
     }
-    
-    public boolean deleteEdge(Edge e){
+
+    private boolean deleteEdge(Edge e){
         if (!edgeSet.contains(e)) return false;
         try {
             GraphNode start = (GraphNode) e.start;
@@ -307,12 +318,12 @@ public class drawableGraph {
         }
         return true;
     }
-    
+
     @Override
     public String toString() {
         return (nodeSet.size() + " Nodes " + "and " + edgeSet.size()  + " Edges" );
     }
-    
+
 }
 
 
