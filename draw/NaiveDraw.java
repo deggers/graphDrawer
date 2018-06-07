@@ -9,12 +9,13 @@ public class NaiveDraw {
         String selectedEdgeType = GUIController.getInstance().getSelectedEdgeType();
         drawableGraph drawableGraph = new drawableGraph(theGraph,selectedEdgeType);
 
-        CycleBreaker.Eades_Dustyn(drawableGraph);
-        CycleBreaker.DFS_Florian(drawableGraph);
+//      1. Remove all Cycles
+        CycleBreaker.GreedyCycleRemoval(drawableGraph);
+
+//      2.  Layer Assignment: Vertices are assigned to layers.
+        AssignLayer.topologicalPath(drawableGraph);
 
 
-//   2.  Layer Assignment: Vertices are assigned to layers.
-//       drawableGraph = LayerAssignment(theGraphtoBedrawn, "LayerAlgo");
       return theGraph;
     }
 

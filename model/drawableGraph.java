@@ -238,12 +238,30 @@ public class drawableGraph {
 //        System.out.println("max = " + max);
         return winnerNode;
     }
+
+    public GraphNode selectRandomNode() {
+        int size = nodeList.size();
+        int item = new Random().nextInt(size); // In real life, the Random object should be rather more shared than this
+        int i = 0;
+        for (GraphNode obj : nodeList) {
+            if (i == item)
+                return obj;
+            i++;
+        }
+        return null;
+    }
+
+    LinkedList<GraphNode> getAllSinks() {
+        LinkedList<GraphNode> allSinks = new LinkedList<>();
+        for (GraphNode node : this.nodeList) {
+            if (getOutdegree(node) == 0 && getIndegree(node) >= 1) {
+                allSinks.add(node);
+            }
+        }
+        return allSinks;
+    }
+
 }
-
-
-
-
-
 
 
 //    LinkedHashSet<Edge> getOutgoingEdges(GraphNode node) {
