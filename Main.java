@@ -37,7 +37,7 @@ public class Main extends Application {
                 file = new File("C:\\Users\\dusty\\Desktop\\Zeckzer\\Baeume_1\\Baeume\\Data\\Phylogeny-Binaer\\hg38.20way.nh");
                 break;
             case "graphML":
-                file = new File("C:\\Users\\dusty\\Desktop\\Zeckzer\\Baeume_1\\Baeume\\Data\\Software-Engineering\\Checkstyle-6.5.graphml");
+                file = new File("C:\\Users\\dusty\\Desktop\\Zeckzer\\Vorlesung\\Baeume_1\\Baeume\\Data\\Software-Engineering\\test.graphml");
                 break;
             default:
                 file = null;

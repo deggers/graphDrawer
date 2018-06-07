@@ -3,6 +3,13 @@ package model;
 
 import java.util.*;
 
+/*A set of edges whose removal makes the digraph acyclic is commonly known as a feedback
+arc set (FAS). Following the terminology used by Di Battista et al. [DETT99] we call a set
+of edges whose reversal makes the digraph acyclic a feedback set (FS). Each FS is also a
+FAS. However, not each FAS is a FS. For example, if a digraph has only one cycle, then the
+set of all edges in the cycle is a FAS but not a FS.*/
+
+
 public class CycleBreaker {
     /*    Returns the edges of a cycle found via a directed, depth-first traversal. */
     private static final boolean verbose = true;
@@ -11,20 +18,21 @@ public class CycleBreaker {
 
     // TODO: 07.06.2018 : Add Constructor which build drawableGraph from listOfEdges
 
-    public static void Eades_Dustyn(drawableGraph g){
-        drawableGraph copyG = g.copy(g);
+    public static void GreedyCycleRemoval(drawableGraph g){
+/*        The first polynomial-time algorithm for solving the minimum FAS problem with an approximation
+          ratio less than 2 in the worst case */
 
+        drawableGraph copyG = g.copy(g);
         LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToIngoingEdges = copyG.getHashmap_nodeToIngoingEdges();
         LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToOutgoingEdges = copyG.getHashmap_nodeToOutgoingEdges();
-
-        LinkedHashSet<Edge> Heuristik_FAS = new LinkedHashSet<>();
+        LinkedHashSet<Edge> safeEdges = new LinkedHashSet<>();
 
         while (!copyG.getNodes().isEmpty()){
             while (copyG.getSink() != null) {
                 GraphNode sink = copyG.getSink();
                 System.out.println("sink = " + sink);
                 LinkedList<Edge> edgeSetOfV = nodeToIngoingEdges.get(sink);
-                Heuristik_FAS.addAll(edgeSetOfV);
+                safeEdges.addAll(edgeSetOfV);
                 copyG.justRemoveNode(sink);
                 copyG.removeIngoingEdges(sink); }
 
@@ -34,14 +42,14 @@ public class CycleBreaker {
                 GraphNode source = copyG.getSource();
                 System.out.println("source = " + source);
                 LinkedList<Edge> edgeSetOfV = nodeToOutgoingEdges.get(source);
-                Heuristik_FAS.addAll(edgeSetOfV);
+                safeEdges.addAll(edgeSetOfV);
                 copyG.justRemoveNode(source);
                 copyG.removeOutgoingEdges(source); }
 
             if (!copyG.getNodes().isEmpty()){
                 GraphNode v = copyG.getNodeWithMaxDiffDegree();
                 LinkedList<Edge> edgeSetOfV = nodeToOutgoingEdges.get(v);
-                Heuristik_FAS.addAll(edgeSetOfV);
+                safeEdges.addAll(edgeSetOfV);
                 copyG.justRemoveNode(v);
                 copyG.removeOutgoingEdges(v);
                 copyG.removeIngoingEdges(v); }
@@ -54,7 +62,7 @@ public class CycleBreaker {
             System.out.println("edge = " + edge);
         }
 
-        System.out.println("Heuristik FAS = " + Heuristik_FAS);
+        System.out.println("Heuristik FAS = " + safeEdges);
     }
 
 
