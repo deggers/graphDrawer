@@ -52,19 +52,18 @@ public class AssignLayer {
 //    right now not working
     public static void topologicalPath(drawableGraph g) {
         int level = 1;
+        System.out.println("got following edges: " + g.getEdgeSet());
         drawableGraph copyG = g.copy(g);
+        System.out.println("got copied    edges: " + copyG.getEdgeSet());
         LinkedHashMap<Integer, LinkedList<GraphNode>> sorted = new LinkedHashMap<>();
-//        LinkedHashSet<Edge> origGraphEdges = g.getEdgeList();  // const edges = this._graph.edges
-//        LinkedHashSet<GraphNode> origGraphNodes = g.getNodeSet();  //  const vertices = this._graph.vertices.toArray()
         LinkedList<GraphNode> sinks = copyG.getAllSinks();
-        System.out.println("sinks before first whileLoop = " + sinks);
-        while (sinks.size() > 0) {
-            sorted.put(level, sinks);
-            System.out.println("sorted = " + sorted);
-            sinks.forEach(copyG::removeIngoingEdges);
 
+        while (!sinks.isEmpty()) {
+            System.out.println("will remove sinks!");
+            System.out.println("sinks = " + sinks);
+            sorted.put(level, sinks);
+            sinks.forEach(copyG::removeIngoingEdges);
             sinks = copyG.getAllSinks();
-            System.out.println("sinks remaining = " + sinks);
             level += 1;
             if (level == g.getNodeSet().size()) System.out.println("Way to many levels..");
         }

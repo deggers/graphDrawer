@@ -21,18 +21,15 @@ public class CycleBreaker {
     public static drawableGraph GreedyCycleRemoval(drawableGraph g){
 /*        The first polynomial-time algorithm for solving the minimum FAS problem with an approximation
           ratio less than 2 in the worst case */
-
         drawableGraph copyG = g.copy(g);
-        LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToIngoingEdges = copyG.getHashmap_nodeToIngoingEdges();
-        LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToOutgoingEdges = copyG.getHashmap_nodeToOutgoingEdges();
+        LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToEdgeIn = copyG.getHashmap_nodeToEdgeIn();
+        LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToEdgeOut = copyG.getHashmap_nodeToEdgeOut();
         LinkedHashSet<Edge> safeEdges = new LinkedHashSet<>();
 
         while (!copyG.getNodeSet().isEmpty()){
             while (copyG.getSink() != null) {
                 GraphNode sink = copyG.getSink();
-                System.out.println("sink = " + sink);
-                LinkedList<Edge> edgeSetOfV = nodeToIngoingEdges.get(sink);
-                safeEdges.addAll(edgeSetOfV);
+                safeEdges.addAll(nodeToEdgeIn.get(sink));
                 copyG.justRemoveNode(sink);
                 copyG.removeIngoingEdges(sink); }
 
@@ -40,27 +37,22 @@ public class CycleBreaker {
 
             while (copyG.getSource() != null){
                 GraphNode source = copyG.getSource();
-                System.out.println("source = " + source);
-                LinkedList<Edge> edgeSetOfV = nodeToOutgoingEdges.get(source);
+//                System.out.println("source = " + source);
+                LinkedList<Edge> edgeSetOfV = nodeToEdgeOut.get(source);
                 safeEdges.addAll(edgeSetOfV);
                 copyG.justRemoveNode(source);
                 copyG.removeOutgoingEdges(source); }
 
             if (!copyG.getNodeSet().isEmpty()){
                 GraphNode v = copyG.getNodeWithMaxDiffDegree();
-                LinkedList<Edge> edgeSetOfV = nodeToOutgoingEdges.get(v);
+                LinkedList<Edge> edgeSetOfV = nodeToEdgeOut.get(v);
                 safeEdges.addAll(edgeSetOfV);
                 copyG.justRemoveNode(v);
                 copyG.removeOutgoingEdges(v);
                 copyG.removeIngoingEdges(v); }
         }
-
         if  (copyG.getNodeSet().size() >0 || copyG.getEdgeList().size() > 0) System.out.println("something wrong in Greedy Cycle Removal - got left Nodes or Edges");
-
-        // return cycleFreeGraph :)
-return null;
-
-
+        return g;
     }
 
 
