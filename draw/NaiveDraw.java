@@ -14,9 +14,10 @@ public class NaiveDraw {
         CycleBreaker.DFS_Florian(drawGraph);
         System.out.println("drawGraph got " + drawGraph);
 
+        System.out.println("layer assignment");
 //      2.  Layer Assignment: Vertices are assigned to layers.
-//        AssignLayer.topologicalPath(drawGraph);
-
+        AssignLayer.topologicalPath(drawGraph);
+        System.out.println("drawGraph got " + drawGraph);
 
       return theGraph;
     }
