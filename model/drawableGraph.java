@@ -58,8 +58,11 @@ public class drawableGraph {
         } //alle Knoten initialisiert und Adjazenzinformationen in den Knoten;
     }
     
-    LinkedHashSet<GraphNode>        getNodes(){
+    public LinkedHashSet<GraphNode> getNodeSet(){
         return new LinkedHashSet<>(nodeList); //returns a copy of the nodeList
+    }
+    public LinkedHashSet<Edge> getEdgeSet(){
+        return new LinkedHashSet<>(edgeList);
     }
     public GraphNode                getNode(String id) {
         for (GraphNode node : nodeList) {
@@ -141,9 +144,6 @@ public class drawableGraph {
                 edgeSetOut.addAll(nodeToEdgesOut.get(u));}
             edgeSetOut.add(e);
             nodeToEdgesOut.put(u, edgeSetOut);
-
-
-            // fill node to Outgoing Edges
         }
 
 
@@ -162,7 +162,6 @@ public class drawableGraph {
         }
         return isolatedNodes;
     }
-    
     GraphNode               getSink () {
             for (GraphNode node : this.nodeList) {
                 if (getOutdegree(node) == 0 && getIndegree(node) >= 1) {
@@ -203,12 +202,13 @@ public class drawableGraph {
 
 
     void removeIngoingEdges(GraphNode node) {
+        System.out.println("node = " + node);
         edgeList.removeAll(nodeToEdgesIn.get(node));
         LinkedList<Edge> edgesToBeRemoved = new LinkedList<>(nodeToEdgesIn.get(node));
         for (Edge edgeToBeRemoved : edgesToBeRemoved) {
             GraphNode startNode = (GraphNode) edgeToBeRemoved.start;
             LinkedList<Edge> modifiedListOut = nodeToEdgesOut.get(startNode);
-            if (!modifiedListOut.remove(edgeToBeRemoved)) System.out.println("Error");
+            if (!modifiedListOut.remove(edgeToBeRemoved)) System.out.println("Error to remove edge in modifiedList");
             nodeToEdgesOut.put(startNode, modifiedListOut);
         }
         nodeToEdgesIn.keySet().removeIf(entry -> entry == node);
@@ -259,6 +259,11 @@ public class drawableGraph {
             }
         }
         return allSinks;
+    }
+
+    @Override
+    public String toString() {
+        return (nodeList.size() + " Nodes " + "and " + edgeList.size()  + " Edges" );
     }
 
 }

@@ -9,16 +9,13 @@ of partitioning the vertex set of a graph into layers is known as the layering p
 layer assignment problem
  */
 
-import com.sun.corba.se.impl.orbutil.graph.Graph;
-
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
 public class AssignLayer {
     private LinkedHashMap<Integer, LinkedList<GraphNode>> layering = new LinkedHashMap<>();
-    private LinkedHashMap<GraphNode, Integer> NodeToRank = new LinkedHashMap<>();
+    private LinkedHashMap<GraphNode, Integer> nodeToRank = new LinkedHashMap<>();
 
 //    right now not working
     public static void longestPath(drawableGraph g) {
@@ -28,15 +25,15 @@ public class AssignLayer {
 
         drawableGraph copyG = g.copy(g);
 
-        while (U != g.getNodes()) {
+        while (U != g.getNodeSet()) {
             /* A new vertex v to be assigned to the current layer is picked among the vertices which have not been
                i.e. v ∈ V \ U, and which have all their immediate successors already assigned to the layers below the
                current one, i.e. N+G (v) ⊆ Z          */
 
-            copyG.getNodes().removeAll(U);
+            copyG.getNodeSet().removeAll(U);
 
             GraphNode selectedNode = null;
-            for (GraphNode v: copyG.getNodes()) {
+            for (GraphNode v: copyG.getNodeSet()) {
 
             }
 
@@ -56,19 +53,20 @@ public class AssignLayer {
     public static void topologicalPath(drawableGraph g) {
         int level = 1;
         drawableGraph copyG = g.copy(g);
-//        LinkedList<GraphNode> sorted = new LinkedList<>();
         LinkedHashMap<Integer, LinkedList<GraphNode>> sorted = new LinkedHashMap<>();
-        LinkedHashSet<Edge> origGraphEdges = g.getEdgeList();  // const edges = this._graph.edges
-        LinkedHashSet<GraphNode> origGraphNodes = g.getNodes();  //  const vertices = this._graph.vertices.toArray()
+//        LinkedHashSet<Edge> origGraphEdges = g.getEdgeList();  // const edges = this._graph.edges
+//        LinkedHashSet<GraphNode> origGraphNodes = g.getNodeSet();  //  const vertices = this._graph.vertices.toArray()
         LinkedList<GraphNode> sinks = copyG.getAllSinks();
         System.out.println("sinks before first whileLoop = " + sinks);
-        while (sinks != null) {
+        while (sinks.size() > 0) {
             sorted.put(level, sinks);
+            System.out.println("sorted = " + sorted);
             sinks.forEach(copyG::removeIngoingEdges);
+
             sinks = copyG.getAllSinks();
             System.out.println("sinks remaining = " + sinks);
             level += 1;
-            System.exit(1);
+            if (level == g.getNodeSet().size()) System.out.println("Way to many levels..");
         }
         System.out.println("sorted = " + sorted);
     }
@@ -79,7 +77,7 @@ public class AssignLayer {
         return layering.get(level);
     }
     private Integer getRank(GraphNode node) {
-        return NodeToRank.get(node);
+        return nodeToRank.get(node);
     }
     private Integer getSpanOf(Edge edge) {
         GraphNode u = (GraphNode) edge.start;

@@ -7,13 +7,15 @@ public class NaiveDraw {
 
     public static GraphMLGraph processGraph(GraphMLGraph theGraph) throws Exception {
         String selectedEdgeType = GUIController.getInstance().getSelectedEdgeType();
-        drawableGraph drawableGraph = new drawableGraph(theGraph,selectedEdgeType);
+        drawableGraph drawGraph = new drawableGraph(theGraph,selectedEdgeType);
+        System.out.println("drawGraph got " + drawGraph);
 
 //      1. Remove all Cycles
-        CycleBreaker.GreedyCycleRemoval(drawableGraph);
+        CycleBreaker.GreedyCycleRemoval(drawGraph);
+        System.out.println("drawGraph got " + drawGraph);
 
 //      2.  Layer Assignment: Vertices are assigned to layers.
-        AssignLayer.topologicalPath(drawableGraph);
+//        AssignLayer.topologicalPath(drawGraph);
 
 
       return theGraph;

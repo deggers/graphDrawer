@@ -18,7 +18,7 @@ public class CycleBreaker {
 
     // TODO: 07.06.2018 : Add Constructor which build drawableGraph from listOfEdges
 
-    public static void GreedyCycleRemoval(drawableGraph g){
+    public static drawableGraph GreedyCycleRemoval(drawableGraph g){
 /*        The first polynomial-time algorithm for solving the minimum FAS problem with an approximation
           ratio less than 2 in the worst case */
 
@@ -27,7 +27,7 @@ public class CycleBreaker {
         LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToOutgoingEdges = copyG.getHashmap_nodeToOutgoingEdges();
         LinkedHashSet<Edge> safeEdges = new LinkedHashSet<>();
 
-        while (!copyG.getNodes().isEmpty()){
+        while (!copyG.getNodeSet().isEmpty()){
             while (copyG.getSink() != null) {
                 GraphNode sink = copyG.getSink();
                 System.out.println("sink = " + sink);
@@ -46,7 +46,7 @@ public class CycleBreaker {
                 copyG.justRemoveNode(source);
                 copyG.removeOutgoingEdges(source); }
 
-            if (!copyG.getNodes().isEmpty()){
+            if (!copyG.getNodeSet().isEmpty()){
                 GraphNode v = copyG.getNodeWithMaxDiffDegree();
                 LinkedList<Edge> edgeSetOfV = nodeToOutgoingEdges.get(v);
                 safeEdges.addAll(edgeSetOfV);
@@ -54,25 +54,23 @@ public class CycleBreaker {
                 copyG.removeOutgoingEdges(v);
                 copyG.removeIngoingEdges(v); }
         }
-        for (GraphNode node : copyG.getNodes()) {
-            System.out.println("node = " + node);
-        }
 
-        for (Edge edge : copyG.getEdgeList()) {
-            System.out.println("edge = " + edge);
-        }
+        if  (copyG.getNodeSet().size() >0 || copyG.getEdgeList().size() > 0) System.out.println("something wrong in Greedy Cycle Removal - got left Nodes or Edges");
 
-        System.out.println("Heuristik FAS = " + safeEdges);
+        // return cycleFreeGraph :)
+return null;
+
+
     }
 
 
     public static void DFS_Florian(drawableGraph g) {
         //Tiefensuche um Zyklen zu entfernen
         HashMap<String, GraphNode> namesMap = new HashMap<>();
-        for (GraphNode graphNode : g.getNodes()) {
+        for (GraphNode graphNode : g.getNodeSet()) {
             namesMap.put(graphNode.label, graphNode);
         }
-        for (GraphNode startNode : g.getNodes()) {
+        for (GraphNode startNode : g.getNodeSet()) {
             if (startNode.getDfsStatus() == 'u') {
                 dfsRec(startNode);
             }
