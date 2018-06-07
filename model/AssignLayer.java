@@ -11,6 +11,7 @@ layer assignment problem
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
 public class AssignLayer {
@@ -19,42 +20,56 @@ public class AssignLayer {
 
 //    right now not working
     public static void longestPath(drawableGraph g) {
-        HashSet<GraphNode> U = new HashSet<>(); // set of already assigned to a layer
-        HashSet<GraphNode> Z = new HashSet<>(); // set of all vertices assigned to a layer below the currnent
+        final boolean optionalCheck = true;
+        
+        LinkedHashSet<GraphNode> U = new LinkedHashSet<>(); // set of nodes that will get a layer in this step
+        LinkedHashSet<GraphNode> Z = new LinkedHashSet<>(); // set of all parents of nodes in U
         int currentLayer = 1;
-
-        drawableGraph copyG = g.copy(g);
-
-        while (U != g.getNodeSet()) {
-            /* A new vertex v to be assigned to the current layer is picked among the vertices which have not been
-               i.e. v ∈ V \ U, and which have all their immediate successors already assigned to the layers below the
-               current one, i.e. N+G (v) ⊆ Z          */
-
-            copyG.getNodeSet().removeAll(U);
-
-            GraphNode selectedNode = null;
-            for (GraphNode v: copyG.getNodeSet()) {
-
+        drawableGraph layeredGraph = g.copy(g);
+        layeredGraph.deleteIsolatedNodes(); //hope this works
+        // nodes without a layer have layer set to -1 by default now (any number that can't be a proper layer is ok)
+        U = new LinkedHashSet<>(layeredGraph.getAllSinks()); // start U with all the sinks in the graph
+        while (!U.isEmpty()) {            
+            for (GraphNode node : U) {
+                node.setLayer(currentLayer); // set all nodes in U to currentLayer
+                Z.addAll(node.getParents()); // compute the union of all parents of nodes in U
             }
-
-            if (selectedNode == null) {
-                currentLayer += 1;
-                Z.addAll(U);
+            U.clear(); // clear U to compute all nodes that can get a layer in the next step
+            for (GraphNode graphNode : Z) {
+                boolean hasNoUnlayeredChildren = true;
+                for (GraphNode gn : graphNode.getChildren()) {
+                    if (gn.getLayer()<0/*depends on default value for unlayered nodes*/) {
+                        hasNoUnlayeredChildren = false;
+                    }
+                }
+                if (hasNoUnlayeredChildren) {
+                    U.add(graphNode); // add all nodes to U, for which all children have a proper layer assigned
+                }
             }
-
-
-
-
-            System.exit(1);
+            currentLayer++; // repeat with next layer, as long as there are nodes that can be assigned a layer 
         }
+        //all nodes should be layered now, optional check
+        if (optionalCheck) {
+            for (GraphNode graphNode : layeredGraph.copyNodeSet()) {
+                if (graphNode.getLayer()<0) {
+                    //if any node is not properly labeled, throw something
+                    throw new Error("LongestPath Layering produced an error, as some nodes in the graph remained unlayered. Check for correctness, solitary nodes or disable this check!");
+                }
+            }
+            // nothing threw, so everythings fine
+        }
+        //one should potentially turn the layering around now, so that the upmost node is at level 0 or 1 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //time to add dummy nodes
+        layeredGraph.addDummies();
+        g = layeredGraph; // copy layered graph to g (necessary)
     }
 
-//    right now not working
+
     public static void topologicalPath(drawableGraph g) {
         int level = 1;
-        System.out.println("got following edges: " + g.getEdgeSet());
+        System.out.println("got following edges: " + g.copyEdgeSet());
         drawableGraph copyG = g.copy(g);
-        System.out.println("got copied    edges: " + copyG.getEdgeSet());
+        System.out.println("got copied    edges: " + copyG.copyEdgeSet());
         LinkedHashMap<Integer, LinkedList<GraphNode>> sorted = new LinkedHashMap<>();
         LinkedList<GraphNode> sinks = copyG.getAllSinks();
 
@@ -65,13 +80,13 @@ public class AssignLayer {
             sinks.forEach(copyG::removeIngoingEdges);
             sinks = copyG.getAllSinks();
             level += 1;
-            if (level == g.getNodeSet().size()) System.out.println("Way to many levels..");
+            if (level == g.copyNodeSet().size()) System.out.println("Way to many levels..");
         }
         System.out.println("sorted = " + sorted);
     }
 
 //  All the HELPER-Functions
-
+    
     private LinkedList<GraphNode> getNodesFromLevel(Integer level) {
         return layering.get(level);
     }
@@ -84,7 +99,7 @@ public class AssignLayer {
         return getRank(u) - getRank(v);
     }
     private Edge getLongEdge(drawableGraph g) {
-        for (Edge edge : g.getEdgeList()) {
+        for (Edge edge : g.copyEdgeSet()) {
             if (getSpanOf(edge) > 1) {
                 return edge;
             }

@@ -26,7 +26,7 @@ public class CycleBreaker {
         LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToEdgeOut = copyG.getHashmap_nodeToEdgeOut();
         LinkedHashSet<Edge> safeEdges = new LinkedHashSet<>();
 
-        while (!copyG.getNodeSet().isEmpty()){
+        while (!copyG.copyNodeSet().isEmpty()){
             while (copyG.getSink() != null) {
                 GraphNode sink = copyG.getSink();
                 safeEdges.addAll(nodeToEdgeIn.get(sink));
@@ -43,7 +43,7 @@ public class CycleBreaker {
                 copyG.justRemoveNode(source);
                 copyG.removeOutgoingEdges(source); }
 
-            if (!copyG.getNodeSet().isEmpty()){
+            if (!copyG.copyNodeSet().isEmpty()){
                 GraphNode v = copyG.getNodeWithMaxDiffDegree();
                 LinkedList<Edge> edgeSetOfV = nodeToEdgeOut.get(v);
                 safeEdges.addAll(edgeSetOfV);
@@ -51,7 +51,7 @@ public class CycleBreaker {
                 copyG.removeOutgoingEdges(v);
                 copyG.removeIngoingEdges(v); }
         }
-        if  (copyG.getNodeSet().size() >0 || copyG.getEdgeList().size() > 0) System.out.println("something wrong in Greedy Cycle Removal - got left Nodes or Edges");
+        if  (copyG.copyNodeSet().size() >0 || copyG.copyEdgeSet().size() > 0) System.out.println("something wrong in Greedy Cycle Removal - got left Nodes or Edges");
         return g;
     }
 
@@ -59,10 +59,10 @@ public class CycleBreaker {
     public static void DFS_Florian(drawableGraph g) {
         //Tiefensuche um Zyklen zu entfernen
         HashMap<String, GraphNode> namesMap = new HashMap<>();
-        for (GraphNode graphNode : g.getNodeSet()) {
+        for (GraphNode graphNode : g.copyNodeSet()) {
             namesMap.put(graphNode.label, graphNode);
         }
-        for (GraphNode startNode : g.getNodeSet()) {
+        for (GraphNode startNode : g.copyNodeSet()) {
             if (startNode.getDfsStatus() == 'u') {
                 dfsRec(startNode);
             }

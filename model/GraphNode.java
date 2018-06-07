@@ -10,6 +10,7 @@ public class GraphNode extends AbstractNode {
     private LinkedHashSet<GraphNode> children = new LinkedHashSet<>();
     private LinkedHashSet<GraphNode> parents = new LinkedHashSet<>();
     private boolean dummyNode = false;
+    private int layer = -1;
 
     private char dfsStatus = 'u'; //unvisited, visited, final
     char getDfsStatus() {
@@ -45,6 +46,21 @@ public class GraphNode extends AbstractNode {
         return new LinkedList<>(parents);
     }
 
+    public int getLayer() {
+        return layer;
+    }
+
+    public void setLayer(int layer) {
+        this.layer = layer;
+    }
+    
+    int indegree(){
+        return parents.size();
+    }
+    
+    int outdegree(){
+        return children.size();
+    }
 
     @Override
     public boolean isLeaf() {
