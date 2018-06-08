@@ -19,13 +19,24 @@ public class CycleBreaker {
     public static void GreedyCycleRemoval(drawableGraph g){
 /*        The first polynomial-time algorithm for solving the minimum FAS problem with an approximation
           ratio less than 2 in the worst case */
+        boolean debug = true;
         drawableGraph copyG = g.copy(g);
         LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToEdgeIn = copyG.getHashmap_nodeToEdgeIn();
         LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToEdgeOut = copyG.getHashmap_nodeToEdgeOut();
         LinkedHashSet<Edge> safeEdges = new LinkedHashSet<>();
 
+        if (debug) {
+            if (g.getNodeSet().size() != copyG.getNodeSet().size() || g.getEdgeSet().size() != copyG.getEdgeSet().size()){
+                System.out.println("g.getEdgeSet()     = " + g.getEdgeSet());
+                System.out.println("copyG.getEdgeSet() = " + copyG.getEdgeSet());
+                System.out.println("g.getNodeSet()     = " + g.getNodeSet());
+                System.out.println("copyG.getNodeSet   = " + copyG.getNodeSet());
+            }
+        }
+
         while (!copyG.copyNodeSet().isEmpty()){
             while (copyG.getSink() != null) {
+//                System.out.println("found sink!");
                 GraphNode sink = copyG.getSink();
                 safeEdges.addAll(nodeToEdgeIn.get(sink));
                 copyG.justRemoveNode(sink);
@@ -34,6 +45,7 @@ public class CycleBreaker {
             copyG.getIsolatedNodes().forEach(copyG::justRemoveNode);
 
             while (copyG.getSource() != null){
+//                System.out.println("found source!");
                 GraphNode source = copyG.getSource();
                 LinkedList<Edge> edgeSetOfV = nodeToEdgeOut.get(source);
                 safeEdges.addAll(edgeSetOfV);
@@ -49,6 +61,25 @@ public class CycleBreaker {
                 copyG.removeIngoingEdges(v); }
         }
         if  (copyG.copyNodeSet().size() >0 || copyG.copyEdgeSet().size() > 0) System.out.println("something wrong in Greedy Cycle Removal - got left Nodes or Edges");
+
+//        LinkedList<Edge> edgesToBeRemoved = new LinkedList<>();
+//        for (Edge edge_orig: g.getEdgeSet()){
+//            boolean status = false;
+//            for (Edge edge: safeEdges){
+//                if (edge_orig.equals(edge)){
+//                    status = true;
+//                }
+//            }
+//            if (!status){
+//                edgesToBeRemoved.add(edge_orig);
+//            }
+//        }
+//        System.out.println("edgesToBeRemoved = " + edgesToBeRemoved);
+
+        LinkedList<Edge> edgesToBeRemoved = new LinkedList<>(g.getEdgeSet());
+        edgesToBeRemoved.removeAll(safeEdges);
+        System.out.println("Edges to be removed: " + edgesToBeRemoved);
+        
     }
     public static void DFS_Florian(drawableGraph g) {
         //Tiefensuche um Zyklen zu entfernen
@@ -62,6 +93,7 @@ public class CycleBreaker {
             }
         }
         // i hope my lambdaExpression is fine :)
+        if (verbose) turnedEdges.forEach(System.out::println);
         turnedEdges.forEach(g::reverseEdge);
     }
     private static void dfsRec(GraphNode node) {
@@ -69,8 +101,8 @@ public class CycleBreaker {
             node.setDfsStatus('f');
         } else {
             node.setDfsStatus('v');
-            if (verbose == true) {
-                System.out.printf("Current Node: %s \n\t\twith children: %s \n",node.getLabel() ,node.childrenLabels().toString());
+            if (verbose) {
+//                System.out.printf("Current Node: %s \n\t\twith children: %s \n",node.getLabel() ,node.childrenLabels().toString());
             }
             for (Iterator<GraphNode> it = node.getChildren().iterator(); it.hasNext();) {
                 GraphNode graphNode = it.next();
@@ -95,6 +127,9 @@ public class CycleBreaker {
         }
 
     }
+
+
+
 }
 
 
