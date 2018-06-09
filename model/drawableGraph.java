@@ -185,7 +185,7 @@ public class drawableGraph {
         removeMe.getChildren().forEach(child -> child.removeParent(removeMe));
         removeMe.getParents().forEach(parent -> parent.removeChild(removeMe));
         this.nodeSet.remove(removeMe); }
-    private int getOutdegree    (GraphNode node) {
+    public int getOutdegree    (GraphNode node) {
         int size = 0;
         if (nodeToEdgesOut.containsKey(node))
         {
@@ -196,7 +196,7 @@ public class drawableGraph {
         }
         return size;
     }
-    private int getIndegree     (GraphNode node) {
+    public int getIndegree     (GraphNode node) {
         int size = 0;
         if (nodeToEdgesIn.containsKey(node))
         {

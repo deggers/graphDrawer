@@ -16,6 +16,25 @@ public class CycleBreaker {
     private static HashSet<Edge> turnedEdges = new LinkedHashSet<>(); //in their original form
 
 
+    public static void Berger_Shor(drawableGraph g){
+        drawableGraph copyG = g.copy(g);
+        LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToEdgeIn = copyG.getHashmap_nodeToEdgeIn();
+        LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToEdgeOut = copyG.getHashmap_nodeToEdgeOut();
+        LinkedHashSet<Edge> safeEdges = new LinkedHashSet<>();
+        for (GraphNode node: copyG.getNodeSet()){
+            if (copyG.getOutdegree(node) >= copyG.getIndegree(node)){
+                safeEdges.addAll(nodeToEdgeOut.get(node));
+            }
+            else {
+                safeEdges.addAll(nodeToEdgeIn.get(node));
+            }
+        }
+        LinkedList<Edge> edgesToBeRemoved = new LinkedList<>(g.getEdgeSet());
+        edgesToBeRemoved.removeAll(safeEdges);
+        System.out.println("Edges to be removed: " + edgesToBeRemoved);
+    }
+
+
     public static void GreedyCycleRemoval(drawableGraph g){
 /*        The first polynomial-time algorithm for solving the minimum FAS problem with an approximation
           ratio less than 2 in the worst case */
@@ -24,6 +43,7 @@ public class CycleBreaker {
         LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToEdgeIn = copyG.getHashmap_nodeToEdgeIn();
         LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToEdgeOut = copyG.getHashmap_nodeToEdgeOut();
         LinkedHashSet<Edge> safeEdges = new LinkedHashSet<>();
+
 
         if (debug) {
             if (g.getNodeSet().size() != copyG.getNodeSet().size() || g.getEdgeSet().size() != copyG.getEdgeSet().size()){
