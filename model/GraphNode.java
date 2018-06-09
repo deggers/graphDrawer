@@ -10,31 +10,37 @@ public class GraphNode extends AbstractNode {
     private LinkedHashSet<GraphNode> parents = new LinkedHashSet<>();
     private boolean dummyNode = false;
     private int layer = -1;
-    private static int uniqueGraphNodeCounter = 0;
     private int uniqueGraphNodeId;
-
     private char dfsStatus = 'u'; //unvisited, visited, final
 
-
-    GraphNode(String label) {
+    GraphNode(int uniqueGraphNodeId, String label, String type, boolean isDummyNode) {
         super(label);
-        this.uniqueGraphNodeId = setNodeId();
-        GraphMLType = null;
-    }
-
-    GraphNode(String label, String type, boolean isDummyNode) {
-        super(label);
-        this.uniqueGraphNodeId = setNodeId();
+        this.uniqueGraphNodeId = uniqueGraphNodeId;
         this.GraphMLType = type;
         this.dummyNode = isDummyNode;
     }
 
-    GraphNode(String label, String type, boolean isDummy, int layer) {
+    GraphNode(int uniqueGraphNodeId, String label, String type) {
         super(label);
-        this.uniqueGraphNodeId = setNodeId();
+        this.uniqueGraphNodeId = uniqueGraphNodeId;
+        this.GraphMLType = type;
+    }
+
+    GraphNode(int uniqueGraphNodeId, String label, String type, boolean isDummy, int layer) {
+        super(label);
+        this.uniqueGraphNodeId = uniqueGraphNodeId;
         this.GraphMLType = type;
         this.dummyNode = isDummy;
         this.layer = layer;
+    }
+
+    GraphNode(int id, String label) {
+        super(label);
+        this.uniqueGraphNodeId = id;
+    }
+
+    int getID() {
+        return this.uniqueGraphNodeId;
     }
 
      char getDfsStatus() {
@@ -81,12 +87,6 @@ public class GraphNode extends AbstractNode {
         return children.size();
     }
 
-    private int setNodeId()
-    {
-        uniqueGraphNodeCounter++;
-        return uniqueGraphNodeCounter;
-    }
-
     @Override
     public boolean isLeaf() {
         return children.isEmpty();
@@ -105,7 +105,7 @@ public class GraphNode extends AbstractNode {
     public String toString() {
 //        return String.format("label: %s parents: %s children: %s \n", label,parentLabels(),childrenLabels());
 //        return String.format("%s,level:%s", label, layer);
-        return String.format("'%s'", label);
+        return String.format("'s'", label);
     }
 
     List<String> parentLabels() {

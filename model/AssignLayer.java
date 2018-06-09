@@ -19,6 +19,7 @@ import static model.drawableGraph.setLayering;
 public class AssignLayer {
     private LinkedHashMap<Integer, LinkedList<GraphNode>> layering = new LinkedHashMap<>();
     private LinkedHashMap<GraphNode, Integer> nodeToRank = new LinkedHashMap<>();
+    static int dummyCounter = 0;
 
     //    right now not working
     public static void longestPath(drawableGraph g) {
@@ -121,7 +122,8 @@ public class AssignLayer {
 
                 LinkedList<GraphNode> block = new LinkedList<>();
                 for (int i = startLevel; i <= endLevel; i++) {
-                    GraphNode dummyNode = new GraphNode("Dummy", "Dummy", true, i);
+
+                    GraphNode dummyNode = new GraphNode(dummyCounter++,"Dummy", "Dummy", true, i);
                     block.add(dummyNode);
                     g.getNodeSet().add(dummyNode);
                 }

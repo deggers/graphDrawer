@@ -14,10 +14,12 @@ public class Edge {
     String edgeType;
     Double weight;
 
-    public Edge() {
+    Edge() {
+        edgeIdCounter++;
+        this.uniqueEdgeId = edgeIdCounter;
     }
 
-    public Edge(Object u, Object v) {
+    Edge(Object u, Object v) {
         this.start = u;
         this.target = v;
 
@@ -35,7 +37,7 @@ public class Edge {
 
     @Override
     public String toString() {
-        return "id:" + this.uniqueEdgeId + " | " + this.start + " to " + this.target + " type: " + edgeType + " ";
+        return "\n EdgeId:" + this.uniqueEdgeId + " | " + this.start + " to " + this.target + " | EdgeType: " + edgeType;
     }
 
     @Override

@@ -27,14 +27,14 @@ public class HelperTypes {
             this.uniqueNodeId = counter;
         }
 
-        public TreeNode toTreeNode(){
+        TreeNode toTreeNode(){
             TreeNode node = new TreeNode(label);
             node.GraphMLType = GraphMLType;
             return node;
         }
         
-        public GraphNode toGraphNode(){
-            return new GraphNode(label, GraphMLType, false);
+        GraphNode toGraphNode(){
+            return new GraphNode(uniqueNodeId, label, GraphMLType, false);
         }
 
         public String getLabel() {
@@ -47,7 +47,7 @@ public class HelperTypes {
 
         @Override
         public String toString() {
-            return "id:" + uniqueNodeId + " " + this.label;
+            return "ProtoID:" + uniqueNodeId + " " + this.label;
         }
 
         @Override

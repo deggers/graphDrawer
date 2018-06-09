@@ -25,6 +25,7 @@ public class Main extends Application {
         guiController.init();
     }
 
+
     public static void main(String[] args) {
         String username = System.getProperty("user.name");
 

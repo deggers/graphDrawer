@@ -9,10 +9,7 @@ import javax.xml.stream.events.*;
 import java.io.File;
 import java.io.FileReader;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 public class GraphMLParser {
 
@@ -23,13 +20,11 @@ public class GraphMLParser {
         long stopTime;
         GraphMLGraph graph = null;
         ProtoNode node = null;
-        Edge edge = null;
-        int uniqueNodeId = 0;
-
+        Edge edge = null;;
 
         // Speichern von Knoten, Kanten und Map<Name, Knoten> zum einfachen auffinden
-        ArrayList<ProtoNode> nodes = new ArrayList<>();
-        ArrayList<Edge> edges = new ArrayList<>(); //brauche Edge-Klasse
+        HashSet<ProtoNode> nodes = new HashSet<>();
+        HashSet<Edge> edges = new HashSet<>(); //brauche Edge-Klasse
         HashMap<String, ProtoNode> nodesMap = new HashMap<>();
 
         try {
@@ -225,14 +220,12 @@ public class GraphMLParser {
             return graph;
         } catch (
                 NoSuchElementException e)
-
         {
 //            e.printStackTrace();
             System.out.println("no such element");
             return null;
         } catch (
                 Exception e)
-
         {
             //e.printStackTrace();
             System.out.println("some mistake in GraphML: " + e);

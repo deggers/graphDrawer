@@ -6,8 +6,8 @@ import java.util.*;
 
 //@formatter:off
 public class drawableGraph {
-    private LinkedHashSet<GraphNode>        nodeSet            = new LinkedHashSet<>();
-    private LinkedHashSet<Edge>             edgeSet            = new LinkedHashSet<>();
+    private LinkedHashSet<GraphNode>        GraphNodeSet             = new LinkedHashSet<>();
+    private LinkedHashSet<Edge>             GraphNodeEdgeSet         = new LinkedHashSet<>();
     private LinkedHashMap<GraphNode,LinkedList<Edge>> nodeToEdgesOut = new LinkedHashMap<>();
     private LinkedHashMap<GraphNode,LinkedList<Edge>> nodeToEdgesIn  = new LinkedHashMap<>();
 
@@ -18,163 +18,124 @@ public class drawableGraph {
         return nodeToEdgesIn;
     }
 
-    public drawableGraph(GraphMLGraph graph, String edgeType) throws Exception { //sollte einziger Konstruktor bleiben
-        Set<ProtoNode> relevantNodes = new LinkedHashSet<>();
-        //relavante Nodes Erzeugen und Adjazenzinformationen aus Edges extrahieren.
-        if (!graph.getEdgeTypes().contains(new HelperTypes.EdgeType(edgeType))) {
+    public  drawableGraph(GraphMLGraph graph, String edgeType) throws Exception {
+
+        if (!graph.getEdgeTypes().contains(new HelperTypes.EdgeType(edgeType)))
             throw new Exception("Chosen EdgeType: " + edgeType + " not in Graphs EdgeTypeList");
-        }
 
         Set<Edge> relevantEdges = new LinkedHashSet<>(graph.getEdgesOfType(edgeType));
         for (Edge e : relevantEdges) {
-            System.out.println("e relevant = " + e);
-            relevantNodes.add((ProtoNode) e.start);
-            relevantNodes.add ((ProtoNode) e.target);
+
+            // generate ProtoNodes from the Edge
+            ProtoNode ProtoNodeStart = (ProtoNode) e.start;
+            ProtoNode ProtoNodeTarget = (ProtoNode) e.target;
+
+            // migrate to ProtoNode to GraphNode
+            GraphNode GraphNodeStart = ProtoNodeStart.toGraphNode();
+            GraphNode GraphNodeTarget = ProtoNodeTarget.toGraphNode();
+
+            // update for EdgeOut
+            GraphNodeStart.addChild(GraphNodeTarget);
+            addEdgeOutToHashmap(GraphNodeStart, e);
+
+            // update for EdgeIn
+            GraphNodeTarget.addParent(GraphNodeStart);
+            addEdgeInToHashmap(GraphNodeTarget, e);
+
+            // Create new GraphNodes containing Edge and add to GraphNodeSet
+            Edge GraphNodeEdge = new Edge(GraphNodeStart, GraphNodeTarget);
+            GraphNodeEdgeSet.add(GraphNodeEdge);
         }
-
-        Map<String, GraphNode> nodesMap = new HashMap<>();
-        for (ProtoNode relevantNode : relevantNodes) {
-            GraphNode newGraphNode = relevantNode.toGraphNode();
-            nodeSet.add(newGraphNode);
-            nodesMap.put(newGraphNode.label, newGraphNode);
-        }
-        for (Edge relevantEdge : relevantEdges) {
-            ProtoNode startObject =(ProtoNode) relevantEdge.start;
-            String startString = startObject.getLabel();
-
-            ProtoNode targetObject = (ProtoNode) relevantEdge.target;
-            String targetString = targetObject.getLabel();
-
-            GraphNode start = nodesMap.get(startString);
-            GraphNode target = nodesMap.get(targetString);
-            start.addChild(target);
-            target.addParent(start);
-
-            Edge edgeToAdd = new Edge(start, target);
-            edgeSet.add(edgeToAdd);
-
-        } //alle Knoten initialisiert und Adjazenzinformationen in den Knoten;
     }
-
-    LinkedHashSet<GraphNode> copyNodeSet(){
-        return new LinkedHashSet<>(nodeSet); //returns a copy of the nodeSet
-    }
-    LinkedHashSet<Edge>      copyEdgeSet(){
-        return new LinkedHashSet<>(edgeSet); //returns a copy of the edgeSet
-    }
-    LinkedHashSet<Edge>             getEdgeSet() {
-        return edgeSet;
-    }
-    LinkedHashSet<GraphNode>        getNodeSet() {
-        return nodeSet;
-    }
-    public GraphNode                getNode(String id) {
-        for (GraphNode node : nodeSet) {
-            if (node.label.equals(id)) return node;
-        }
-        return null;
-    }
-//    public LinkedList<GraphNode>    getRoots(){
-//        LinkedList<GraphNode> returnlist = new LinkedList<>();
-//        for (GraphNode graphNode : nodeSet) {
-//            if (graphNode.isRoot()) {
-//                returnlist.add(graphNode);
-//            }
-//        }
-//        return returnlist;
-//    }
-//    public LinkedList<GraphNode>    getLeaves(){
-//        LinkedList<GraphNode> returnlist = new LinkedList<>();
-//        for (GraphNode graphNode : nodeSet) {
-//            if (graphNode.isLeaf()) {
-//                returnlist.add(graphNode);
-//            }
-//        }
-//        return returnlist;
-//    }
-
-
-
-//    added by dustyn
     private drawableGraph(LinkedHashSet<GraphNode> nodeSet, LinkedHashSet<Edge> edgeSet, LinkedHashMap<GraphNode,LinkedList<Edge>> nodeToEdgesIn, LinkedHashMap<GraphNode,LinkedList<Edge>> nodeToEdgesOut  ){
-        this.edgeSet = new LinkedHashSet<>(edgeSet);
-        this.nodeSet = new LinkedHashSet<>(nodeSet);
+        this.GraphNodeEdgeSet = new LinkedHashSet<>(edgeSet);
+        this.GraphNodeSet = new LinkedHashSet<>(nodeSet);
         this.nodeToEdgesIn = new LinkedHashMap<>(nodeToEdgesIn);
         this.nodeToEdgesOut = new LinkedHashMap<>(nodeToEdgesOut);
 }
-    drawableGraph           copy(drawableGraph graph) {
+
+    private void addEdgeInToHashmap(GraphNode graphNodeTarget, Edge e) {
+        LinkedList<Edge> edgeSetIn = new LinkedList<>();
+        if (nodeToEdgesIn.containsKey(graphNodeTarget)){
+            edgeSetIn.addAll(nodeToEdgesIn.get(graphNodeTarget));}
+            edgeSetIn.add(e);
+            nodeToEdgesIn.put(graphNodeTarget, edgeSetIn);
+    }
+    private void addEdgeOutToHashmap(GraphNode graphNodeStart, Edge e) {
+        LinkedList<Edge> edgeSetOut = new LinkedList<>();
+        if (nodeToEdgesOut.containsKey(graphNodeStart)){
+                edgeSetOut.addAll(nodeToEdgesOut.get(graphNodeStart));}
+            edgeSetOut.add(e);
+            nodeToEdgesOut.put(graphNodeStart, edgeSetOut);
+    }
+    drawableGraph copy(drawableGraph graph) {
         LinkedHashSet<GraphNode>    copyNodes   = new LinkedHashSet<>();
         LinkedHashSet<Edge>         copyEdges   = new LinkedHashSet<>();
-        LinkedList<Edge>            origEdges   = new LinkedList<>(graph.getEdgeSet());
+        LinkedList<Edge>            origEdges   = new LinkedList<>(graph.getGraphNodeEdges());
 
         LinkedHashMap<GraphNode,LinkedList<Edge>> nodeToEdgesIn = new LinkedHashMap<>();
         LinkedHashMap<GraphNode,LinkedList<Edge>> nodeToEdgesOut = new LinkedHashMap<>();
 
-        for (Edge e : origEdges) {
-            GraphNode u_orig = (GraphNode) e.start;
+        for (Edge e_orig : origEdges) {
+            GraphNode u_orig = (GraphNode) e_orig.start;
             String u_label = u_orig.getLabel();
             String u_type = u_orig.getType();
             Boolean u_dummy = u_orig.isDummyNode();
             Integer u_layer = u_orig.getLayer();
+            int u_ID = u_orig.getID();
 
-            GraphNode u_copy = new GraphNode(u_label,u_type,u_dummy,u_layer);
+            GraphNode u_copy = new GraphNode(u_ID, u_label,u_type,u_dummy,u_layer);
             copyNodes.add(u_copy);
 
-            GraphNode v_orig = (GraphNode) e.target;
+            GraphNode v_orig = (GraphNode) e_orig.target;
             String v_label = v_orig.getLabel();
             String v_type = v_orig.getType();
             Boolean v_dummy = v_orig.isDummyNode();
             Integer v_layer = v_orig.getLayer();
-            GraphNode v_copy = new GraphNode(v_label,v_type,v_dummy,v_layer);
+            int v_ID = v_orig.getID();
+
+            GraphNode v_copy = new GraphNode(v_ID, v_label,v_type,v_dummy,v_layer);
             copyNodes.add(v_copy);
 
-            copyEdges.add(new Edge(u_copy,v_copy));
+            Edge e_copy = new Edge(u_copy,v_copy);
+            copyEdges.add(e_copy);
+
+            // update Hashmap for EdgeOut
+            u_copy.addChild(v_copy);
+            addEdgeOutToHashmap(u_copy, e_copy);
+
+            // update Hashmap for EdgeIn
+            v_copy.addParent(u_copy);
+            addEdgeInToHashmap(v_copy, e_copy);
         }
-
-
-//        generate HashMaps
-        for (Edge e: copyEdges) {
-            GraphNode u = (GraphNode) e.start;
-            GraphNode v = (GraphNode) e.target;
-
-            LinkedList<Edge> edgeSetIn = new LinkedList<>();
-            if (nodeToEdgesIn.containsKey(v)){
-                edgeSetIn.addAll(nodeToEdgesIn.get(v));}
-            edgeSetIn.add(e);
-            nodeToEdgesIn.put(v, edgeSetIn);
-
-            LinkedList<Edge> edgeSetOut = new LinkedList<>();
-            if (nodeToEdgesOut.containsKey(u)){
-                edgeSetOut.addAll(nodeToEdgesOut.get(u));}
-            edgeSetOut.add(e);
-            nodeToEdgesOut.put(u, edgeSetOut);
-        }
-
         return new drawableGraph(copyNodes,copyEdges, nodeToEdgesIn,nodeToEdgesOut);
     }
 
-    LinkedList<GraphNode>   getIsolatedNodes(){
+    LinkedHashSet<GraphNode>    copyNodeSet(){
+        return new LinkedHashSet<>(GraphNodeSet); //returns a copy of the nodeSet
+    }
+    LinkedHashSet<Edge>         copyEdgeSet(){
+        return new LinkedHashSet<>(GraphNodeEdgeSet); //returns a copy of the edgeSet
+    }
+    private LinkedHashSet<Edge> getGraphNodeEdges() {
+        return GraphNodeEdgeSet;
+    }
+
+    LinkedList<GraphNode>       getIsolatedNodes(){
     LinkedList<GraphNode> isolatedNodes = new LinkedList<>();
-        for (GraphNode v: nodeSet) {
+        for (GraphNode v: GraphNodeSet) {
             if (getIndegree(v) == 0 && getOutdegree(v) == 0){
                 isolatedNodes.add(v);
             }
         }
         return isolatedNodes;
     }
-    void                    deleteIsolatedNodes(){
-        LinkedList<GraphNode> n = getIsolatedNodes();
-        System.out.printf("Found %d isolated nodes: %s\n",n.size(), n.toString());
-        for (GraphNode graphNode : n) {
-            justRemoveNode(graphNode);
-        }
-    }
-    GraphNode               getSink () {
-            for (GraphNode node : nodeSet)
+    GraphNode                   getSink () {
+            for (GraphNode node : GraphNodeSet)
                 if (getOutdegree(node) == 0 && getIndegree(node) > 0) return node;
             return null;}
-    GraphNode               getSource () {
-            for (GraphNode node : nodeSet)
+    GraphNode                   getSource () {
+            for (GraphNode node : GraphNodeSet)
                 if (getIndegree(node) == 0) return node;
             return null;}
 
@@ -182,8 +143,8 @@ public class drawableGraph {
         /* will only remove this node, and children/parents references, nothin else */
         removeMe.getChildren().forEach(child -> child.removeParent(removeMe));
         removeMe.getParents().forEach(parent -> parent.removeChild(removeMe));
-        this.nodeSet.remove(removeMe); }
-    public int getOutdegree    (GraphNode node) {
+        this.GraphNodeSet.remove(removeMe); }
+    int         getOutdegree    (GraphNode node) {
         int size = 0;
         if (nodeToEdgesOut.containsKey(node))
         {
@@ -194,7 +155,7 @@ public class drawableGraph {
         }
         return size;
     }
-    public int getIndegree     (GraphNode node) {
+    int         getIndegree     (GraphNode node) {
         int size = 0;
         if (nodeToEdgesIn.containsKey(node))
         {
@@ -207,14 +168,13 @@ public class drawableGraph {
     }
 
 
-//    void removeOutgoingEdges(GraphNode node) { }
-//@formatter:on
-
-
     void removeIngoingEdges(GraphNode node) {
-        edgeSet.removeAll(nodeToEdgesIn.get(node));
-        LinkedList<Edge> edgesToBeRemoved = new LinkedList<>(nodeToEdgesIn.get(node));
 
+        // remove from the GraphNodeEdgeSet
+        GraphNodeEdgeSet.removeAll(nodeToEdgesIn.get(node));
+
+        // update Hashmap
+        LinkedList<Edge> edgesToBeRemoved = new LinkedList<>(nodeToEdgesIn.get(node));
         for (Edge edgeToBeRemoved : edgesToBeRemoved) {
             GraphNode startNode = (GraphNode) edgeToBeRemoved.start;
             LinkedList<Edge> modifiedListOut = nodeToEdgesOut.get(startNode);
@@ -224,7 +184,10 @@ public class drawableGraph {
         nodeToEdgesIn.keySet().removeIf(entry -> entry == node);
     }
     void removeOutgoingEdges(GraphNode node) {
-        edgeSet.removeAll(nodeToEdgesOut.get(node));
+        // remove from GraphNodeEdgeSet
+        GraphNodeEdgeSet.removeAll(nodeToEdgesOut.get(node));
+
+        // update hashmap
         LinkedList<Edge> edgesToBeRemoved = new LinkedList<>(nodeToEdgesOut.get(node));
         for (Edge edgeToBeRemoved : edgesToBeRemoved) {
             GraphNode targetNode = (GraphNode) edgeToBeRemoved.target;
@@ -235,39 +198,46 @@ public class drawableGraph {
         nodeToEdgesOut.keySet().removeIf(entry -> entry == node);
     }
 
-    GraphNode   getNodeWithMaxDiffDegree() {
+    GraphNode               getNodeWithMaxDiffDegree() {
         int max = Integer.MIN_VALUE;
         GraphNode winnerNode = null;
-        for (GraphNode node : nodeSet) {
+        for (GraphNode node : GraphNodeSet) {
             if (getOutdegree(node) - getIndegree(node) > max) {
                 max = getOutdegree(node) - getIndegree(node);
                 winnerNode = node;
             }
         }
-//        System.out.println("max = " + max);
         return winnerNode;
     }
-    public GraphNode selectRandomNode() {
-        int size = nodeSet.size();
-        int item = new Random().nextInt(size); // In real life, the Random object should be rather more shared than this
-        int i = 0;
-        for (GraphNode obj : nodeSet) {
-            if (i == item)
-                return obj;
-            i++;
-        }
-        return null;
-    }
-    LinkedList<GraphNode> getAllSinks() {
+    LinkedList<GraphNode>   getAllSinks() {
         LinkedList<GraphNode> allSinks = new LinkedList<>();
-        for (GraphNode node : nodeSet) {
+        for (GraphNode node : GraphNodeSet) {
             if (getOutdegree(node) == 0 && getIndegree(node) >= 1) {
                 allSinks.add(node);
             }
         }
         return allSinks;
     }
-    boolean reverseEdge(Edge edge) {
+
+    void    addEdge     (Edge edge) {
+        this.GraphNodeEdgeSet.add(edge);
+    }
+    boolean deleteEdge  (Edge e) {
+        if (!GraphNodeEdgeSet.contains(e)) return false;
+        try {
+            GraphNode start = (GraphNode) e.start;
+            GraphNode target = (GraphNode) e.target;
+            start.removeChild(target);
+            target.removeParent(start);
+            GraphNodeEdgeSet.remove(e);
+            //does not update the hashsets nodeToIn/OutgoingEdges
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+    boolean reverseEdge (Edge edge) {
         GraphNode u = (GraphNode) edge.start;
         GraphNode v = (GraphNode) edge.target;
 
@@ -280,38 +250,43 @@ public class drawableGraph {
     }
 
 
-    void addEdge(Edge edge) {
-        this.edgeSet.add(edge);
-    }
-    boolean deleteEdge(Edge e){
-        if (!edgeSet.contains(e)) return false;
-        try {
-            GraphNode start = (GraphNode) e.start;
-            GraphNode target = (GraphNode) e.target;
-            start.removeChild(target);
-            target.removeParent(start);
-            edgeSet.remove(e);
-            //does not update the hashsets nodeToIn/OutgoingEdges
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return false;
-        }
-        return true;
-    }
-
     @Override
     public String toString() {
-        return (nodeSet.size() + " Nodes " + "and " + edgeSet.size()  + " Edges" );
+        return (GraphNodeSet.size() + " Nodes " + "and " + GraphNodeEdgeSet.size() + " Edges");
     }
 
-    static void setLayering(drawableGraph g, Integer layer, LinkedList<GraphNode> nodes) {
-        for (GraphNode nodeCopy : nodes) {
-            for (GraphNode nodeOrig : g.getNodeSet()) {
-                if (nodeCopy.getLabel().equals(nodeOrig.getLabel())) {
-                    nodeOrig.setLayer(layer);
-                }
-            }
+
+//////////////////////////
+//  not really needed area
+/////////////////////////
+
+        void                    deleteIsolatedNodes(){
+        LinkedList<GraphNode> n = getIsolatedNodes();
+        System.out.printf("Found %d isolated nodes: %s\n",n.size(), n.toString());
+        for (GraphNode graphNode : n) {
+            justRemoveNode(graphNode);
         }
     }
+
+
+    public GraphNode selectRandomNode() {
+        int size = GraphNodeSet.size();
+        int item = new Random().nextInt(size); // In real life, the Random object should be rather more shared than this
+        int i = 0;
+        for (GraphNode obj : GraphNodeSet) {
+            if (i == item)
+                return obj;
+            i++;
+        }
+        return null;
+    }
+
+    public GraphNode getNode(String id) {
+        for (GraphNode node : GraphNodeSet) {
+            if (node.label.equals(id)) return node;
+        }
+        return null;
+    }
+
 
 }

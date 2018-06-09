@@ -12,21 +12,11 @@ public class GraphMLGraph {
     private LinkedHashSet<String> visitedNodesForExtractSubtreeSet = null;
     private HashSet<Edge> temporaryEdgeSubset = null;
 
-    public boolean addEdgeType(String id, String attrType) {
-        EdgeType et = new EdgeType(id, attrType);
-        if (!edgeTypeList.contains(et)) {
-            edgeTypeList.add(et);
-            return true;
-        } else {
-            System.out.println("EdgeType " + et + " already in list");
-            return false;
-        }
-    }
+    // constructorless
 
     public ArrayList<EdgeType> getEdgeTypes() {
         return new ArrayList<>(edgeTypeList);
     }
-
     public List<String> getPossibleRootLabels(String edgeType) {
         List<String> possibleRoots = new LinkedList<>();
         boolean bTest;
@@ -46,15 +36,14 @@ public class GraphMLGraph {
         possibleRoots.sort(null);
         return possibleRoots;//.size() > 0 ? possibleRoots : null;
     }
-
-    void addAllNodes(ArrayList<ProtoNode> nodes) {
-        nodeList.addAll(nodes);
+    void addEdgeType(String id, String attrType) {
+        EdgeType et = new EdgeType(id, attrType);
+        if (!edgeTypeList.contains(et)) {
+            edgeTypeList.add(et);
+        } else {
+            System.out.println("got that already! " + attrType);
+        }
     }
-
-    void addAllEdges(ArrayList<Edge> edges) {
-        edgeList.addAll(edges);
-    }
-
     public Tree extractSubtreeFromProtoNode(ProtoNode root, String edgeType) { //setzt mit hilfe der Edge Liste und des gewählten Edge Types -> Parent und children für alle Noten, überschreibt bestehende Infos, damit konsekutive Auswahlen nicht interferieren
         if (root == null) {
             return null;
@@ -85,7 +74,6 @@ public class GraphMLGraph {
         visitedNodesForExtractSubtreeSet = null;
         return new Tree(rootnode);
     }
-
     private void extractSubtreeFromRootRecursion(TreeNode node) {
 //        System.out.println("recursion at node:" + node);
         node.resetChildren();
@@ -102,7 +90,33 @@ public class GraphMLGraph {
             }
         }
     }
-
+    private List<Edge> getEdgesOutWithType(ProtoNode node, String edgeType) {
+        List<Edge> outgoingEdges = new LinkedList<>();
+        for (Edge e : edgeList) {
+            if (e.start.equals(node) && e.edgeType.equals(edgeType)) {
+                outgoingEdges.add(e);
+            }
+        }
+        return outgoingEdges;
+    }
+    private List<Edge> getEdgesIn(ProtoNode node) {
+        List<Edge> incomingEdges = new LinkedList<>();
+        for (Edge e : edgeList) {
+            if (e.target.equals(node)) {
+                incomingEdges.add(e);
+            }
+        }
+        return incomingEdges;
+    }
+    private List<Edge> getEdgesInWithType(ProtoNode node, String edgeType) {
+        List<Edge> incomingEdges = new LinkedList<>();
+        for (Edge e : edgeList) {
+            if (e.target.equals(node) && e.edgeType.equals(edgeType)) {
+                incomingEdges.add(e);
+            }
+        }
+        return incomingEdges;
+    }
     public List<ProtoNode> getRoots() {
         List<ProtoNode> roots = new LinkedList<>();
         for (ProtoNode node : nodeList) {
@@ -113,7 +127,6 @@ public class GraphMLGraph {
         }
         return roots;
     }
-
     public ProtoNode labelToProtoNode(String label) {
         // here we need to stripOf the (#TreeDepth)
         label = label.split(" \\(")[0];
@@ -126,14 +139,17 @@ public class GraphMLGraph {
 
         return null;
     }
-
-
     public List<ProtoNode> listAllNodes() {
         //System.out.println("List of all nodes returned");
         return new LinkedList<>(nodeList);
     }
-
-    public List<Edge> getEdgesOut(ProtoNode node) {
+    void addAllNodes(HashSet<ProtoNode> nodes) {
+        nodeList.addAll(nodes);
+    }
+    void addAllEdges(HashSet<Edge> edges) {
+        edgeList.addAll(edges);
+    }
+    List<Edge> getEdgesOut(ProtoNode node) {
         List<Edge> outgoingEdges = new LinkedList<>();
         for (Edge e : edgeList) {
             if (e.start.equals(node)) {
@@ -143,47 +159,15 @@ public class GraphMLGraph {
         return outgoingEdges;
     }
 
-    public List<Edge> getEdgesOutWithType(ProtoNode node, String edgeType) {
-        List<Edge> outgoingEdges = new LinkedList<>();
-        for (Edge e : edgeList) {
-            if (e.start.equals(node) && e.edgeType.equals(edgeType)) {
-                outgoingEdges.add(e);
-            }
-        }
-        return outgoingEdges;
-    }
-
-    public List<Edge> getEdgesIn(ProtoNode node) {
-        List<Edge> incomingEdges = new LinkedList<>();
-        for (Edge e : edgeList) {
-            if (e.target.equals(node)) {
-                incomingEdges.add(e);
-            }
-        }
-        return incomingEdges;
-    }
-
-    public List<Edge> getEdgesInWithType(ProtoNode node, String edgeType) {
-        List<Edge> incomingEdges = new LinkedList<>();
-        for (Edge e : edgeList) {
-            if (e.target.equals(node) && e.edgeType.equals(edgeType)) {
-                incomingEdges.add(e);
-            }
-        }
-        return incomingEdges;
-    }
-
-    public List<Edge> getEdgesOfType(String edgeType) {
+    List<Edge> getEdgesOfType(String edgeType) {
         List<Edge> relevantEdges = new LinkedList<>();
         for (Edge e : edgeList) {
             if (e.edgeType.equals(edgeType)) {
-                System.out.println("e = " + e);
                 relevantEdges.add(e);
             }
         }
         return relevantEdges;
     }
-
 
     @Override
     public String toString() {

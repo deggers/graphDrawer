@@ -36,6 +36,7 @@ public class CycleBreaker {
 
 
     public static void GreedyCycleRemoval(drawableGraph g){
+        System.out.println("g = " + g);
 /*        The first polynomial-time algorithm for solving the minimum FAS problem with an approximation
           ratio less than 2 in the worst case */
         boolean debug = true;
@@ -54,6 +55,9 @@ public class CycleBreaker {
                 System.out.println("copyG.getNodeSet   = " + copyG.getNodeSet());
             }
         }
+        System.out.println("g.getEdgeSet() = " + g.getEdgeSet());
+        System.out.println("copyG.getEdgeSet() = " + copyG.getEdgeSet());
+        System.exit(1);
 
         while (!copyG.copyNodeSet().isEmpty()){
 
@@ -117,12 +121,12 @@ public class CycleBreaker {
             for (Iterator<GraphNode> it = node.getChildren().iterator(); it.hasNext();) {
                 GraphNode graphNode = it.next();
                 if (graphNode.getDfsStatus() == 'v') {
-                    if (verbose == true) {
+                    if (verbose) {
                         System.out.printf("Cycle found, turning edge from %s to %s \n", node.label, graphNode.label);
                     }
 
-                    GraphNode startNode = new GraphNode(node.label);
-                    GraphNode targetNode = new GraphNode(graphNode.label);
+                    GraphNode startNode = new GraphNode(node.getID(), node.label);
+                    GraphNode targetNode = new GraphNode(node.getID(), graphNode.label);
 
                     turnedEdges.add(new Edge(startNode, targetNode));
                 } else {
