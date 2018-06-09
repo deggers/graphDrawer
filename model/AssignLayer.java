@@ -15,13 +15,13 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
 public class AssignLayer {
-    private static final boolean verbose = true;
+    private static final boolean verbose = false;
     
     private LinkedHashMap<Integer, LinkedList<GraphNode>> layering = new LinkedHashMap<>();
     private LinkedHashMap<GraphNode, Integer> nodeToRank = new LinkedHashMap<>();
 
 //    right now not working
-    public static void longestPath(drawableGraph g) {
+    public static drawableGraph longestPath(drawableGraph g) {
         final boolean optionalCheck = true;
 
         LinkedHashSet<GraphNode> U = new LinkedHashSet<>(); // set of nodes that will get a layer in this step
@@ -68,7 +68,7 @@ public class AssignLayer {
         //one should potentially turn the layering around now, so that the upmost node is at level 0 or 1 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         //time to add dummy nodes
         layeredGraph.addDummies();
-        g = layeredGraph; // copy layered graph to g (necessary)
+        return layeredGraph;
     }
     public static void topologicalPath(drawableGraph g) {
         int level = 1;
@@ -93,9 +93,11 @@ public class AssignLayer {
 //        copyG.copyNodeSet().forEach(System.out::println);
 
         g.addDummies();
-        System.out.println(g);
-        System.out.println(g.getEdgeSet());
-        System.out.println("g.getNodeSet() = " + g.getNodeSet());
+        if (verbose) {
+            System.out.println(g);
+            System.out.println(g.getEdgeSet());
+            System.out.println("g.getNodeSet() = " + g.getNodeSet());
+        }
     }
 
 //  All the HELPER-Functions

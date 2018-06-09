@@ -22,7 +22,7 @@ public class NaiveDraw {
         }
 //      2.  Layer Assignment: Vertices are assigned to layers.
         System.out.println("layer assignment");
-        AssignLayer.longestPath(drawGraph);
+        drawGraph = AssignLayer.longestPath(drawGraph);
         System.out.println("drawGraph got " + drawGraph);
         if (verbose) {
             System.out.println(drawGraph);
