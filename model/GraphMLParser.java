@@ -23,7 +23,9 @@ public class GraphMLParser {
         long stopTime;
         GraphMLGraph graph = null;
         ProtoNode node = null;
-        Edge edge = null; //brauchen wahrscheinlich edge
+        Edge edge = null;
+        int uniqueNodeId = 0;
+
 
         // Speichern von Knoten, Kanten und Map<Name, Knoten> zum einfachen auffinden
         ArrayList<ProtoNode> nodes = new ArrayList<>();
@@ -38,17 +40,13 @@ public class GraphMLParser {
             while (reader.hasNext()) { //Über Inhalt der XML iterieren
                 XMLEvent event = reader.nextEvent();
                 switch (event.getEventType()) {
-
                     case XMLStreamConstants.START_ELEMENT:
                         StartElement startElement = event.asStartElement();
                         String sName = startElement.getName().getLocalPart();
-//                        System.out.println("sName = " + sName);
-                        // key
                         Iterator<Attribute> attributes;
                         switch (sName) {
                             case "graphml":
                                 graph = new GraphMLGraph();
-//                                System.out.println("found graphml start");
                                 break;
                             case "key"://-----------------------------Key--------------------------------------
 //                                System.out.println("found key start");
@@ -59,24 +57,13 @@ public class GraphMLParser {
                                     Attribute attrib = attributes.next();
                                     String attributeName = attrib.getName().getLocalPart();
                                     String attributeValue = attrib.getValue();
-                                    // attr.name
-//                                    System.out.println("befor switch: " + attributeName);
                                     switch (attributeName) {
                                         case "id":
                                             id = attributeValue;
-//                                            System.out.println("set id: " + attributeValue);
                                             break;
                                         case "for":
-//                                            System.out.println("found for");
-//                                            if (attributeValue.equalsIgnoreCase("edge")) {
-////                                                System.out.println("inside if clause");
-//                                            } else {
-//                                                throw new Exception("Unknown attribute for GraphML key: for=\"" + attributeValue + "\"");
-//                                            }
                                             break;
                                         case "attr.name":
-//                                            ktype = attributeValue;
-                                            //throw new Exception("GraphML Key id doesn't match attr.name or was not set");
                                             break;
                                         case "attr.type":
                                             ktype = attributeValue;
@@ -92,42 +79,10 @@ public class GraphMLParser {
                                 graph.addEdgeType(id, ktype);
                                 break;
                             case "graph"://-----------------------------Graph--------------------------------------
-//                                System.out.println("found graph start");
-                                //eigentlich nichts
                                 break;
-
                             case "node"://-----------------------------Node--------------------------------------
-//                                System.out.println("found node start");
-                                attributes = startElement.getAttributes();
-                                String label = null;
-                                String type = null;
-                                while (attributes.hasNext()) {
-                                    Attribute attrib = attributes.next();
-                                    String attributeName = attrib.getName().getLocalPart();
-                                    String attributeValue = attrib.getValue();
-                                    switch (attributeName) {
-                                        case "id":
-//                                            System.out.println("node id: " + attributeValue);
-                                            label = attributeValue;
-                                            break;
-                                        case "type":
-//                                            System.out.println("node type: " + attributeValue);
-                                            type = attributeValue;
-                                            break;
-                                        default:
-                                            System.out.println("Unknown attribute type for Node: " + attributeName);
-                                            break;
-                                    }
-                                }
-                                if (type != null && label != null) {
-                                    node = new ProtoNode(label, type);
-                                } else
-                                    throw new RuntimeException("Exception due to improperly formatted GraphML Node entry: " + startElement.toString());
-                                nodes.add(node);
-                                nodesMap.put(node.getLabel(), node);
                                 break;
                             case "edge": //-----------------------------Edge--------------------------------------
-//                                System.out.println("found edge start");
                                 edge = new Edge();
                                 attributes = startElement.getAttributes();
                                 while (attributes.hasNext()) {
@@ -136,19 +91,14 @@ public class GraphMLParser {
                                     String attributeValue = attrib.getValue();
                                     switch (attributeName) {
                                         case "source":
-                                            if (!nodesMap.containsKey(attributeValue)) {
-                                                System.out.println("source not in nodesMap! :(");
-                                            }
-                                            edge.start = nodesMap.get(attributeValue);
-
-//                                            System.out.println("edge source: " + edge.start);
+                                            ProtoNode start = new ProtoNode(attributeValue);
+                                            nodes.add(start);
+                                            edge.start = start;
                                             break;
                                         case "target":
-                                            if (!nodesMap.containsKey(attributeValue)) {
-                                                System.out.println("target not in nodesMap");
-                                            }
-                                            edge.target = nodesMap.get(attributeValue);
-//                                            System.out.println("edge target: " + edge.target);
+                                            ProtoNode target = new ProtoNode(attributeValue);
+                                            nodes.add(target);
+                                            edge.target = target;
                                             break;
                                         default:
 //                                            System.out.println("Unknown attribute type for Edge: " + attributeName);
@@ -157,7 +107,6 @@ public class GraphMLParser {
                                 }
                                 break;
                             case "data"://-----------------------------Data--------------------------------------
-//                                System.out.println("found data start");
                                 attributes = startElement.getAttributes();
                                 while (attributes.hasNext()) {
                                     Attribute attrib = attributes.next();
@@ -198,40 +147,27 @@ public class GraphMLParser {
                         String eName = endElement.getName().getLocalPart();
                         switch (eName) { //Switch Ende der Elemente, baue Edge mit den gesammelten Informationen, gib Graphen zurück
                             case "graphml":
-//                                System.out.println("found graphml end");
                                 //fehler, graph sollte zuerst beendet sein
                                 break;
                             case "key":
-//                                System.out.println("found key end");
                                 break;
                             case "graph":
-//                                System.out.println("found graph end");
                                 //Graph ausgeben, wenn es mehrere sind wird nur der erste ausgegeben
                                 break;
                             case "node":
 //                                System.out.println("found node end");
                                 break;
                             case "edge":
-//                                System.out.println("found edge end");
-                                //Edge fertig bauen
-                                /* boolean edgeIsNew = true; //test for existing equal edge
-                                for (Edge e : edges) {
-                                    if (e.start.label.equals(nodeStart.label) && e.end.label.equals(nodeEnd.label) && e.edgeType.equals(edgeType)) {
-                                        edgeIsNew = false;
-                                    }
-                                }*/
-                                if (/*edgeIsNew*/true) { // checkt aktuell nicht, ob die Kante schon existiert
-//                                    System.out.println("Adding Edge: " + edge);
-                                    ProtoNode startNode = (ProtoNode) edge.start;
-                                    ProtoNode targetNode = (ProtoNode) edge.target;
-                                    if (!startNode.equals(targetNode)) {
-                                        edges.add(edge); //keine Selbstkanten
-                                    } else {
-                                        System.out.println("self-Edge found!");
-                                        System.out.println("startNode = " + startNode);
-                                        System.out.println("targetNode = " + targetNode);
-                                    }
+                                ProtoNode startNode = (ProtoNode) edge.start;
+                                ProtoNode targetNode = (ProtoNode) edge.target;
+                                if (!startNode.equals(targetNode)) {
+                                    edges.add(edge); //keine Selbstkanten
+                                } else {
+                                    System.out.println("self-Edge found!");
+                                    System.out.println("startNode = " + startNode);
+                                    System.out.println("targetNode = " + targetNode);
                                 }
+
                                 break;
                             case "data":
 //                                System.out.println("found data end");
@@ -281,27 +217,28 @@ public class GraphMLParser {
 //                }
                 graph.addAllEdges(edges);
                 graph.addAllNodes(nodes);
-                System.out.println("edges = " + edges);
-                System.out.println("nodesMap = " + nodesMap);
-                System.out.println("nodes = " + nodes);
-                //graph.finalizeGraphFromParser(); nocht nicht gebraucht: erst, wenn root und edgeType eines teilbaumes bekannt
-//                ParseController.getInstance().setTree(graph);
-                // der Parse-Controller setzt den jetzt
             }
             System.out.println("Parsing finished!");
             stopTime = System.nanoTime();
             Duration dur = Duration.ofNanos(startTime - stopTime);
             System.out.println("Estimated elapsed time: " + (dur));
             return graph;
-        } catch (NoSuchElementException e) {
+        } catch (
+                NoSuchElementException e)
+
+        {
 //            e.printStackTrace();
             System.out.println("no such element");
             return null;
-        } catch (Exception e) {
+        } catch (
+                Exception e)
+
+        {
             //e.printStackTrace();
             System.out.println("some mistake in GraphML: " + e);
             return null;
         }
+
     }
 
     private static ArrayList<String> makeListOfPackageParents(String s) {
@@ -314,6 +251,4 @@ public class GraphMLParser {
 
         return returnList;
     }
-
-
 }

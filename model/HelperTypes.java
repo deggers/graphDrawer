@@ -17,17 +17,16 @@ public class HelperTypes {
         
         private final String label;
         private final String GraphMLType;
+        private static int counter = 0;
+        private int uniqueNodeId;
 
-        public ProtoNode(String label) {
+        ProtoNode(String label){
+            counter++;
             this.label = label;
-            GraphMLType = null;
+            this.GraphMLType = "noneByDustyn";
+            this.uniqueNodeId = counter;
         }
 
-        public ProtoNode(String label, String GraphMLType) {
-            this.label = label;
-            this.GraphMLType = GraphMLType;
-        }
-        
         public TreeNode toTreeNode(){
             TreeNode node = new TreeNode(label);
             node.GraphMLType = GraphMLType;
@@ -48,7 +47,7 @@ public class HelperTypes {
 
         @Override
         public String toString() {
-            return this.label;
+            return "id:" + uniqueNodeId + " " + this.label;
         }
 
         @Override
@@ -96,10 +95,6 @@ public class HelperTypes {
         public String getAttrType() {
             return attrType; 
         }
-
-        //public Class<?> getAttrClass() throws ClassNotFoundException {
-        //    return Class.forName(attrType);
-        //} wahrscheinlich braucht keiner reflection
 
         @Override
         public boolean equals(Object obj) {

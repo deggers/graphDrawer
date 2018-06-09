@@ -10,11 +10,34 @@ public class GraphNode extends AbstractNode {
     private LinkedHashSet<GraphNode> parents = new LinkedHashSet<>();
     private boolean dummyNode = false;
     private int layer = -1;
-    private LinkedList<GraphNode> incidentTo = new LinkedList<>();
+    private static int uniqueGraphNodeCounter = 0;
+    private int uniqueGraphNodeId;
 
     private char dfsStatus = 'u'; //unvisited, visited, final
 
-    char getDfsStatus() {
+
+    GraphNode(String label) {
+        super(label);
+        this.uniqueGraphNodeId = setNodeId();
+        GraphMLType = null;
+    }
+
+    GraphNode(String label, String type, boolean isDummyNode) {
+        super(label);
+        this.uniqueGraphNodeId = setNodeId();
+        this.GraphMLType = type;
+        this.dummyNode = isDummyNode;
+    }
+
+    GraphNode(String label, String type, boolean isDummy, int layer) {
+        super(label);
+        this.uniqueGraphNodeId = setNodeId();
+        this.GraphMLType = type;
+        this.dummyNode = isDummy;
+        this.layer = layer;
+    }
+
+     char getDfsStatus() {
         return dfsStatus;
     }
 
@@ -25,39 +48,6 @@ public class GraphNode extends AbstractNode {
             throw new IllegalArgumentException("dfsStatus can only be set to u, v or f");
         }
     }
-
-    GraphNode(String label) {
-        super(label);
-        GraphMLType = null;
-    }
-
-    GraphNode(String label, String type, boolean isDummyNode) {
-        super(label);
-        this.GraphMLType = type;
-        this.dummyNode = isDummyNode;
-        children = new LinkedHashSet<>();
-        parents = new LinkedHashSet<>();
-    }
-
-    GraphNode(String label, String type, boolean isDummy, int layer) {
-        super(label);
-        this.GraphMLType = type;
-        this.dummyNode = isDummy;
-        this.layer = layer;
-        children = new LinkedHashSet<>();
-        parents = new LinkedHashSet<>();
-    }
-
-    // not sure if useful - hoped so but did not solve to create node with parent and child --dustyn
-    GraphNode(String label, String type, boolean isDummy, int layer, GraphNode parent, GraphNode children) {
-        super(label);
-        this.GraphMLType = type;
-        this.dummyNode = isDummy;
-        this.layer = layer;
-        this.children.add(children);
-        this.parents.add(parent);
-    }
-
 
     public String getLabel() {
         return this.label;
@@ -91,6 +81,12 @@ public class GraphNode extends AbstractNode {
         return children.size();
     }
 
+    private int setNodeId()
+    {
+        uniqueGraphNodeCounter++;
+        return uniqueGraphNodeCounter;
+    }
+
     @Override
     public boolean isLeaf() {
         return children.isEmpty();
@@ -100,7 +96,7 @@ public class GraphNode extends AbstractNode {
         return parents.isEmpty();
     }
 
-    public boolean isDummyNode() {
+    boolean isDummyNode() {
         return dummyNode;
     }
 
@@ -109,7 +105,7 @@ public class GraphNode extends AbstractNode {
     public String toString() {
 //        return String.format("label: %s parents: %s children: %s \n", label,parentLabels(),childrenLabels());
 //        return String.format("%s,level:%s", label, layer);
-        return String.format("%s", label);
+        return String.format("'%s'", label);
     }
 
     List<String> parentLabels() {
@@ -152,14 +148,15 @@ public class GraphNode extends AbstractNode {
 
         GraphNode node = (GraphNode) o;
 
-        return label.equals(node.label);
+        return uniqueGraphNodeId == node.uniqueGraphNodeId;
     }
+
 
     @Override
     public int hashCode() {
         int hash = 7;
         for (int i = 0; i < label.length(); i++)
             hash = hash * 31 + label.charAt(i);
-        return hash;
+        return hash * uniqueGraphNodeId;
     }
 }
