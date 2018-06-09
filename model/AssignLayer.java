@@ -21,7 +21,7 @@ public class AssignLayer {
     private LinkedHashMap<GraphNode, Integer> nodeToRank = new LinkedHashMap<>();
 
 //    right now not working
-    public static void longestPath(drawableGraph g) {
+    public static drawableGraph longestPath(drawableGraph g) {
         final boolean optionalCheck = true;
 
         LinkedHashSet<GraphNode> U = new LinkedHashSet<>(); // set of nodes that will get a layer in this step
@@ -68,7 +68,7 @@ public class AssignLayer {
         //one should potentially turn the layering around now, so that the upmost node is at level 0 or 1 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         //time to add dummy nodes
         layeredGraph.addDummies();
-        g = layeredGraph; // copy layered graph to g (necessary)
+        return layeredGraph;
     }
     public static void topologicalPath(drawableGraph g) {
         int level = 1;
