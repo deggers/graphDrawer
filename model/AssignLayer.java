@@ -15,6 +15,8 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
 public class AssignLayer {
+    private static final boolean verbose = true;
+    
     private LinkedHashMap<Integer, LinkedList<GraphNode>> layering = new LinkedHashMap<>();
     private LinkedHashMap<GraphNode, Integer> nodeToRank = new LinkedHashMap<>();
 
@@ -26,11 +28,15 @@ public class AssignLayer {
         LinkedHashSet<GraphNode> Z = new LinkedHashSet<>(); // set of all parents of nodes in U
         int currentLayer = 1;
         drawableGraph layeredGraph = g.copy(g);
-//        layeredGraph.deleteIsolatedNodes(); //hope this works
-        layeredGraph.getIsolatedNodes().forEach(layeredGraph::justRemoveNode);
+        if (verbose) System.out.println("Deleting isolated nodes, if any.");
+        //layeredGraph.deleteIsolatedNodes(); //hope this works
+        //layeredGraph.getIsolatedNodes().forEach(layeredGraph::justRemoveNode);
         // nodes without a layer have layer set to -1 by default now (any number that can't be a proper layer is ok)
+        if (verbose) System.out.println("Fetching set of sinks");
         U = new LinkedHashSet<>(layeredGraph.getAllSinks()); // start U with all the sinks in the graph
+        if (verbose) System.out.printf("Starting while loop\n");
         while (!U.isEmpty()) {
+            if (verbose) System.out.printf("Set U: %s\n", U.toString());
             for (GraphNode node : U) {
                 node.setLayer(currentLayer); // set all nodes in U to currentLayer
                 Z.addAll(node.getParents()); // compute the union of all parents of nodes in U
@@ -47,6 +53,7 @@ public class AssignLayer {
                     U.add(graphNode); // add all nodes to U, for which all children have a proper layer assigned
                 }
             }
+            Z.clear();
             currentLayer++; // repeat with next layer, as long as there are nodes that can be assigned a layer
         }
         //all nodes should be layered now, optional check

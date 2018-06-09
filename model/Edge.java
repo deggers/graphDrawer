@@ -33,14 +33,6 @@ public class Edge {
    }
 
     @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 73 * hash + Objects.hashCode(this.start);
-        hash = 73 * hash + Objects.hashCode(this.target);
-        return hash;
-    }
-
-    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -59,6 +51,16 @@ public class Edge {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 13 * hash + Objects.hashCode(this.start);
+        hash = 13 * hash + Objects.hashCode(this.target);
+        hash = 13 * hash + Objects.hashCode(this.edgeType);
+        hash = 13 * hash + Objects.hashCode(this.weight);
+        return hash;
     }
 
     
