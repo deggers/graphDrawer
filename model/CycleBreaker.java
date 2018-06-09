@@ -78,11 +78,7 @@ public class CycleBreaker {
                     if (verbose == true) {
                         System.out.printf("Cycle found, turning edge from %s to %s \n", node.label, graphNode.label);
                     }
-
-                    GraphNode startNode = new GraphNode(node.label);
-                    GraphNode targetNode = new GraphNode(graphNode.label);
-
-                    turnedEdges.add(new Edge(startNode, targetNode));
+                    turnedEdges.add(new Edge(node, graphNode));
                 } else {
                     if (graphNode.getDfsStatus() == 'u') {
                         dfsRec(graphNode);

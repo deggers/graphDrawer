@@ -12,9 +12,9 @@ public class NaiveDraw {
 
 //      1. Remove all Cycles
         System.out.println("remove all cycles");
-        CycleBreaker.GreedyCycleRemoval(drawGraph);
+        CycleBreaker.DFS_Florian(drawGraph);
         System.out.println("cyclefree got " + drawGraph);
-
+        
 //      2.  Layer Assignment: Vertices are assigned to layers.
         System.out.println("layer assignment");
         AssignLayer.topologicalPath(drawGraph);

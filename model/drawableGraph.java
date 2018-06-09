@@ -6,6 +6,8 @@ import java.util.*;
 
 //@formatter:off
 public class drawableGraph {
+    private final boolean verbose = false;
+    
     private LinkedHashSet<GraphNode>        nodeSet            = new LinkedHashSet<>();
     private LinkedHashSet<Edge>             edgeSet            = new LinkedHashSet<>();
     private LinkedHashMap<GraphNode,LinkedList<Edge>> nodeToEdgesOut = new LinkedHashMap<>();
@@ -185,7 +187,10 @@ public class drawableGraph {
             size = nodeToEdgesOut.get(node).size();
         }
         if (size!=node.outdegree()) {
-            System.out.printf("Warning! Outdegree of node.parents %d is not equal to the number of outgoing edges %d!\n",size,node.outdegree());
+            System.out.printf("Warning! Outdegree of node.children %d is not equal to the number of outgoing edges %d!\n",node.outdegree(),size);
+            System.out.println("Node: " + node.getLabel());
+            System.out.println("Edges by Hash: " + nodeToEdgesOut.get(node));
+            System.out.println("Edges by Node.Children: " + node.childrenLabels());
         }
         return size;
     }
@@ -196,7 +201,10 @@ public class drawableGraph {
             size = nodeToEdgesIn.get(node).size();
         }
         if (size!=node.indegree()) {
-            System.out.printf("Warning! Indegree of node.parents %d is not equal to the number of incoming edges %d!\n",size,node.indegree());
+            System.out.printf("Warning! Indegree of node.parents %d is not equal to the number of incoming edges %d!\n",node.indegree(),size);
+            System.out.println("Node: " + node.getLabel());
+            System.out.println("Edges by Hash: " + nodeToEdgesIn.get(node));
+            System.out.println("Edges by Node.Parent: " + node.parentLabels());
         }
         return size;
     }
@@ -265,11 +273,34 @@ public class drawableGraph {
     boolean reverseEdge(Edge edge) {
         GraphNode u = (GraphNode) edge.start;
         GraphNode v = (GraphNode) edge.target;
-
+        if (verbose) {
+            System.out.printf("Turning: %s to %s \n",u.label,v.label);
+            System.out.println("Old Nodes:");
+            System.out.printf("Node: %s Children: %s Parents: %s\n",u.label, u.childrenLabels(), u.parentLabels());
+            System.out.printf("Node: %s Children: %s Parents: %s\n",v.label, v.childrenLabels(), v.parentLabels());
+        }
         boolean status1 = u.removeChild(v);
         boolean status2 = u.addParent(v);
         boolean status3 = v.removeParent(u);
-        boolean status4 = v.addChild(v);
+        boolean status4 = v.addChild(u);
+        if (verbose) {
+            System.out.println(status1);
+            System.out.println(status2);
+            System.out.println(status3);
+            System.out.println(status4);
+
+            System.out.println("New Nodes:");
+            System.out.printf("Node: %s Children: %s Parents: %s\n",u.label, u.childrenLabels(), u.parentLabels());
+            System.out.printf("Node: %s Children: %s Parents: %s\n",v.label, v.childrenLabels(), v.parentLabels());
+        }
+        // get equivalent edge in edgeSet, delete it and insert the turned variant
+        if (edgeSet.contains(edge)) {
+            if (verbose) {
+                System.out.println("Edge in EdgeSet going to be turned");
+            }
+            edgeSet.remove(edge);
+            edgeSet.add(new Edge(v, u, edge.edgeType, edge.weight));
+        }
 
         return status1 && status2 && status3 && status4;
     }
@@ -277,29 +308,39 @@ public class drawableGraph {
 
     void addDummies(){
         LinkedList<Edge> edgesToDelete = new LinkedList<>();
+        LinkedList<Edge> edgesNew = new LinkedList<>();
         for (Edge edge : edgeSet) {
             GraphNode start = (GraphNode) edge.start;
             GraphNode target = (GraphNode) edge.target;
-            int spanningLevels = Math.abs(start.getLayer() - target.getLayer());
+            int spanningLevels = Math.abs(start.getLayer() - target.getLayer())-1;
 //            spanningLevels = Math.abs(spanningLevels * spanningLevels -1); // keine ahnung wie man sonst das vorzeichen entfernt
-            if (spanningLevels > 1) { // precondition for adding dummies
+            if (spanningLevels > 0) { // precondition for adding dummies
                 edgesToDelete.add(edge);
-//                if (!deleteEdge(edge)) System.out.println("couldnt delete edge in addDummies");
                 List<GraphNode> block = new LinkedList<>();
                 block.add(start);
                 for (int i = spanningLevels; i > 0; i--) { // for every additional spanned level
                     String label = "Dummy-" + i + "; from: " + start.label + " to: " + target.label+"|";
                     GraphNode node = new GraphNode(label, "Dummy", true); // create a dummy with a proper label
+                    node.setLayer(target.getLayer() + i);
                     nodeSet.add(node); // add to NodeSet
                     block.add(node); // add to block to find parent/children
                 }
                 block.add(target);
 
                 for (int i = 0; i < block.size(); i++) { // hoffe das wirft keinen outOfBounds
-                    if (!block.get(i).equals(target)) block.get(i).addChild(block.get(i+1)); // except for at start Node, add children
-                    if (!block.get(i).equals(start)) block.get(i).addParent(block.get(i-1)); // except for at target Node, add parents
+                    if (!block.get(i).equals(target)) {
+                        block.get(i).addChild(block.get(i+1)); // except for at target Node, add child i+1
+                        edgesNew.add(new Edge(block.get(i), block.get(i+1))); // likewise, add Edge to edgeList
+                    }
+                    if (!block.get(i).equals(start)) block.get(i).addParent(block.get(i-1)); // except for at start Node, add parent i-1
                 }
             }
+        }
+        for (Edge edge : edgesToDelete) {
+            deleteEdge(edge);
+        }
+        for (Edge edge : edgesNew) {
+            edgeSet.add(edge);
         }
     }
 
