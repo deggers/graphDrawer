@@ -45,6 +45,29 @@ public class HelperTypes {
         public String getGraphMLType() {
             return GraphMLType;
         }
+
+        @Override
+        public String toString() {
+            return this.label;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof ProtoNode)) return false;
+
+            ProtoNode protoNode = (ProtoNode) o;
+
+            if (label != null ? !label.equals(protoNode.label) : protoNode.label != null) return false;
+            return GraphMLType != null ? GraphMLType.equals(protoNode.GraphMLType) : protoNode.GraphMLType == null;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = label != null ? label.hashCode() : 0;
+            result = 31 * result + (GraphMLType != null ? GraphMLType.hashCode() : 0);
+            return result;
+        }
     }
     
     public static class EdgeType{

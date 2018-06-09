@@ -177,6 +177,7 @@ public class GraphMLGraph {
         List<Edge> relevantEdges = new LinkedList<>();
         for (Edge e : edgeList) {
             if (e.edgeType.equals(edgeType)) {
+                System.out.println("e = " + e);
                 relevantEdges.add(e);
             }
         }
@@ -190,7 +191,6 @@ public class GraphMLGraph {
         dumpNodeStructure(builder, null, "- ");
         return builder.toString();
     }
-
     private void dumpNodeStructure(StringBuilder builder, TreeNode node, String prefix) {
         if (node != null) {
             builder.append(prefix);

@@ -29,9 +29,9 @@ public class CycleBreaker {
                 safeEdges.addAll(nodeToEdgeIn.get(node));
             }
         }
-        LinkedList<Edge> edgesToBeRemoved = new LinkedList<>(g.getEdgeSet());
-        edgesToBeRemoved.removeAll(safeEdges);
-        System.out.println("Edges to be removed: " + edgesToBeRemoved);
+        LinkedList<Edge> edgesToBeReversed = new LinkedList<>(g.getEdgeSet());
+        edgesToBeReversed.removeAll(safeEdges);
+        System.out.println("Edges to be reversed: " + edgesToBeReversed);
     }
 
 
@@ -43,7 +43,8 @@ public class CycleBreaker {
         LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToEdgeIn = copyG.getHashmap_nodeToEdgeIn();
         LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToEdgeOut = copyG.getHashmap_nodeToEdgeOut();
         LinkedHashSet<Edge> safeEdges = new LinkedHashSet<>();
-
+//        System.out.println("copyG.getEdgeSet() = " + copyG.getEdgeSet());
+//        System.out.println("g.getEdgeSet() = " + g.getEdgeSet());
 
         if (debug) {
             if (g.getNodeSet().size() != copyG.getNodeSet().size() || g.getEdgeSet().size() != copyG.getEdgeSet().size()){
@@ -55,51 +56,40 @@ public class CycleBreaker {
         }
 
         while (!copyG.copyNodeSet().isEmpty()){
+
             while (copyG.getSink() != null) {
-//                System.out.println("found sink!");
                 GraphNode sink = copyG.getSink();
+//                System.out.println("sink = " + sink);
                 safeEdges.addAll(nodeToEdgeIn.get(sink));
                 copyG.justRemoveNode(sink);
-                copyG.removeIngoingEdges(sink);}
-
-            copyG.getIsolatedNodes().forEach(copyG::justRemoveNode);
+                copyG.removeIngoingEdges(sink);
+                copyG.getIsolatedNodes().forEach(copyG::justRemoveNode);
+            }
 
             while (copyG.getSource() != null){
-//                System.out.println("found source!");
                 GraphNode source = copyG.getSource();
-                LinkedList<Edge> edgeSetOfV = nodeToEdgeOut.get(source);
-                safeEdges.addAll(edgeSetOfV);
+//                System.out.println("source = " + source);
+                safeEdges.addAll(nodeToEdgeOut.get(source));
                 copyG.justRemoveNode(source);
-                copyG.removeOutgoingEdges(source); }
+                copyG.removeOutgoingEdges(source);
+                copyG.getIsolatedNodes().forEach(copyG::justRemoveNode);
+            }
 
             if (!copyG.copyNodeSet().isEmpty()){
                 GraphNode v = copyG.getNodeWithMaxDiffDegree();
-                LinkedList<Edge> edgeSetOfV = nodeToEdgeOut.get(v);
-                safeEdges.addAll(edgeSetOfV);
+//                System.out.println("selected v = " + v);
+                safeEdges.addAll(nodeToEdgeOut.get(v));
                 copyG.justRemoveNode(v);
                 copyG.removeOutgoingEdges(v);
-                copyG.removeIngoingEdges(v); }
+                copyG.removeIngoingEdges(v);
+            }
         }
         if  (copyG.copyNodeSet().size() >0 || copyG.copyEdgeSet().size() > 0) System.out.println("something wrong in Greedy Cycle Removal - got left Nodes or Edges");
 
-//        LinkedList<Edge> edgesToBeRemoved = new LinkedList<>();
-//        for (Edge edge_orig: g.getEdgeSet()){
-//            boolean status = false;
-//            for (Edge edge: safeEdges){
-//                if (edge_orig.equals(edge)){
-//                    status = true;
-//                }
-//            }
-//            if (!status){
-//                edgesToBeRemoved.add(edge_orig);
-//            }
-//        }
-//        System.out.println("edgesToBeRemoved = " + edgesToBeRemoved);
-
-        LinkedList<Edge> edgesToBeRemoved = new LinkedList<>(g.getEdgeSet());
-        edgesToBeRemoved.removeAll(safeEdges);
-        System.out.println("Edges to be removed: " + edgesToBeRemoved);
-        
+        LinkedList<Edge> edgesToBeReversed = new LinkedList<>(g.getEdgeSet());
+        edgesToBeReversed.removeAll(safeEdges);
+        System.out.println("Edges to be reversed: " + edgesToBeReversed);
+        System.out.println("safeEdges = " + safeEdges);
     }
     public static void DFS_Florian(drawableGraph g) {
         //Tiefensuche um Zyklen zu entfernen

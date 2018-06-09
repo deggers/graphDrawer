@@ -1,5 +1,7 @@
 package model;
 
+import model.HelperTypes.ProtoNode;
+
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -7,8 +9,10 @@ import javax.xml.stream.events.*;
 import java.io.File;
 import java.io.FileReader;
 import java.time.Duration;
-import java.util.*;
-import model.HelperTypes.ProtoNode;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class GraphMLParser {
 
@@ -27,7 +31,6 @@ public class GraphMLParser {
         HashMap<String, ProtoNode> nodesMap = new HashMap<>();
 
         try {
-
             // XML-Reader
             XMLInputFactory factory = XMLInputFactory.newInstance();
             XMLEventReader reader = factory.createXMLEventReader(new FileReader(file));
@@ -72,9 +75,9 @@ public class GraphMLParser {
 //                                            }
                                             break;
                                         case "attr.name":
-                                            if (!attributeValue.equalsIgnoreCase(id))
-                                                //throw new Exception("GraphML Key id doesn't match attr.name or was not set");
-                                                break;
+//                                            ktype = attributeValue;
+                                            //throw new Exception("GraphML Key id doesn't match attr.name or was not set");
+                                            break;
                                         case "attr.type":
                                             ktype = attributeValue;
                                             if (!attributeValue.equalsIgnoreCase("double")) {
@@ -116,9 +119,10 @@ public class GraphMLParser {
                                             break;
                                     }
                                 }
-                                if (type != null && label != null){
+                                if (type != null && label != null) {
                                     node = new ProtoNode(label, type);
-                                } else throw new RuntimeException("Exception due to improperly formatted GraphML Node entry: " + startElement.toString());
+                                } else
+                                    throw new RuntimeException("Exception due to improperly formatted GraphML Node entry: " + startElement.toString());
                                 nodes.add(node);
                                 nodesMap.put(node.getLabel(), node);
                                 break;
@@ -132,10 +136,17 @@ public class GraphMLParser {
                                     String attributeValue = attrib.getValue();
                                     switch (attributeName) {
                                         case "source":
+                                            if (!nodesMap.containsKey(attributeValue)) {
+                                                System.out.println("source not in nodesMap! :(");
+                                            }
                                             edge.start = nodesMap.get(attributeValue);
+
 //                                            System.out.println("edge source: " + edge.start);
                                             break;
                                         case "target":
+                                            if (!nodesMap.containsKey(attributeValue)) {
+                                                System.out.println("target not in nodesMap");
+                                            }
                                             edge.target = nodesMap.get(attributeValue);
 //                                            System.out.println("edge target: " + edge.target);
                                             break;
@@ -213,8 +224,13 @@ public class GraphMLParser {
 //                                    System.out.println("Adding Edge: " + edge);
                                     ProtoNode startNode = (ProtoNode) edge.start;
                                     ProtoNode targetNode = (ProtoNode) edge.target;
-                                    if (!startNode.getLabel().equals(targetNode.getLabel()))
+                                    if (!startNode.equals(targetNode)) {
                                         edges.add(edge); //keine Selbstkanten
+                                    } else {
+                                        System.out.println("self-Edge found!");
+                                        System.out.println("startNode = " + startNode);
+                                        System.out.println("targetNode = " + targetNode);
+                                    }
                                 }
                                 break;
                             case "data":
@@ -265,7 +281,9 @@ public class GraphMLParser {
 //                }
                 graph.addAllEdges(edges);
                 graph.addAllNodes(nodes);
-
+                System.out.println("edges = " + edges);
+                System.out.println("nodesMap = " + nodesMap);
+                System.out.println("nodes = " + nodes);
                 //graph.finalizeGraphFromParser(); nocht nicht gebraucht: erst, wenn root und edgeType eines teilbaumes bekannt
 //                ParseController.getInstance().setTree(graph);
                 // der Parse-Controller setzt den jetzt

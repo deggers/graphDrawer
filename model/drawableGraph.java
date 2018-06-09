@@ -19,17 +19,15 @@ public class drawableGraph {
     }
 
     public drawableGraph(GraphMLGraph graph, String edgeType) throws Exception { //sollte einziger Konstruktor bleiben
-        Set<Edge> relevantEdges = new LinkedHashSet<>();
         Set<ProtoNode> relevantNodes = new LinkedHashSet<>();
         //relavante Nodes Erzeugen und Adjazenzinformationen aus Edges extrahieren.
         if (!graph.getEdgeTypes().contains(new HelperTypes.EdgeType(edgeType))) {
             throw new Exception("Chosen EdgeType: " + edgeType + " not in Graphs EdgeTypeList");
         }
 
-        relevantEdges.addAll(graph.getEdgesOfType(edgeType));
-
-
+        Set<Edge> relevantEdges = new LinkedHashSet<>(graph.getEdgesOfType(edgeType));
         for (Edge e : relevantEdges) {
+            System.out.println("e relevant = " + e);
             relevantNodes.add((ProtoNode) e.start);
             relevantNodes.add ((ProtoNode) e.target);
         }
@@ -172,11 +170,11 @@ public class drawableGraph {
         }
     }
     GraphNode               getSink () {
-            for (GraphNode node : this.nodeSet)
+            for (GraphNode node : nodeSet)
                 if (getOutdegree(node) == 0 && getIndegree(node) > 0) return node;
             return null;}
     GraphNode               getSource () {
-            for (GraphNode node : this.nodeSet)
+            for (GraphNode node : nodeSet)
                 if (getIndegree(node) == 0) return node;
             return null;}
 
@@ -237,7 +235,7 @@ public class drawableGraph {
         nodeToEdgesOut.keySet().removeIf(entry -> entry == node);
     }
 
-    GraphNode getNodeWithMaxDiffDegree() {
+    GraphNode   getNodeWithMaxDiffDegree() {
         int max = Integer.MIN_VALUE;
         GraphNode winnerNode = null;
         for (GraphNode node : nodeSet) {
@@ -317,50 +315,3 @@ public class drawableGraph {
     }
 
 }
-
-
-//    LinkedHashSet<Edge> getOutgoingEdges(GraphNode node) {
-//        LinkedHashSet<Edge> outgoingEdges = new LinkedHashSet<>();
-//        for (GraphNode v : node.getParents()) {
-//            for (Edge e: edgeSet){
-//                if (e.start == v){
-//                    outgoingEdges.add(e);
-//                }
-//            }
-//        }
-//        return outgoingEdges;
-//    }
-
-//    LinkedList<GraphNode>   getSources(){
-//    LinkedList<GraphNode> sources = new LinkedList<>();
-//        for (GraphNode node: nodeSet){
-//            if (node.inDegree() == 0){
-//                sources.add(node);
-//            }
-//        }
-//        return sources;
-//    }
-
-//    LinkedList<GraphNode>   getSinks(){
-//        LinkedList<GraphNode> sinks = new LinkedList<>();
-//        for (GraphNode node: nodeSet){
-//            if (node.outDegree() == 0){
-//                sinks.add(node);
-//            }
-//        }
-//        return sinks;
-//    }
-
-//    ArrayList<Edge> getIngoingEdges(GraphNode node) {
-//        ArrayList<Edge> ingoingEdges = new ArrayList<>();
-//        for (Edge e : edgeSet)  // ingoing, if node is target from edge
-//            if (e.target == node) ingoingEdges.add(e);
-//        return ingoingEdges;
-//    }
-
-//        boolean containsSink () {
-//            for (GraphNode node : nodeSet) {
-//                if (node.outDegree() == 0) return true;
-//            }
-//            return false;
-//        }
