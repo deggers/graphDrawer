@@ -11,9 +11,11 @@ public class NaiveDraw {
         String selectedEdgeType = GUIController.getInstance().getSelectedEdgeType();
         Graph partialGraph = theGraph.copyWithRestrains(selectedEdgeType);
         System.out.println("Nodes: " + partialGraph.getNodes().size() + ", Edges: " + partialGraph.getEdges().size());
+
+
 ////      1. Remove all Cycles
         System.out.println("remove all cycles");
-        CycleBreaker.DFS_Florian(partialGraph);
+        CycleBreaker.Berger_Shor(partialGraph);
 //        System.out.println("cyclefree got " + drawGraph);
 //        if (verbose) {
 //            System.out.println(drawGraph);

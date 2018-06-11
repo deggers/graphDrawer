@@ -15,9 +15,35 @@ set of all edges in the cycle is a FAS but not a FS.*/
 
 public class CycleBreaker {
     /*    Returns the edges of a cycle found via a directed, depth-first traversal. */
-    private static final boolean VERBOSE = false;
-        private static final boolean DEBUG = false;
-    private static HashSet<Edge> edgesToBeTurned = new LinkedHashSet<>(); //in their original form
+    private static final boolean VERBOSE = true;
+    private static final boolean DEBUG = false;
+    private static HashSet<Edge> edgesToBeReversed = new LinkedHashSet<>(); //in their original form
+
+    public static void Berger_Shor(Graph g){
+        Graph copyG = g.copy(g);
+        LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToEdgeIn = copyG.getHashmap_nodeToEdgeIn();
+        LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToEdgeOut = copyG.getHashmap_nodeToEdgeOut();
+        LinkedHashSet<Edge> acyclicEdges = new LinkedHashSet<>();
+        for (GraphNode node: g.getNodes()) {
+            if (copyG.getOutdegree(node) >= copyG.getIndegree(node) && copyG.getOutdegree(node) > 0) {
+                acyclicEdges.addAll(nodeToEdgeOut.get(node));
+                }
+            else if(copyG.getIndegree(node) > 0)
+                acyclicEdges.addAll(nodeToEdgeIn.get(node));
+
+            if (copyG.getHashmap_nodeToEdgeIn().containsKey(node))
+                copyG.removeIngoingEdges(node);
+            if (copyG.getHashmap_nodeToEdgeOut().containsKey(node))
+                copyG.removeOutgoingEdges(node);
+        }
+
+        edgesToBeReversed = new LinkedHashSet<>(g.getEdges());
+        edgesToBeReversed.removeAll(acyclicEdges);
+        if (VERBOSE) System.out.println("Going to reverse following edges:");
+        if (VERBOSE) edgesToBeReversed.forEach(System.out::println);
+        edgesToBeReversed.forEach(g::reverseEdge);
+        edgesToBeReversed.clear();
+    }
 
 
     public static void GreedyCycleRemoval(Graph g){
@@ -26,12 +52,12 @@ public class CycleBreaker {
         Graph copyG = g.copy(g);
         LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToEdgeIn = copyG.getHashmap_nodeToEdgeIn();
         LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToEdgeOut = copyG.getHashmap_nodeToEdgeOut();
-        LinkedHashSet<Edge> safeEdges = new LinkedHashSet<>();
+        LinkedHashSet<Edge> acyclicEdges = new LinkedHashSet<>();
 
         while (!copyG.getNodes().isEmpty()){
             while (copyG.getSink() != null) {
                 GraphNode sink = copyG.getSink();
-                safeEdges.addAll(nodeToEdgeIn.get(sink));
+                acyclicEdges.addAll(nodeToEdgeIn.get(sink));
                 copyG.justRemoveNode(sink);
                 copyG.removeIngoingEdges(sink);}
 
@@ -40,30 +66,34 @@ public class CycleBreaker {
             while (copyG.getSource() != null){
                 GraphNode source = copyG.getSource();
                 LinkedList<Edge> edgeSetOfV = nodeToEdgeOut.get(source);
-                safeEdges.addAll(edgeSetOfV);
+                acyclicEdges.addAll(edgeSetOfV);
                 copyG.justRemoveNode(source);
                 copyG.removeOutgoingEdges(source); }
 
             if (!copyG.getNodes().isEmpty()){
                 GraphNode v = copyG.getNodeWithMaxDiffDegree();
                 LinkedList<Edge> edgeSetOfV = nodeToEdgeOut.get(v);
-                safeEdges.addAll(edgeSetOfV);
+                acyclicEdges.addAll(edgeSetOfV);
                 copyG.justRemoveNode(v);
                 copyG.removeOutgoingEdges(v);
                 copyG.removeIngoingEdges(v); }
         }
         if  (copyG.getNodes().size() >0 || copyG.getEdges().size() > 0) System.out.println("something wrong in Greedy Cycle Removal - got left Nodes or Edges");
 
-        safeEdges.forEach(System.out::println);
-        edgesToBeTurned.clear();
+        edgesToBeReversed = g.getEdges();
+        edgesToBeReversed.removeAll(acyclicEdges);
+        if (VERBOSE) System.out.println("Going to reverse following edges:");
+        if (VERBOSE) edgesToBeReversed.forEach(System.out::println);
+        edgesToBeReversed.forEach(g::reverseEdge);
+        edgesToBeReversed.clear();
     }
     public static void DFS_Florian(Graph g) {
         for (GraphNode startNode : g.getNodes())
             if (startNode.getDfsStatus() == 'u')
                 dfsRec(g, startNode);
-        if (VERBOSE) edgesToBeTurned.forEach(System.out::println);
-        edgesToBeTurned.forEach(g::reverseEdge);
-        edgesToBeTurned.clear();
+        if (VERBOSE) edgesToBeReversed.forEach(System.out::println);
+        edgesToBeReversed.forEach(g::reverseEdge);
+        edgesToBeReversed.clear();
     }
     private static void dfsRec(Graph g, GraphNode node) {
         if (g.isSink(node)) {
@@ -76,9 +106,9 @@ public class CycleBreaker {
                     if (graphNode.getDfsStatus() == 'v') {
                         if (VERBOSE) System.out.printf("Cycle found, turning edge from %s to %s \n", node.getLabel(), graphNode.getLabel());
                         Edge edge =  g.getEdgeBetween(node, graphNode);
-                        edgesToBeTurned.add(edge);
+                        edgesToBeReversed.add(edge);
 //                        String edgeType = g.getEdgeType();
-//                        edgesToBeTurned.add(new Edge(node, graphNode, edgeType));
+//                        edgesToBeReversed.add(new Edge(node, graphNode, edgeType));
                     } else {
                         if (graphNode.getDfsStatus() == 'u')
                             dfsRec(g, graphNode);

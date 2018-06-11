@@ -239,7 +239,7 @@ public class Graph {
         this.nodeSet.remove(removeMe);
     }
 
-    private int getOutdegree(GraphNode node) {
+    int getOutdegree(GraphNode node) {
         int size = 0;
         if (nodeToEdgesOut.containsKey(node)) {
             size = nodeToEdgesOut.get(node).size();
@@ -247,7 +247,7 @@ public class Graph {
         return size;
     }
 
-    private int getIndegree(GraphNode node) {
+    int getIndegree(GraphNode node) {
         int size = 0;
         if (nodeToEdgesIn.containsKey(node)) {
             size = nodeToEdgesIn.get(node).size();
