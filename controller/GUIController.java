@@ -10,7 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import model.GraphMLGraph;
+import model.Graph;
 import model.Tree;
 
 import java.io.File;
@@ -24,12 +24,13 @@ import java.util.ListIterator;
 import java.util.stream.Collectors;
 
 public class GUIController {
-
+    //@formatter:off
     private static final String PARSE_WHOLE_GRAPH = "WHOLE GRAPH";
 
-    private boolean choiceBoxEdgeTypeIsSet = false;
-    private boolean choiceBoxRootIsSet = false;
-    private File    fileHandle         = null;
+    private boolean         choiceBoxEdgeTypeIsSet  = false;
+    private boolean         choiceBoxRootIsSet      = false;
+    private File            fileHandle              = null;
+    private ParseController parseInstance           = ParseController.INSTANCE;
 
     public void setChoiceBoxAlgorithmIsSet(boolean choiceBoxAlgorithmIsSet) {
         this.choiceBoxAlgorithmIsSet = choiceBoxAlgorithmIsSet;
@@ -46,7 +47,7 @@ public class GUIController {
         choiceBoxAlgorithm.setDisable((true)); // disable at beginning :)
     } // setup observer for nodeSizeSlider
 
-    //@formatter:off
+
     @FXML    private    VBox            vBox;
     @FXML    Button                     exitBtn;
     @FXML    ToggleButton               fullscreenToggle;
@@ -78,9 +79,9 @@ public class GUIController {
                 List<File> files = filesInFolder;
                 this.filesIter = files.listIterator();
             }
-            ParseController.getInstance().setFile(filesIter.next());
-            File file = ParseController.getInstance().getFile();
-            if (ParseController.getInstance().initializeParsing(file)) {
+            parseInstance.setFile(filesIter.next());
+            File file = parseInstance.getFile();
+            if (parseInstance.initParsing(file)) {
                 this.fileName = file.getName();
                 drawInit();
             } else {
@@ -103,7 +104,7 @@ public class GUIController {
         if (file != null) {
             this.fileName = file.getName();
             filesInFolder = getFilesFromFolder(file);
-            if (ParseController.getInstance().initializeParsing(file)) {
+            if (parseInstance.initParsing(file)) {
                 drawInit();
             } else {
                 System.out.println("was not able to ParseController.getInstance().initializeParsing(file)");
@@ -180,30 +181,29 @@ public class GUIController {
             choiceBoxRoot.getItems().clear();
             choiceBoxRoot.setDisable(false);
 
-            GraphMLGraph theGraph = ParseController.getInstance().getGraph();
+            Graph theGraph = parseInstance.getGraph();
             if (theGraph != null) {
-                List<String> rootList = ParseController.getInstance().getGraph().getPossibleRootLabels(selectedEdgeType);
-                choiceBoxRoot.getItems().setAll(rootList);
-                choiceBoxRoot.getItems().add(0,PARSE_WHOLE_GRAPH);
+//                List<String> rootList = parseInstance.getGraph().getPossibleRootLabels(selectedEdgeType);
+//                choiceBoxRoot.getItems().setAll(rootList);
+//                choiceBoxRoot.getItems().add(0,PARSE_WHOLE_GRAPH);
             }
             drawInit();
         }
     }
     public void cb_SelectRootOnAction(ActionEvent event) {
         this.selectedRoot     = String.valueOf(choiceBoxRoot.getSelectionModel().getSelectedItem());
-        GraphMLGraph    theGraph        = ParseController.getInstance().getGraph();
-        ParseController parseController = ParseController.getInstance();
+        Graph    theGraph        = parseInstance.getGraph();
 
         boolean willBeTree = (selectedRoot != null) && (theGraph != null) && !selectedRoot.equals(PARSE_WHOLE_GRAPH);
         boolean isWholeGraph = (selectedRoot != null) && (theGraph != null) && selectedRoot.equals(PARSE_WHOLE_GRAPH);
 
         if (willBeTree) {
-            Tree extractedTreeFromNode = theGraph.extractSubtreeFromProtoNode(theGraph.labelToProtoNode(selectedRoot), selectedEdgeType);
-            parseController.setTree(extractedTreeFromNode);
+//            Tree extractedTreeFromNode = theGraph.extractSubtreeFromProtoNode(theGraph.labelToProtoNode(selectedRoot), selectedEdgeType);
+//            parseInstance.setTree(extractedTreeFromNode);
         }
         else if (isWholeGraph) {
-             parseController.setGraph(theGraph);
-             parseController.setTree(null);
+            parseInstance.setGraph(theGraph);
+            parseInstance.setTree(null);
         }
         cleanPane();
         drawInit();
@@ -212,15 +212,13 @@ public class GUIController {
     private void processAlgo() {
         cleanPane();
         nodeSizeSlider.setDisable(false);
-        ParseController parseInstance = ParseController.getInstance();
-        switch (selectedAlgorithm) {  // what about a tree.resizeToScreen() ?
+        switch (selectedAlgorithm) {
             case "Walker":
                 Tree treeWalker = WalkerImprovedDraw.processTreeNodes(parseInstance.getTree());
                 paneController.drawTreeStructure(treeWalker);
                 break;
             case "Radial":
                 Tree radialTree = RadialTree.processTree(parseInstance.getTree());
-//                nodeSizeSlider.setDisable(true);
                 paneController.drawRadialTreeStructure(radialTree);
                 break;
             case "RT":
@@ -234,8 +232,7 @@ public class GUIController {
             case "Random":
                 if (parseInstance.getGraph() != null) {
                     try {
-                        GraphMLGraph randomGraph = NaiveDraw.processGraph(parseInstance.getGraph());
-//                    paneController.drawGraph(randomGraph);
+                        Graph randomGraph = NaiveDraw.processGraph(parseInstance.getGraph());
                     }
                     catch (Exception e) {
                         e.printStackTrace();
@@ -250,12 +247,11 @@ public class GUIController {
 
     }
 
-    //@formatter:on
 
     private void drawInit() {
         setFileLabel();
-        Tree theTree = ParseController.getInstance().getTree();
-        GraphMLGraph theGraph = ParseController.getInstance().getGraph();
+        Tree theTree = parseInstance.getTree();
+        Graph theGraph = parseInstance.getGraph();
         boolean treeOrGraph = (theTree != null || theGraph != null);
 
         setupChoiceBoxAlgorithms(theTree, theGraph, treeOrGraph);
@@ -273,8 +269,7 @@ public class GUIController {
             }
         }
     }
-
-    private void setupChoiceBoxAlgorithms(Tree theTree, GraphMLGraph theGraph, boolean treeOrGraph) {
+    private void setupChoiceBoxAlgorithms(Tree theTree, Graph theGraph, boolean treeOrGraph) {
         List<String> allAlgos = Arrays.asList("BPlus", "RT", "Walker", "Radial", "Random");
         List<String> reducedAlgos = Arrays.asList("BPlus", "Walker", "Radial", "Random");
         List<String> graphMLAlgos = Arrays.asList("Random");
@@ -286,7 +281,7 @@ public class GUIController {
             choiceBoxAlgorithm.getItems().setAll(theTree != null ? theTree.isBinary() ? allAlgos : reducedAlgos : graphMLAlgos);
         }
     }
-    private void setupChoiceBoxEdgeType(GraphMLGraph theGraph) {
+    private void setupChoiceBoxEdgeType(Graph theGraph) {
         if (theGraph != null && !choiceBoxEdgeTypeIsSet) {
             choiceBoxEdgeType.setDisable(false);
             choiceBoxEdgeType.getItems().setAll(theGraph.getEdgeTypes());
@@ -299,36 +294,28 @@ public class GUIController {
     public Parent getRoot() {
         return this.vBox;
     }
-
     private void setNodeSize(double nodeSize) {
         this.nodeSize = nodeSize;
         drawInit();
     }
-
     double getNodeSize() {
         return this.nodeSize;
     }
-
     private void setPane(VBox vBox) {
         this.vBox = vBox;
     }
-
     void setChoiceBoxAlgorithm(String algo) {
         this.selectedAlgorithm = algo;
     }
-
     public void setFilesInFolder(List<File> filesInFolder) {
         this.filesInFolder = filesInFolder;
     }
-
     public File getFileHandle() {
         return fileHandle;
     }
-
     public String getSelectedAlgo() {
         return selectedAlgorithm;
     }
-
     public String getSelectedEdgeType() {
         return selectedEdgeType;
     }

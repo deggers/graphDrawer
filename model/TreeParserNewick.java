@@ -1,55 +1,25 @@
 package model;
 
-import controller.ParseController;
-
 import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
+//    @formatter:off
 public class TreeParserNewick {
     private static int pseudoNode_id = 0;
 
-    public static Tree parseFileToTree(File file) {
+    public static   Tree parseFileToTree(File file) {
         try {
             Stream<String> lines = Files.lines(file.toPath());
             String newickString = lines.map(line -> line.replaceAll("\\s+", "")).collect(Collectors.joining()).trim();
-
-            if (isValidFormat(newickString)) {
-                TreeNode root = buildTreeStructure(newickString);
-                Tree tree = new Tree(root);
-                return tree;
-            } else {
-                System.out.println("format for newick seems to be wrong, daaamn");
-                return null;
-            }
+            return isValidFormat(newickString) ? new Tree(buildTreeStructure(newickString)) : null;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
-
-    public static TreeNode parseStringToTree(String newickString) {
-
-        newickString = newickString.replace(" ", "");
-        newickString = newickString.replace("\t", "");
-        newickString = newickString.replace("\n", "");
-
-        // check if string is valid format
-        if (isValidFormat(newickString)) {
-            // process it
-            return buildTreeStructure(newickString);
-        } else {
-
-            System.out.println("format for newick seems to be wrong, daaamn");
-            return null;
-        }
-    }
-
-// Problem: es müssen noch die längen der kanten der pseudoknoten gespeichert werden!
-    private static TreeNode buildTreeStructure(String string) {
-
+    private static  TreeNode buildTreeStructure(String string) {
         try {  // try to find branch
             int rightPar = getClosingParenthesis(string);
             int nodeId = pseudoNode_id++;
@@ -59,50 +29,22 @@ public class TreeParserNewick {
             for (String branch : splitArray) {
                 TreeNode child = buildTreeStructure(branch);
                 currentNode.addChild(child);
-
-//                if(currentNode.children.isEmpty()){ // klappt nicht, wird immer right da
-//                    // jeder knoten alle unter sich mit in children hat
-//                    currentNode.leftChild= child;
-//                    System.out.println("left = " + child);
-//                } else {
-//                    currentNode.rightChild= child;
-//                    System.out.println("right = " + child);
-//                }
-
             }
             return currentNode;
         } catch (IllegalArgumentException e) {
-//            System.out.println("i guess we have a leaf here");
 
             // problem: if node has name but is no leaf saved as label= id instead of label= name
             String[] nameSplit = string.split(":");
             TreeNode node = new TreeNode(nameSplit[0]);
             if (nameSplit.length > 1) {
-                node.weight= Double.parseDouble(nameSplit[1]);
+                node.weight = Double.parseDouble(nameSplit[1]);
             } else {
                 node.weight = 1.00;
             }
             return node;
         }
     }
-
-    private static int getClosingParenthesis(final String strng) {
-        if (!strng.trim().startsWith("(")) {
-            throw new IllegalArgumentException(String.format("Illegal Argument [%s] does not start with an opening parenthesis", strng));
-        }
-
-        int depth = 0;
-        for (int i = 0; i < strng.length(); i++) {
-            if (strng.charAt(i) == '(') {
-                depth++;
-            } else if (strng.charAt(i) == ')' && (--depth == 0)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    private static String[] splitToBranches(String s) {
+    private static  String[] splitToBranches(String s) {
         ArrayList<Integer> splitIndices = new ArrayList<>();
         int rightParenCount = 0;
         int leftParenCount = 0;
@@ -136,8 +78,22 @@ public class TreeParserNewick {
         }
         return splits;
     }
+    private static  int getClosingParenthesis(final String strng) {
+        if (!strng.trim().startsWith("(")) {
+            throw new IllegalArgumentException(String.format("Illegal Argument [%s] does not start with an opening parenthesis", strng));
+        }
 
-    private static boolean isValidFormat(String inputCleaned) {
+        int depth = 0;
+        for (int i = 0; i < strng.length(); i++) {
+            if (strng.charAt(i) == '(') {
+                depth++;
+            } else if (strng.charAt(i) == ')' && (--depth == 0)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    private static  boolean isValidFormat(String inputCleaned) {
         if (inputCleaned.isEmpty()) {
             return false;
         }
@@ -158,10 +114,6 @@ public class TreeParserNewick {
                 return false;
             }
         }
-        if (brackets != 0) {
-            return false;
-        }
-        return true;
+        return brackets==0;
     }
-
 }

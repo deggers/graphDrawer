@@ -1,26 +1,31 @@
 package model;
 
 import java.util.Objects;
-import model.HelperTypes.ProtoNode;
 
 public class Edge {
 
-    Object start;
-    Object target;
+    GraphNode start;
+    GraphNode target;
     String edgeType;
     Double weight;
 
-    public Edge() {
+    Edge() {
     }
 
-    public Edge(Object start, Object target) {
+    Edge(GraphNode start, GraphNode target) {
         this.start = start;
         this.target = target;
         edgeType = "none";
         weight = 1.0;
     }
 
-    public Edge(Object start, Object target, String edgeType, Double weight) {
+    public Edge(GraphNode start, GraphNode target, String edgeType) {
+        this.start = start;
+        this.target = target;
+        this.edgeType = edgeType;
+    }
+
+    public Edge(GraphNode start, GraphNode target, String edgeType, Double weight) {
         this.start = start;
         this.target = target;
         this.edgeType = edgeType;
@@ -30,27 +35,19 @@ public class Edge {
     @Override
     public String toString() {
         return this.start + " to " + this.target;
-   }
+    }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
+        if (this == obj) return true;
+
+        if (obj == null || getClass() != obj.getClass()) return false;
+
         final Edge other = (Edge) obj;
-        if (!Objects.equals(this.start, other.start)) {
+        if (!Objects.equals(this.start, other.start) || !Objects.equals(this.target, other.target))
             return false;
-        }
-        if (!Objects.equals(this.target, other.target)) {
-            return false;
-        }
-        return true;
+
+        return Objects.equals(this.edgeType, other.edgeType);
     }
 
     @Override
@@ -59,10 +56,11 @@ public class Edge {
         hash = 13 * hash + Objects.hashCode(this.start);
         hash = 13 * hash + Objects.hashCode(this.target);
         hash = 13 * hash + Objects.hashCode(this.edgeType);
-        hash = 13 * hash + Objects.hashCode(this.weight);
         return hash;
     }
 
-    
-    
+
+    boolean isSelfEdge() {
+        return (this.start.equals(this.target));
+    }
 }

@@ -12,41 +12,7 @@ import java.util.Objects;
  * @author gross
  */
 public class HelperTypes {
-    
-    public static class ProtoNode { //Hält eine kleine Repräsentation eines Knotens in einem GraphML Graphen, die keinerlei Zeichenfunktionalität oder Adjazenzinformationen bereitstellt
-        
-        private final String label;
-        private final String GraphMLType;
 
-        public ProtoNode(String label) {
-            this.label = label;
-            GraphMLType = null;
-        }
-
-        public ProtoNode(String label, String GraphMLType) {
-            this.label = label;
-            this.GraphMLType = GraphMLType;
-        }
-        
-        public TreeNode toTreeNode(){
-            TreeNode node = new TreeNode(label);
-            node.GraphMLType = GraphMLType;
-            return node;
-        }
-        
-        public GraphNode toGraphNode(){
-            return new GraphNode(label, GraphMLType, false);
-        }
-
-        public String getLabel() {
-            return label;
-        }
-
-        public String getGraphMLType() {
-            return GraphMLType;
-        }
-    }
-    
     public static class EdgeType{
         final String id;
         final String attrType;

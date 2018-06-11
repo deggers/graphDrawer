@@ -1,78 +1,82 @@
 
 package controller;
 
-import model.GraphMLGraph;
+import model.Graph;
 import model.GraphMLParser;
 import model.Tree;
 import model.TreeParserNewick;
 
 import java.io.File;
 
-public class ParseController {
+import static java.util.Objects.requireNonNull;
 
-    private File file = null;
-    private Tree tree = null;
+public enum ParseController{
+    INSTANCE;
+    private File file;
+    private Tree tree;
+    private Graph graph;
 
-    private GraphMLGraph graph = null;
-    public static ParseController instance;
-
-    public static ParseController getInstance() {
-        if (instance == null) {
-            ParseController.instance = new ParseController();
-        }
-        return ParseController.instance;
+    public boolean initParsing(File file) {
+        setFile(file);
+        if (getFileExtension(file).equalsIgnoreCase("nh")) return parseNewick(file);
+        else if (getFileExtension(file).equalsIgnoreCase("graphml")) return parseGraphML(file);
+        // nothing worked, error!
+        System.out.println("tried to parse a unknown fileExtension");
+        return false;
     }
 
-    public boolean initializeParsing(File file) {
-        setFile(file);
-        String fileName = file.getName();
-        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());
-        if (fileExtension.equalsIgnoreCase("nh")) {
-            Tree newickTree = TreeParserNewick.parseFileToTree(file);
-            // rather "setupNewickConfig()"
-            GUIController.getInstance().choiceBoxEdgeType.setDisable(true);
-            GUIController.getInstance().choiceBoxRoot.setDisable(true);
-            setTree(newickTree);
-            setGraph(null);
-            return true;
-        } else if (fileExtension.equalsIgnoreCase("graphml")) {
-            /// rather "setupGraphMLConfig()"
-            GraphMLGraph graphML = GraphMLParser.parseFileToGraph(file);
+    private boolean parseGraphML(File file) {
+        try {
+            Graph graphML = GraphMLParser.parseFileToGraph(file);
             setGraph(graphML);
             setTree(null);
             return true;
-        } else {
-            System.out.println("format is not supported ?!");
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+    private boolean parseNewick(File file) {
+        try {
+            Tree newickTree = TreeParserNewick.parseFileToTree(file);
+            requireNonNull(GUIController.getInstance()).choiceBoxEdgeType.setDisable(true);
+            requireNonNull(GUIController.getInstance()).choiceBoxRoot.setDisable(true);
+            setTree(newickTree);
+            setGraph(null);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
 
-    // SETTER & GETTER AREA
-    public void setTree(Tree tree) {
+    void    setGraph(Graph graph) {
+        this.graph = graph;
+    }
+    void    setTree(Tree newickTree) {
         GUIController guiController = GUIController.getInstance();
         if (guiController != null) {
             guiController.setChoiceBoxAlgorithmIsSet(false); // new tree new Algorithms possible -> calc new
             guiController.setChoiceBoxAlgorithm(null); // do not draw the old Algorithm again, new one is necessary
         }
         if (PaneController.getInstance() != null) guiController.cleanPane();  // new tree => new drawing => clean old pane
-        this.tree = tree;
+        this.tree = newickTree;
     }
-    public Tree getTree() {
+    void    setFile(File file) {
+        this.file = file;
+    }
+    private String  getFileExtension(File file) {
+        String fileName = file.getName();
+        return fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());
+    }
+
+    public Tree         getTree() {
         return this.tree;
     }
-
-    public GraphMLGraph getGraph() {
-        return graph;
+    public Graph getGraph() {
+        return this.graph;
     }
-    public void setGraph(GraphMLGraph graph) {
-        GUIController.getInstance().setChoiceBoxAlgorithmIsSet(false);
-        this.graph = graph;
-    }
-
-    public File getFile() {
-        return file;
-    }
-    public void setFile(File file) {
-        this.file = file;
+    public File         getFile() {
+        return this.file;
     }
 }

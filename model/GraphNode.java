@@ -1,18 +1,64 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-
-public class GraphNode extends AbstractNode {
-
-    private LinkedHashSet<GraphNode> children = new LinkedHashSet<>();
-    private LinkedHashSet<GraphNode> parents = new LinkedHashSet<>();
+public class GraphNode {
+    private String label;
+    private String nodeType;
     private boolean dummyNode = false;
     private int layer = -1;
-
     private char dfsStatus = 'u'; //unvisited, visited, final
+
+    GraphNode(String label, String nodeType ) {
+        this.label = label;
+        this.nodeType = nodeType;
+    }
+    GraphNode(String label, String type, boolean isDummyNode) {
+        this.label = label;
+        this.nodeType = type;
+        this.dummyNode = isDummyNode;
+    }
+    GraphNode(String label, String type, boolean isDummyNode, int layer) {
+        this.label = label;
+        this.nodeType = type;
+        this.dummyNode = isDummyNode;
+        this.layer = layer;
+    }
+
+    String getNodeType() {
+        return nodeType;
+    }
+    public String getLabel() {
+        return this.label;
+    }
+
+
+    int getLayer() {
+        return layer;
+    }
+
+    void setLayer(int layer) {
+        this.layer = layer;
+    }
+
+    boolean isDummyNode(){
+        return dummyNode;
+    }
+
+
+
+    @Override
+    public String toString() {
+//        return String.format("label: %s parents: %s children: %s \n", label,parentLabels(),childrenLabels());
+        return String.format("'%s':%s", label, layer);
+    }
+
+
+    TreeNode toTreeNode(){
+        String label = this.label;
+        String type = this.getNodeType();
+        return new TreeNode(label,type);
+    }
+
+
     char getDfsStatus() {
         return dfsStatus;
     }
@@ -24,90 +70,25 @@ public class GraphNode extends AbstractNode {
         }
     }
 
-    GraphNode(String label, String type, boolean isDummyNode) {
-        super(label);
-        this.GraphMLType = type;
-        this.dummyNode = isDummyNode;
-        children = new LinkedHashSet<>();
-        parents = new LinkedHashSet<>();
-    }
-    GraphNode(String label) {
-        super(label);
-        GraphMLType = null;
-    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof GraphNode)) return false;
 
-    public String getLabel() {
-        return this.label;
-    }
-    public List<GraphNode> getChildren() {
-        return new LinkedList<>(children);
-    }
-    public List<GraphNode> getParents() {
-        return new LinkedList<>(parents);
-    }
+        GraphNode node = (GraphNode) o;
 
-    public int getLayer() {
-        return layer;
-    }
-
-    public void setLayer(int layer) {
-        this.layer = layer;
-    }
-    
-    int indegree(){
-        return parents.size();
-    }
-    
-    int outdegree(){
-        return children.size();
+        if (dummyNode != node.dummyNode) return false;
+        if (layer != node.layer) return false;
+        if (label != null ? !label.equals(node.label) : node.label != null) return false;
+        return nodeType != null ? nodeType.equals(node.nodeType) : node.nodeType == null;
     }
 
     @Override
-    public boolean isLeaf() {
-        return children.isEmpty();
+    public int hashCode() {
+        int result = label != null ? label.hashCode() : 0;
+        result = 31 * result + (nodeType != null ? nodeType.hashCode() : 0);
+        result = 31 * result + (dummyNode ? 1 : 0);
+        result = 31 * result + layer;
+        return result;
     }
-    public boolean isRoot() {
-        return parents.isEmpty();
-    }
-    public boolean isDummyNode(){
-        return dummyNode;
-    }
-
-
-
-    @Override
-    public String toString() {
-//        return String.format("label: %s parents: %s children: %s \n", label,parentLabels(),childrenLabels());
-        return String.format("%s,level:%s", label, layer);
-    }
-     List<String> parentLabels(){
-        List<String> returnlist = new LinkedList<>();
-        for (GraphNode node : parents) {
-            returnlist.add(node.label);
-        }
-        return returnlist;
-    }
-     List<String> childrenLabels(){
-        List<String> returnlist = new LinkedList<>();
-        for (GraphNode node : children) {
-            returnlist.add(node.label);
-        }
-        return returnlist;
-    }
-
-    boolean addChild(GraphNode node){
-        return children.add(node);
-    }
-    boolean removeChild(GraphNode node) {
-        return children.remove(node);
-    }
-
-    boolean addParent(GraphNode node){
-        return parents.add(node);
-    }
-    boolean removeParent(GraphNode node) {
-        return parents.remove(node);
-    }
-    
-    
 }

@@ -27,6 +27,7 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         String username = System.getProperty("user.name");
+        ParseController parseInstance = ParseController.INSTANCE;
 
         File file;
         String arg1;
@@ -51,7 +52,8 @@ public class Main extends Application {
                 break;
         }
 
-        ParseController.getInstance().initializeParsing(file);
+        parseInstance.initParsing(file);
+        System.out.println("init parsing!");
         GUIController guiInstance = GUIController.getInstance();
 
         assert guiInstance != null;

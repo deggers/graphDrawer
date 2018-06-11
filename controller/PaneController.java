@@ -9,7 +9,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
-import model.GraphMLGraph;
 import model.TreeNode;
 import model.Tree;
 
@@ -238,7 +237,7 @@ public class PaneController {
         }
     }
 
-    /*public void drawGraph(GraphMLGraph theGraph) {
+    /*public void drawGraph(Graph theGraph) {
         for (TreeNode node : theGraph.nodeList) {
             if (node.parent == null) {
                 pane.getChildren().add(createNode(node, "graph"));

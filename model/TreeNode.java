@@ -3,8 +3,14 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TreeNode extends AbstractNode {
+public class TreeNode {
     public double weight=0;
+    public String label;
+    public String type;
+    public double x;
+    public double y;
+    public int level;
+
     public static List<Integer> depthList = new ArrayList<>();    
     //walker
     // muss resetted werden
@@ -26,7 +32,12 @@ public class TreeNode extends AbstractNode {
 
 
     public TreeNode(String label) {
-        super(label);
+        this.label = label;
+    }
+
+    public TreeNode(String label, String type) {
+        this.label = label;
+        this.type = type;
     }
 
     public List<TreeNode> getChildren() {
@@ -54,7 +65,6 @@ public class TreeNode extends AbstractNode {
         return max;
     }
 
-    @Override
     public boolean isLeaf() {
         return children.isEmpty();
     }

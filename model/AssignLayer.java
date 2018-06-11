@@ -9,6 +9,8 @@ of partitioning the vertex set of a graph into layers is known as the layering p
 layer assignment problem
  */
 
+import model.GraphNode;
+
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -21,13 +23,13 @@ public class AssignLayer {
     private LinkedHashMap<GraphNode, Integer> nodeToRank = new LinkedHashMap<>();
 
 //    right now not working
-    public static drawableGraph longestPath(drawableGraph g) {
+    public static Graph longestPath(Graph g) {
         final boolean optionalCheck = true;
 
         LinkedHashSet<GraphNode> U = new LinkedHashSet<>(); // set of nodes that will get a layer in this step
         LinkedHashSet<GraphNode> Z = new LinkedHashSet<>(); // set of all parents of nodes in U
         int currentLayer = 1;
-        drawableGraph layeredGraph = g.copy(g);
+        Graph layeredGraph = g.copy(g);
         if (verbose) System.out.println("Deleting isolated nodes, if any.");
         //layeredGraph.deleteIsolatedNodes(); //hope this works
         //layeredGraph.getIsolatedNodes().forEach(layeredGraph::justRemoveNode);
@@ -39,12 +41,12 @@ public class AssignLayer {
             if (verbose) System.out.printf("Set U: %s\n", U.toString());
             for (GraphNode node : U) {
                 node.setLayer(currentLayer); // set all nodes in U to currentLayer
-                Z.addAll(node.getParents()); // compute the union of all parents of nodes in U
+                Z.addAll(layeredGraph.getParentsOf(node)); // compute the union of all parents of nodes in U
             }
             U.clear(); // clear U to compute all nodes that can get a layer in the next step
             for (GraphNode graphNode : Z) {
                 boolean hasNoUnlayeredChildren = true;
-                for (GraphNode gn : graphNode.getChildren()) {
+                for (GraphNode gn : layeredGraph.getChildrenOf(graphNode)) {
                     if (gn.getLayer()<0/*depends on default value for unlayered nodes*/) {
                         hasNoUnlayeredChildren = false;
                     }
@@ -58,7 +60,7 @@ public class AssignLayer {
         }
         //all nodes should be layered now, optional check
         if (optionalCheck) {
-            for (GraphNode graphNode : layeredGraph.copyNodeSet()) {
+            for (GraphNode graphNode : layeredGraph.getNodes()) {
                 if (graphNode.getLayer()<0) {
                     //if any node is not properly labeled, throw something
                     throw new Error("LongestPath Layering produced an error, as some nodes in the graph remained unlayered. Check for correctness, solitary nodes or disable this check!");
@@ -70,9 +72,9 @@ public class AssignLayer {
         layeredGraph.addDummies();
         return layeredGraph;
     }
-    public static void topologicalPath(drawableGraph g) {
+    public static void topologicalPath(Graph g) {
         int level = 1;
-        drawableGraph copyG = g.copy(g);
+        Graph copyG = g.copy(g);
         LinkedHashMap<Integer, LinkedList<GraphNode>> sorted = new LinkedHashMap<>();
         LinkedList<GraphNode> sinks;
 
@@ -82,21 +84,17 @@ public class AssignLayer {
             sinks.forEach(copyG::removeIngoingEdges);
             sinks.forEach(copyG::justRemoveNode);
             level += 1;
-            if (level == g.getNodeSet().size()) System.out.println("Way to many levels..");
+            if (level == g.getNodes().size()) System.out.println("Way to many levels..");
         }
         sorted.put(level, copyG.getIsolatedNodes());
+        System.out.println("sorted = " + sorted);
         sorted.forEach((key, value) -> {value.forEach(node -> node.setLayer(key));});
-
-//        System.out.println("print g orig");
-//        g.getNodeSet().forEach(System.out::println);
-//        System.out.println("print g copied");
-//        copyG.copyNodeSet().forEach(System.out::println);
 
         g.addDummies();
         if (verbose) {
             System.out.println(g);
-            System.out.println(g.getEdgeSet());
-            System.out.println("g.getNodeSet() = " + g.getNodeSet());
+            System.out.println(g.getEdges());
+            System.out.println("g.getNodeSet() = " + g.getNodes());
         }
     }
 
@@ -109,19 +107,19 @@ public class AssignLayer {
         return nodeToRank.get(node);
     }
     private Integer getSpanOf(Edge edge) {
-        GraphNode u = (GraphNode) edge.start;
-        GraphNode v = (GraphNode) edge.target;
+        GraphNode u = edge.start;
+        GraphNode v = edge.target;
         return getRank(u) - getRank(v);
     }
-    private Edge getLongEdge(drawableGraph g) {
-        for (Edge edge : g.copyEdgeSet()) {
+    private Edge getLongEdge(Graph g) {
+        for (Edge edge : g.getEdges()) {
             if (getSpanOf(edge) > 1) {
                 return edge;
             }
         }
         return null;
     }
-    private Boolean layeringIsProper(drawableGraph g) {
+    private Boolean layeringIsProper(Graph g) {
        /*   The layering found by a layering algorithm might not
             be proper because only a small fraction of DAGs can be layered properly and also because
             a proper layering may not satisfy other layering requirements.

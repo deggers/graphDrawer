@@ -4,31 +4,32 @@ import controller.GUIController;
 import model.*;
 
 public class NaiveDraw {
-    private static final boolean verbose = false;
+    private static final boolean VERBOSE = false;
 
-    public static GraphMLGraph processGraph(GraphMLGraph theGraph) throws Exception {
+    public static Graph processGraph(Graph theGraph) {
+        System.out.println("Nodes: " + theGraph.getNodes().size() + ", Edges: " + theGraph.getEdges().size());
         String selectedEdgeType = GUIController.getInstance().getSelectedEdgeType();
-        drawableGraph drawGraph = new drawableGraph(theGraph,selectedEdgeType);
-        System.out.println("drawGraph got " + drawGraph);
-
-//      1. Remove all Cycles
+        Graph partialGraph = theGraph.copyWithRestrains(selectedEdgeType);
+        System.out.println("Nodes: " + partialGraph.getNodes().size() + ", Edges: " + partialGraph.getEdges().size());
+////      1. Remove all Cycles
         System.out.println("remove all cycles");
-        CycleBreaker.DFS_Florian(drawGraph);
-        System.out.println("cyclefree got " + drawGraph);
-        if (verbose) {
-            System.out.println(drawGraph);
-            System.out.println(drawGraph.copyEdgeSet());
-            System.out.println("g.getNodeSet() = " + drawGraph.copyNodeSet());
-        }
-//      2.  Layer Assignment: Vertices are assigned to layers.
-        System.out.println("layer assignment");
-        drawGraph = AssignLayer.longestPath(drawGraph);
-        System.out.println("drawGraph got " + drawGraph);
-        if (verbose) {
-            System.out.println(drawGraph);
-            System.out.println(drawGraph.copyEdgeSet());
-            System.out.println("g.getNodeSet() = " + drawGraph.copyNodeSet());
-        }
+        CycleBreaker.DFS_Florian(partialGraph);
+//        System.out.println("cyclefree got " + drawGraph);
+//        if (verbose) {
+//            System.out.println(drawGraph);
+//            System.out.println(drawGraph.copyEdgeSet());
+//            System.out.println("g.getNodeSet() = " + drawGraph.copyNodeSet());
+//        }
+////      2.  Layer Assignment: Vertices are assigned to layers.
+//        System.out.println("Layer assignment");
+//        AssignLayer.topologicalPath(partialGraph);
+//        System.out.println("partialGraph = " + partialGraph);
+//        System.out.println("drawGraph got " + drawGraph);
+//        if (verbose) {
+//            System.out.println(drawGraph);
+//            System.out.println(drawGraph.copyEdgeSet());
+//            System.out.println("g.getNodeSet() = " + drawGraph.copyNodeSet());
+//        }
 
       return theGraph;
     }
