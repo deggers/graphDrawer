@@ -1,3 +1,4 @@
+/*
 package draw;
 
 import model.DrawableGraph;
@@ -18,3 +19,4 @@ public class Barycenter {
 
     // method calcCrossings(Ba
 }
+*/

@@ -53,11 +53,11 @@ public class GraphNode extends AbstractNode {
     public void setLayer(int layer) {
         this.layer = layer;
     }
-    
+
     int indegree(){
         return parents.size();
     }
-    
+
     int outdegree(){
         return children.size();
     }
@@ -80,14 +80,14 @@ public class GraphNode extends AbstractNode {
 //        return String.format("label: %s parents: %s children: %s \n", label,parentLabels(),childrenLabels());
         return String.format("%s,level:%s", label, layer);
     }
-     List<String> parentLabels(){
+    List<String> parentLabels(){
         List<String> returnlist = new LinkedList<>();
         for (GraphNode node : parents) {
             returnlist.add(node.label);
         }
         return returnlist;
     }
-     List<String> childrenLabels(){
+    List<String> childrenLabels(){
         List<String> returnlist = new LinkedList<>();
         for (GraphNode node : children) {
             returnlist.add(node.label);
@@ -102,12 +102,15 @@ public class GraphNode extends AbstractNode {
         return children.remove(node);
     }
 
+    //boolean hasChild(Node node){
+    //  return children.contains(node)}
+
     boolean addParent(GraphNode node){
         return parents.add(node);
     }
     boolean removeParent(GraphNode node) {
         return parents.remove(node);
     }
-    
-    
+
+
 }
