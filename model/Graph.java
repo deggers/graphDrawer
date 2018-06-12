@@ -7,7 +7,8 @@ public class Graph {
     private LinkedHashSet<GraphNode> nodeSet;
     private LinkedHashSet<Edge> edgeSet;
     private LinkedList<HelperTypes.EdgeType> edgeTypeList = new LinkedList<>();
-
+    private LinkedHashMap<Integer, GraphNode> nodeToLayer;
+    private LinkedHashMap<Integer, LinkedList<GraphNode>> layerMap;
 
     private LinkedHashSet<String> visitedNodesForExtractSubtreeSet = null;
     private HashSet<Edge> temporaryEdgeSubset = null;
@@ -15,11 +16,11 @@ public class Graph {
     private LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToEdgesOut;
     private LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToEdgesIn;
 
-    LinkedHashMap<model.GraphNode, LinkedList<Edge>> getHashmap_nodeToEdgeOut() {
+    LinkedHashMap<GraphNode, LinkedList<Edge>> getHashmap_nodeToEdgeOut() {
         return nodeToEdgesOut;
     }
 
-    LinkedHashMap<model.GraphNode, LinkedList<Edge>> getHashmap_nodeToEdgeIn() {
+    LinkedHashMap<GraphNode, LinkedList<Edge>> getHashmap_nodeToEdgeIn() {
         return nodeToEdgesIn;
     }
 
@@ -28,19 +29,28 @@ public class Graph {
     Graph(LinkedHashSet<Edge> inputEdges) {
         LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToEdgesOut = new LinkedHashMap<>();
         LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToEdgesIn = new LinkedHashMap<>();
+        LinkedHashMap<Integer, GraphNode> nodeToLayer = new LinkedHashMap<>();
+        LinkedHashMap<Integer, LinkedList<GraphNode>> layerMap = new LinkedHashMap<>();
 
         LinkedHashSet<GraphNode> clonedNodes = new LinkedHashSet<>();
         LinkedHashSet<Edge> clonedEdges = new LinkedHashSet<>();
 
+
         for (Edge originalEdge : inputEdges) {
+
             GraphNode start = originalEdge.start;
-            GraphNode clonedStart = new GraphNode(start.getLabel(), start.getNodeType(),start.isDummyNode(), start.getLayer());
+            int startLayer = start.getLayer();
+            GraphNode clonedStart = new GraphNode(start.getLabel(), start.getNodeType(), startLayer);
+            nodeToLayer.put(startLayer, clonedStart);
 
             GraphNode target = originalEdge.target;
-            GraphNode clonedTarget = new GraphNode((target.getLabel()), target.getNodeType(), target.isDummyNode(), target.getLayer());
+            int targetLayer = target.getLayer();
+            GraphNode clonedTarget = new GraphNode((target.getLabel()), target.getNodeType(), targetLayer);
+            nodeToLayer.put(targetLayer, clonedTarget);
 
             clonedNodes.add(clonedStart);
             clonedNodes.add(clonedTarget);
+            System.out.println("clonedNodes = " + clonedNodes);
 
             Edge clonedEdge = new Edge(clonedStart, clonedTarget, originalEdge.edgeType);
             clonedEdges.add(clonedEdge);
@@ -64,6 +74,17 @@ public class Graph {
 
         this.nodeSet = clonedNodes;
         this.edgeSet = clonedEdges;
+        this.nodeToLayer = nodeToLayer;
+
+        for (Map.Entry<Integer, GraphNode> entry : nodeToLayer.entrySet()) {
+            int layer = entry.getKey();
+            LinkedList<GraphNode> modifyList = new LinkedList<>();
+            if (layerMap.containsKey(layer))
+                modifyList.addAll(layerMap.get(layer));
+            modifyList.add(entry.getValue());
+            layerMap.put(layer, modifyList);
+        }
+        this.layerMap = layerMap;
     }
 
     public Graph copyWithRestrains(String edgeType) {
@@ -318,15 +339,25 @@ public class Graph {
     void reverseEdge(Edge edge) {
         GraphNode u = edge.start;
         GraphNode v = edge.target;
+
         if (VERBOSE) System.out.printf("Turning: %s to %s \n", u.getLabel(), v.getLabel());
         if (edgeSet.contains(edge)) {
+            String edgeType = edge.edgeType;
             if (VERBOSE) System.out.println("Edge in EdgeSet going to be turned");
-            edgeSet.remove(edge);
-            edgeSet.add(new Edge(v, u, edge.edgeType, edge.weight));
-        }
-        else System.out.println("EDGE COULDN'T BE TURNED, WTF!");
+            deleteEdge(edge);
+            addEdge(new Edge(v, u, edgeType));
+        } else System.out.println("EDGE COULDN'T BE TURNED, WTF!");
     }
 
+    void insertLayer(int layer, LinkedList<GraphNode> nodes) {
+        for (GraphNode node : nodes) {
+            for (GraphNode graphNode : nodeSet) {
+                if (node.equals(graphNode)) {
+                    graphNode.setLayer(layer);
+                }
+            }
+        }
+    }
 
     void addDummies() {
         LinkedList<Edge> edgesToDelete = new LinkedList<>();
@@ -421,7 +452,7 @@ public class Graph {
         return !nodeToEdgesOut.containsKey(node);
     }
 
-    LinkedList<GraphNode> getChildrenOf(GraphNode node) {
+    LinkedList<GraphNode> getChildrenFrom(GraphNode node) {
         LinkedList<GraphNode> children = new LinkedList<>();
         if (nodeToEdgesOut.containsKey(node)) {
             for (Edge edge : nodeToEdgesOut.get(node))
@@ -442,10 +473,6 @@ public class Graph {
         this.edgeTypeList = edgeTypes;
     }
 
-    String getEdgeType() {
-        Iterator<Edge> it = edgeSet.iterator();
-        return it.next().edgeType;
-    }
 
     Edge getEdgeBetween(GraphNode start, GraphNode end) {
         for (Edge edge : edgeSet)

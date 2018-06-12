@@ -7,10 +7,10 @@ public class NaiveDraw {
     private static final boolean VERBOSE = false;
 
     public static Graph processGraph(Graph theGraph) {
-        System.out.println("Nodes: " + theGraph.getNodes().size() + ", Edges: " + theGraph.getEdges().size());
+        System.out.println("Graph: \n Nodes: " + theGraph.getNodes().size() + ", Edges: " + theGraph.getEdges().size());
         String selectedEdgeType = GUIController.getInstance().getSelectedEdgeType();
         Graph partialGraph = theGraph.copyWithRestrains(selectedEdgeType);
-        System.out.println("Nodes: " + partialGraph.getNodes().size() + ", Edges: " + partialGraph.getEdges().size());
+        System.out.println("Partial: \n Nodes: " + partialGraph.getNodes().size() + ", Edges: " + partialGraph.getEdges().size());
 
 
 ////      1. Remove all Cycles
@@ -22,11 +22,14 @@ public class NaiveDraw {
 //            System.out.println(drawGraph.copyEdgeSet());
 //            System.out.println("g.getNodeSet() = " + drawGraph.copyNodeSet());
 //        }
+
 ////      2.  Layer Assignment: Vertices are assigned to layers.
-//        System.out.println("Layer assignment");
-//        AssignLayer.topologicalPath(partialGraph);
+        System.out.println("Layer assignment");
+        AssignLayer.topologicalPath(partialGraph);
 //        System.out.println("partialGraph = " + partialGraph);
-//        System.out.println("drawGraph got " + drawGraph);
+//        System.out.println("Partial: \n Nodes: " + partialGraph.getNodes().size() + ", Edges: " + partialGraph.getEdges().size());
+//        System.out.println(partialGraph.getEdges());
+
 //        if (verbose) {
 //            System.out.println(drawGraph);
 //            System.out.println(drawGraph.copyEdgeSet());

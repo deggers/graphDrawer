@@ -23,6 +23,12 @@ public class GraphNode {
         this.layer = layer;
     }
 
+    GraphNode(String label, String nodeType, int layer) {
+        this.label = label;
+        this.nodeType = nodeType;
+        this.layer = layer;
+    }
+
     String getNodeType() {
         return nodeType;
     }
@@ -48,7 +54,10 @@ public class GraphNode {
     @Override
     public String toString() {
 //        return String.format("label: %s parents: %s children: %s \n", label,parentLabels(),childrenLabels());
-        return String.format("'%s':%s", label, layer);
+//        return String.format("'%s':%s", label, layer);
+        return String.format("'%s':%s %s", label, layer, Integer.toString(this.hashCode()));
+
+//        return this.getLabel() + ":" +Integer.toString(this.hashCode());
     }
 
 
@@ -63,11 +72,9 @@ public class GraphNode {
         return dfsStatus;
     }
     void setDfsStatus(char dfsStatus) {
-        if (dfsStatus=='u' || dfsStatus=='v' || dfsStatus=='f') {
+        if (dfsStatus=='u' || dfsStatus=='v' || dfsStatus=='f')
             this.dfsStatus = dfsStatus;
-        } else {
-            throw new IllegalArgumentException("dfsStatus can only be set to u, v or f");
-        }
+        else throw new IllegalArgumentException("dfsStatus can only be set to u, v or f");
     }
 
     @Override
@@ -77,8 +84,6 @@ public class GraphNode {
 
         GraphNode node = (GraphNode) o;
 
-        if (dummyNode != node.dummyNode) return false;
-        if (layer != node.layer) return false;
         if (label != null ? !label.equals(node.label) : node.label != null) return false;
         return nodeType != null ? nodeType.equals(node.nodeType) : node.nodeType == null;
     }
@@ -87,8 +92,6 @@ public class GraphNode {
     public int hashCode() {
         int result = label != null ? label.hashCode() : 0;
         result = 31 * result + (nodeType != null ? nodeType.hashCode() : 0);
-        result = 31 * result + (dummyNode ? 1 : 0);
-        result = 31 * result + layer;
         return result;
     }
 }

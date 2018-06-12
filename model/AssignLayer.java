@@ -9,9 +9,6 @@ of partitioning the vertex set of a graph into layers is known as the layering p
 layer assignment problem
  */
 
-import model.GraphNode;
-
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -46,7 +43,7 @@ public class AssignLayer {
             U.clear(); // clear U to compute all nodes that can get a layer in the next step
             for (GraphNode graphNode : Z) {
                 boolean hasNoUnlayeredChildren = true;
-                for (GraphNode gn : layeredGraph.getChildrenOf(graphNode)) {
+                for (GraphNode gn : layeredGraph.getChildrenFrom(graphNode)) {
                     if (gn.getLayer()<0/*depends on default value for unlayered nodes*/) {
                         hasNoUnlayeredChildren = false;
                     }
@@ -88,9 +85,18 @@ public class AssignLayer {
         }
         sorted.put(level, copyG.getIsolatedNodes());
         System.out.println("sorted = " + sorted);
-        sorted.forEach((key, value) -> {value.forEach(node -> node.setLayer(key));});
+//        sorted.forEach((key, value) -> {value.forEach(node -> node.setLayer(key));});
+        System.out.println("g.getNodes befor () = " + g.getNodes());
+        System.out.println("g.getEdges before() = " + g.getEdges());
+        System.out.println("");
+        for (int layer : sorted.keySet()) {
+           g.insertLayer(layer, sorted.get(layer));
+        }
 
-        g.addDummies();
+        System.out.println("g.getNodes after () = " + g.getNodes());
+        System.out.println("g.getEdges after() = " + g.getEdges());
+
+//        g.addDummies();
         if (verbose) {
             System.out.println(g);
             System.out.println(g.getEdges());

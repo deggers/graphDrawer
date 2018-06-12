@@ -15,11 +15,11 @@ set of all edges in the cycle is a FAS but not a FS.*/
 
 public class CycleBreaker {
     /*    Returns the edges of a cycle found via a directed, depth-first traversal. */
-    private static final boolean VERBOSE = true;
-    private static final boolean DEBUG = false;
+    private static final boolean VERBOSE    = true;
+    private static final boolean DEBUG      = false;
     private static HashSet<Edge> edgesToBeReversed = new LinkedHashSet<>(); //in their original form
 
-    public static void Berger_Shor(Graph g){
+    public static void      Berger_Shor(Graph g){
         Graph copyG = g.copy(g);
         LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToEdgeIn = copyG.getHashmap_nodeToEdgeIn();
         LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToEdgeOut = copyG.getHashmap_nodeToEdgeOut();
@@ -44,9 +44,7 @@ public class CycleBreaker {
         edgesToBeReversed.forEach(g::reverseEdge);
         edgesToBeReversed.clear();
     }
-
-
-    public static void GreedyCycleRemoval(Graph g){
+    public static void      GreedyCycleRemoval(Graph g){
 /*        The first polynomial-time algorithm for solving the minimum FAS problem with an approximation
           ratio less than 2 in the worst case */
         Graph copyG = g.copy(g);
@@ -87,7 +85,7 @@ public class CycleBreaker {
         edgesToBeReversed.forEach(g::reverseEdge);
         edgesToBeReversed.clear();
     }
-    public static void DFS_Florian(Graph g) {
+    public static void      DFS_Florian(Graph g) {
         for (GraphNode startNode : g.getNodes())
             if (startNode.getDfsStatus() == 'u')
                 dfsRec(g, startNode);
@@ -95,14 +93,14 @@ public class CycleBreaker {
         edgesToBeReversed.forEach(g::reverseEdge);
         edgesToBeReversed.clear();
     }
-    private static void dfsRec(Graph g, GraphNode node) {
+    private static void     dfsRec(Graph g, GraphNode node) {
         if (g.isSink(node)) {
             node.setDfsStatus('f');
         } else {
             node.setDfsStatus('v');
             if (VERBOSE && DEBUG) System.out.printf("Current Node: %s \n", node.getLabel());
-            if (g.getChildrenOf(node) != null) {
-                for (GraphNode graphNode : g.getChildrenOf(node)) {
+            if (g.getChildrenFrom(node) != null) {
+                for (GraphNode graphNode : g.getChildrenFrom(node)) {
                     if (graphNode.getDfsStatus() == 'v') {
                         if (VERBOSE) System.out.printf("Cycle found, turning edge from %s to %s \n", node.getLabel(), graphNode.getLabel());
                         Edge edge =  g.getEdgeBetween(node, graphNode);
