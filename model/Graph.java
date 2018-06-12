@@ -382,16 +382,29 @@ public class Graph {
                 for (int i = spanningLevels; i > 0; i--) { // for every additional spanned level
                     String label = "Dummy-" + i + "; from: " + start.getLabel() + " to: " + target.getLabel() + "|";
                     GraphNode node = new GraphNode(label, "Dummy", true); // create a dummy with a proper label
-                    node.setLayer(target.getLayer() + i);
+                    int layer = target.getLayer() + i;
+                    node.setLayer(layer);
+
+                    LinkedList<GraphNode> tempList = new LinkedList<>();
+                    if (layerMap.containsKey(layer))
+                        tempList.addAll(layerMap.get(layer));
+                    tempList.add(node);
+                    layerMap.put(layer,tempList);
+
                     nodeSet.add(node); // add to NodeSet
                     block.add(node); // add to block to find parent/children
                 }
                 block.add(target);
 
-                // missing adding new edges !! --dustyn
+                for (int i = 0; i < block.size(); i++) { // hoffe das wirft keinen outOfBounds
+                    if (!block.get(i).equals(target)) {
+//                        block.get(i).addChild(block.get(i+1)); // except for at target Node, add child i+1
+                        edgesNew.add(new Edge(block.get(i), block.get(i+1),"Graph1")); // likewise, add Edge to edgeList
+                    }
+//                    if (!block.get(i).equals(start)) block.get(i).addParent(block.get(i-1)); // except for at start Node, add parent i-1
+                }
             }
         } // end-for edge
-
 
         edgesToDelete.forEach(this::deleteEdge);
         edgesNew.forEach(this::addEdge);
