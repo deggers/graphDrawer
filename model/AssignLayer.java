@@ -84,17 +84,9 @@ public class AssignLayer {
             if (level == g.getNodes().size()) System.out.println("Way to many levels..");
         }
         sorted.put(level, copyG.getIsolatedNodes());
-        System.out.println("sorted = " + sorted);
-//        sorted.forEach((key, value) -> {value.forEach(node -> node.setLayer(key));});
-        System.out.println("g.getNodes befor () = " + g.getNodes());
-        System.out.println("g.getEdges before() = " + g.getEdges());
-        System.out.println("");
         for (int layer : sorted.keySet()) {
            g.insertLayer(layer, sorted.get(layer));
         }
-
-        System.out.println("g.getNodes after () = " + g.getNodes());
-        System.out.println("g.getEdges after() = " + g.getEdges());
 
 //        g.addDummies();
         if (verbose) {

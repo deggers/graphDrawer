@@ -1,5 +1,6 @@
 package controller;
 
+import draw.Arrow;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ScrollPane;
@@ -9,16 +10,16 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
-import model.TreeNode;
-import model.Tree;
+import model.*;
 
+import javax.tools.Tool;
 import java.io.IOException;
 import java.util.Objects;
 
 //@formatter:off
 public class PaneController {
     // CONSTANTS
-    private static  final   double  OFFSET              = 20;
+    private static  final   int  OFFSET              = 20;
     private static final    Paint   LEAF_COLOR          = Color.FORESTGREEN;
     private static final    Paint   NODE_COLOR          = Color.GRAY;
     private static final    Paint   RADIAL_LEVEL        = Color.LIGHTGRAY;
@@ -57,7 +58,6 @@ public class PaneController {
     void            cleanPane() {
         if (pane != null) this.pane.getChildren().clear();
     }
-
     private double  scaleCoordinate(double number) {
         return (number * 2 * getNodeSize()) + OFFSET;
     }
@@ -69,11 +69,50 @@ public class PaneController {
     ScrollPane      getScrollPane() {
         return scrollPane;
     }
-    private double     getNodeSize() {
+    private int     getNodeSize() {
         return Objects.requireNonNull(GUIController.getInstance()).getNodeSize();
     }
 
     // DRAWFUNCTIONS
+
+    void drawDAG(Graph graph) {
+        drawDAGEdges(graph);
+        drawDAGNodes(graph);
+    }
+
+    private void drawDAGEdges(Graph graph){
+        for (Edge edge: graph.getEdges()) {
+            GraphNode startNode = edge.getStart();
+            int startX = scaleGraphNode(startNode.x);
+            int startY = scaleGraphNode(startNode.y);
+
+            GraphNode targetNode = edge.getTarget();
+            int targetX = scaleGraphNode(targetNode.x);
+            int targetY = scaleGraphNode(targetNode.y);
+
+            pane.getChildren().add(new Arrow(startX,startY,targetX,targetY,14));
+        }
+    }
+
+    private void drawDAGNodes(Graph graph){
+        for (GraphNode node: graph.getNodes()){
+            pane.getChildren().add(createGraphNode(node,"DAG"));
+            }
+    }
+
+    private Circle createGraphNode(GraphNode node, String type){
+        Circle circle;
+        circle = new Circle(scaleGraphNode(node.x), scaleGraphNode(node.y), getNodeSize());
+        Tooltip tip = new Tooltip((node.getLabel() + ", " + node.getLayer()));
+        Tooltip.install(circle,tip);
+        return circle;
+    }
+
+    private int scaleGraphNode(int number){
+        return (number * 4 * getNodeSize()) + OFFSET;
+    }
+
+
     void            drawTreeStructure(Tree tree) {
         drawTreeEdges(tree);
         drawTreeNodes(tree);
@@ -115,12 +154,7 @@ public class PaneController {
         }
     }
 
-    private Circle  createGuideline(int width, int height, int decreasingRadius) {
-        Circle node = new Circle(width, height, decreasingRadius);
-        node.setFill(Color.TRANSPARENT);
-        node.setStroke(RADIAL_LEVEL);
-        return node;
-    }
+
     private Circle  createNode(TreeNode node, String type) {
         Circle circle;
         if (type.equalsIgnoreCase("radial"))
@@ -134,6 +168,13 @@ public class PaneController {
         return circle;
     }
 
+
+        private Circle  createGuideline(int width, int height, int decreasingRadius) {
+        Circle node = new Circle(width, height, decreasingRadius);
+        node.setFill(Color.TRANSPARENT);
+        node.setStroke(RADIAL_LEVEL);
+        return node;
+    }
     //@formatter:on
 
     public void drawRadialTreeStructure(Tree tree) {
@@ -252,5 +293,6 @@ public class PaneController {
     public int getScrollPaneWidth() {
         return scrollPane == null ? 0 : (int) scrollPane.getWidth();
     }
+
 
 }

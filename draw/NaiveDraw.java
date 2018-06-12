@@ -3,6 +3,9 @@ package draw;
 import controller.GUIController;
 import model.*;
 
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+
 public class NaiveDraw {
     private static final boolean VERBOSE = false;
 
@@ -36,12 +39,18 @@ public class NaiveDraw {
 //            System.out.println("g.getNodeSet() = " + drawGraph.copyNodeSet());
 //        }
 
-      return theGraph;
-    }
+        // simple algo to give nodes an coordinate to draw something :)
+        LinkedHashMap<Integer,LinkedList<GraphNode>> layerMap = partialGraph.getLayerMap();
+        for (int layer : layerMap.keySet()) {
+            int x = 1;
+            System.out.println("layer = " + layerMap.get(layer));
+            for (GraphNode node : layerMap.get(layer)) {
+                node.y = layer;
+                node.x = x;
+                x++;
+            }
+        }
 
-
-    public static Tree processTree(Tree theTree) {
-
-        return null;
+      return partialGraph;
     }
 }

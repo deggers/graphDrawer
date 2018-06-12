@@ -9,6 +9,14 @@ public class Edge {
     String edgeType;
     Double weight;
 
+    public GraphNode getStart() {
+        return this.start;
+    }
+
+    public GraphNode getTarget() {
+        return this.target;
+    }
+
     Edge() {
     }
 

@@ -7,6 +7,9 @@ public class GraphNode {
     private int layer = -1;
     private char dfsStatus = 'u'; //unvisited, visited, final
 
+    public int x;
+    public int y;
+
     GraphNode(String label, String nodeType ) {
         this.label = label;
         this.nodeType = nodeType;
@@ -15,12 +18,6 @@ public class GraphNode {
         this.label = label;
         this.nodeType = type;
         this.dummyNode = isDummyNode;
-    }
-    GraphNode(String label, String type, boolean isDummyNode, int layer) {
-        this.label = label;
-        this.nodeType = type;
-        this.dummyNode = isDummyNode;
-        this.layer = layer;
     }
 
     GraphNode(String label, String nodeType, int layer) {
@@ -37,7 +34,7 @@ public class GraphNode {
     }
 
 
-    int getLayer() {
+    public int getLayer() {
         return layer;
     }
 

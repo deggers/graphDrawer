@@ -1,5 +1,5 @@
 package model;
-
+//@formatter:off
 import java.util.*;
 
 public class Graph {
@@ -84,15 +84,15 @@ public class Graph {
         this.edgeSet = clonedEdges;
         this.nodeToLayer = nodeToLayer;
 
-//        for (Map.Entry<Integer, GraphNode> entry : nodeToLayer.entrySet()) {
-//            int layer = entry.getKey();
-//            LinkedList<GraphNode> modifyList = new LinkedList<>();
-//            if (layerMap.containsKey(layer))
-//                modifyList.addAll(layerMap.get(layer));
-//            modifyList.add(entry.getValue());
-//            layerMap.put(layer, modifyList);
-//        }
-//        this.layerMap = layerMap;
+        for (Map.Entry<Integer, GraphNode> entry : nodeToLayer.entrySet()) {
+            int layer = entry.getKey();
+            LinkedList<GraphNode> modifyList = new LinkedList<>();
+            if (layerMap.containsKey(layer))
+                modifyList.addAll(layerMap.get(layer));
+            modifyList.add(entry.getValue());
+            layerMap.put(layer, modifyList);
+        }
+        this.layerMap = layerMap;
     }
 
     public Graph copyWithRestrains(String edgeType) {
@@ -173,12 +173,6 @@ public class Graph {
         }
     }
 
-
-    public List<GraphNode> listAllNodes() {
-        //System.out.println("List of all nodes returned");
-        return new LinkedList<>(nodeSet);
-    }
-
     public List<Edge> getEdgesOut(GraphNode node) {
         List<Edge> outgoingEdges = new LinkedList<>();
         for (Edge e : edgeSet) {
@@ -256,7 +250,6 @@ public class Graph {
             if (getOutdegree(node) == 0 && getIndegree(node) > 0) return node;
         return null;
     }
-
     model.GraphNode getSource() {
         for (model.GraphNode node : this.nodeSet)
             if (getIndegree(node) == 0) return node;
@@ -267,7 +260,6 @@ public class Graph {
         /* will only remove this node */
         this.nodeSet.remove(removeMe);
     }
-
     int getOutdegree(GraphNode node) {
         int size = 0;
         if (nodeToEdgesOut.containsKey(node)) {
@@ -275,7 +267,6 @@ public class Graph {
         }
         return size;
     }
-
     int getIndegree(GraphNode node) {
         int size = 0;
         if (nodeToEdgesIn.containsKey(node)) {
@@ -283,7 +274,6 @@ public class Graph {
         }
         return size;
     }
-
     void removeIngoingEdges(GraphNode node) {
         edgeSet.removeAll(nodeToEdgesIn.get(node));
         LinkedList<Edge> edgesToBeRemoved = new LinkedList<>(nodeToEdgesIn.get(node));
@@ -296,7 +286,6 @@ public class Graph {
         }
         nodeToEdgesIn.keySet().removeIf(entry -> entry == node);
     }
-
     void removeOutgoingEdges(GraphNode node) {
         edgeSet.removeAll(nodeToEdgesOut.get(node));
         LinkedList<Edge> edgesToBeRemoved = new LinkedList<>(nodeToEdgesOut.get(node));
@@ -321,7 +310,6 @@ public class Graph {
 //        System.out.println("max = " + max);
         return winnerNode;
     }
-
     public GraphNode selectRandomNode() {
         int size = nodeSet.size();
         int item = new Random().nextInt(size); // In real life, the Random object should be rather more shared than this
@@ -333,7 +321,6 @@ public class Graph {
         }
         return null;
     }
-
     LinkedList<GraphNode> getAllSinks() {
         LinkedList<GraphNode> allSinks = new LinkedList<>();
         for (GraphNode node : this.nodeSet) {
@@ -343,7 +330,6 @@ public class Graph {
         }
         return allSinks;
     }
-
     void reverseEdge(Edge edge) {
         GraphNode u = edge.start;
         GraphNode v = edge.target;
@@ -358,15 +344,26 @@ public class Graph {
         } else System.out.println("EDGE COULDN'T BE TURNED, WTF!");
     }
 
+    public LinkedHashMap<Integer,LinkedList<GraphNode>> getLayerMap(){
+        return this.layerMap;
+    }
+
     void insertLayer(int layer, LinkedList<GraphNode> nodes) {
         for (GraphNode node : nodes) {
             for (GraphNode graphNode : nodeSet) {
                 if (node.equals(graphNode)) {
                     graphNode.setLayer(layer);
+                    nodeToLayer.put(layer, graphNode);
+
+                    LinkedList<GraphNode> tempList = new LinkedList<>();
+                    if (layerMap.containsKey(layer))
+                        tempList.addAll(layerMap.get(layer));
+                    tempList.add(graphNode);
+                    layerMap.put(layer,tempList);
+                    }
                 }
             }
         }
-    }
 
     void addDummies() {
         LinkedList<Edge> edgesToDelete = new LinkedList<>();
@@ -382,7 +379,6 @@ public class Graph {
                 block.add(start);
 
                 // not sure if correct... --dustyn
-
                 for (int i = spanningLevels; i > 0; i--) { // for every additional spanned level
                     String label = "Dummy-" + i + "; from: " + start.getLabel() + " to: " + target.getLabel() + "|";
                     GraphNode node = new GraphNode(label, "Dummy", true); // create a dummy with a proper label
@@ -439,12 +435,12 @@ public class Graph {
             edgeSetIn.remove(edge);
             nodeToEdgesIn.put(node_key, edgeSetIn);
         }
-
+        // logik korrekt ?
         for (GraphNode node_key : nodeToEdgesOut.keySet()) {
             LinkedList<Edge> edgeSetOut = new LinkedList<>();
-            edgeSetOut.addAll(nodeToEdgesIn.get(node_key));
+            edgeSetOut.addAll(nodeToEdgesOut.get(node_key));
             edgeSetOut.remove(edge);
-            nodeToEdgesIn.put(node_key, edgeSetOut);
+            nodeToEdgesOut.put(node_key, edgeSetOut);
         }
 
     }

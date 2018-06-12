@@ -40,7 +40,7 @@ public class GUIController {
 
     public void initialize() {
         nodeSizeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            setNodeSize(newValue.doubleValue());
+            setNodeSize(newValue.intValue());
         });
         choiceBoxEdgeType.setDisable(true); // disable at beginning
         choiceBoxRoot.setDisable(true); // disable at beginning
@@ -145,7 +145,7 @@ public class GUIController {
     private static  GUIController       guiInstance                 = null;
 
 
-    private double                      nodeSize                    = 8;
+    private int                      nodeSize                    = 8;
     private int                         spaceBetweenRadii           = 0;
     private String                      selectedRoot                = null;
     private String                      selectedEdgeType            = null;
@@ -231,14 +231,8 @@ public class GUIController {
                 break;
             case "Random":
                 if (parseInstance.getGraph() != null) {
-                    try {
-                        Graph randomGraph = NaiveDraw.processGraph(parseInstance.getGraph());
-                    }
-                    catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else if (parseInstance.getTree() != null) {
-                    Tree randomTree = NaiveDraw.processTree(parseInstance.getTree());
+                    Graph naiveDraw = NaiveDraw.processGraph(parseInstance.getGraph());
+                    paneController.drawDAG(naiveDraw);
                 }
                 break;
             default:
@@ -294,11 +288,11 @@ public class GUIController {
     public Parent getRoot() {
         return this.vBox;
     }
-    private void setNodeSize(double nodeSize) {
+    private void setNodeSize(int nodeSize) {
         this.nodeSize = nodeSize;
         drawInit();
     }
-    double getNodeSize() {
+    int getNodeSize() {
         return this.nodeSize;
     }
     private void setPane(VBox vBox) {
