@@ -105,6 +105,7 @@ public class PaneController {
         circle = new Circle(scaleGraphNode(node.x), scaleGraphNode(node.y), getNodeSize());
         Tooltip tip = new Tooltip((node.getLabel() + ", " + node.getLayer()));
         Tooltip.install(circle,tip);
+        if (node.isDummyNode()) circle.setFill(Color.LIGHTSKYBLUE);
         return circle;
     }
 
