@@ -42,7 +42,7 @@ public class GraphNode {
         this.layer = layer;
     }
 
-    boolean isDummyNode(){
+   public boolean isDummyNode(){
         return dummyNode;
     }
 
