@@ -88,7 +88,7 @@ public class AssignLayer {
            g.insertLayer(layer, sorted.get(layer));
         }
 
-//        g.addDummies();
+        g.addDummies();
         if (verbose) {
             System.out.println(g);
             System.out.println(g.getEdges());
