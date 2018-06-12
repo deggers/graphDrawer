@@ -248,7 +248,7 @@ public class GUIController {
     }
 
 
-    private void drawInit() {
+    public void drawInit() {
         setFileLabel();
         Tree theTree = parseInstance.getTree();
         Graph theGraph = parseInstance.getGraph();

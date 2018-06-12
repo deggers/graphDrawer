@@ -12,13 +12,6 @@ public class Edge {
     Edge() {
     }
 
-    Edge(GraphNode start, GraphNode target) {
-        this.start = start;
-        this.target = target;
-        edgeType = "none";
-        weight = 1.0;
-    }
-
     Edge(GraphNode start, GraphNode target, String edgeType) {
         this.start = start;
         this.target = target;
@@ -44,7 +37,8 @@ public class Edge {
         if (obj == null || getClass() != obj.getClass()) return false;
 
         final Edge other = (Edge) obj;
-        if (!Objects.equals(this.start.getLabel(), other.start.getLabel()) || !Objects.equals(this.target.getLabel(), other.target.getLabel()))
+//        if (!Objects.equals(this.start.getLabel(), other.start.getLabel()) || !Objects.equals(this.target.getLabel(), other.target.getLabel()))
+        if (!Objects.equals(this.start, other.start) || !Objects.equals(this.target, other.target))
             return false;
 
         return Objects.equals(this.edgeType, other.edgeType);

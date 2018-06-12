@@ -33,6 +33,7 @@ public class Graph {
         LinkedHashMap<Integer, LinkedList<GraphNode>> layerMap = new LinkedHashMap<>();
 
         LinkedHashSet<GraphNode> clonedNodes = new LinkedHashSet<>();
+        LinkedHashMap<String, GraphNode> nodeMap = new LinkedHashMap<>();
         LinkedHashSet<Edge> clonedEdges = new LinkedHashSet<>();
 
 
@@ -41,18 +42,22 @@ public class Graph {
             GraphNode start = originalEdge.start;
             int startLayer = start.getLayer();
             GraphNode clonedStart = new GraphNode(start.getLabel(), start.getNodeType(), startLayer);
-            nodeToLayer.put(startLayer, clonedStart);
+//            nodeToLayer.put(startLayer, clonedStart);
 
             GraphNode target = originalEdge.target;
             int targetLayer = target.getLayer();
             GraphNode clonedTarget = new GraphNode((target.getLabel()), target.getNodeType(), targetLayer);
-            nodeToLayer.put(targetLayer, clonedTarget);
+//            nodeToLayer.put(targetLayer, clonedTarget);
 
-            clonedNodes.add(clonedStart);
-            clonedNodes.add(clonedTarget);
-            System.out.println("clonedNodes = " + clonedNodes);
+            if (!nodeMap.containsKey(clonedStart.getLabel()))
+                nodeMap.put(clonedStart.getLabel(), clonedStart);
+            if (!nodeMap.containsKey(clonedTarget.getLabel()))
+                nodeMap.put(clonedTarget.getLabel(), clonedTarget);
 
-            Edge clonedEdge = new Edge(clonedStart, clonedTarget, originalEdge.edgeType);
+            GraphNode referencedStartClone = nodeMap.get(clonedStart.getLabel());
+            GraphNode referencedTargetClone = nodeMap.get(clonedTarget.getLabel());
+
+            Edge clonedEdge = new Edge(referencedStartClone, referencedTargetClone, originalEdge.edgeType);
             clonedEdges.add(clonedEdge);
 
             // update Hashmaps :)
@@ -72,19 +77,22 @@ public class Graph {
         this.nodeToEdgesOut = nodeToEdgesOut;
         this.nodeToEdgesIn = nodeToEdgesIn;
 
+        for (String str : nodeMap.keySet())
+            clonedNodes.add(nodeMap.get(str));
+
         this.nodeSet = clonedNodes;
         this.edgeSet = clonedEdges;
         this.nodeToLayer = nodeToLayer;
 
-        for (Map.Entry<Integer, GraphNode> entry : nodeToLayer.entrySet()) {
-            int layer = entry.getKey();
-            LinkedList<GraphNode> modifyList = new LinkedList<>();
-            if (layerMap.containsKey(layer))
-                modifyList.addAll(layerMap.get(layer));
-            modifyList.add(entry.getValue());
-            layerMap.put(layer, modifyList);
-        }
-        this.layerMap = layerMap;
+//        for (Map.Entry<Integer, GraphNode> entry : nodeToLayer.entrySet()) {
+//            int layer = entry.getKey();
+//            LinkedList<GraphNode> modifyList = new LinkedList<>();
+//            if (layerMap.containsKey(layer))
+//                modifyList.addAll(layerMap.get(layer));
+//            modifyList.add(entry.getValue());
+//            layerMap.put(layer, modifyList);
+//        }
+//        this.layerMap = layerMap;
     }
 
     public Graph copyWithRestrains(String edgeType) {
@@ -343,6 +351,7 @@ public class Graph {
         if (VERBOSE) System.out.printf("Turning: %s to %s \n", u.getLabel(), v.getLabel());
         if (edgeSet.contains(edge)) {
             String edgeType = edge.edgeType;
+            System.out.println("edgeType = " + edgeType);
             if (VERBOSE) System.out.println("Edge in EdgeSet going to be turned");
             deleteEdge(edge);
             addEdge(new Edge(v, u, edgeType));

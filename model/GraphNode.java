@@ -54,8 +54,9 @@ public class GraphNode {
     @Override
     public String toString() {
 //        return String.format("label: %s parents: %s children: %s \n", label,parentLabels(),childrenLabels());
-//        return String.format("'%s':%s", label, layer);
-        return String.format("'%s':%s %s", label, layer, Integer.toString(this.hashCode()));
+        return String.format("'%s':%s", label, layer);
+//        return String.format("'%s':%s %s", label, layer, Integer.toString(this.hashCode()));
+//        return String.format("'%s':%s %s", label, layer,nodeType);
 
 //        return this.getLabel() + ":" +Integer.toString(this.hashCode());
     }
@@ -84,8 +85,8 @@ public class GraphNode {
 
         GraphNode node = (GraphNode) o;
 
-        if (label != null ? !label.equals(node.label) : node.label != null) return false;
-        return nodeType != null ? nodeType.equals(node.nodeType) : node.nodeType == null;
+        if (label != null ? !label.equals(node.getLabel()) : node.label != null) return false;
+        return nodeType != null ? nodeType.equals(node.getNodeType()) : node.nodeType == null;
     }
 
     @Override
