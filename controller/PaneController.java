@@ -18,7 +18,10 @@ import java.util.Objects;
 //@formatter:off
 public class PaneController {
     // CONSTANTS
-    private static  final   int  OFFSET              = 20;
+    private static  final   int     OFFSET              = 20;
+    private static final    int     ARROW_HEAD_SIZE     = 8;
+
+
     private static final    Paint   LEAF_COLOR          = Color.FORESTGREEN;
     private static final    Paint   NODE_COLOR          = Color.GRAY;
     private static final    Paint   RADIAL_LEVEL        = Color.LIGHTGRAY;
@@ -84,7 +87,7 @@ public class PaneController {
             GraphNode startNode = edge.getStart();
             GraphNode targetNode = edge.getTarget();
 
-            pane.getChildren().add(new Connector(startNode,targetNode,14));
+            pane.getChildren().add(new Connector(startNode,targetNode,ARROW_HEAD_SIZE));
         }
     }
 

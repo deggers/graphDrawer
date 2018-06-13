@@ -292,7 +292,7 @@ public class GUIController {
         this.nodeSize = nodeSize;
         drawInit();
     }
-    int getNodeSize() {
+    public int getNodeSize() {
         return this.nodeSize;
     }
     private void setPane(VBox vBox) {
