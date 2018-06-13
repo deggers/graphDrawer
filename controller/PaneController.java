@@ -78,16 +78,16 @@ public class PaneController {
     // DRAWFUNCTIONS
 
     void drawDAG(Graph graph) {
-        drawDAGEdges(graph);
+        drawDAGEdges(graph,4);
         drawDAGNodes(graph);
     }
 
-    private void drawDAGEdges(Graph graph){
+    private void drawDAGEdges(Graph graph, int ports){
         for (Edge edge: graph.getEdges()) {
             GraphNode startNode = edge.getStart();
             GraphNode targetNode = edge.getTarget();
 
-            pane.getChildren().add(new Connector(startNode,targetNode,ARROW_HEAD_SIZE));
+            pane.getChildren().add(new Connector(startNode,targetNode,ports,ARROW_HEAD_SIZE));
         }
     }
 

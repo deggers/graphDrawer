@@ -1,5 +1,7 @@
 package model;
 
+import java.util.LinkedHashMap;
+
 public class GraphNode {
     private String label;
     private String nodeType;
@@ -7,13 +9,24 @@ public class GraphNode {
     private int layer = -1;
     private char dfsStatus = 'u'; //unvisited, visited, final
 
+    public LinkedHashMap<Double, Boolean> getPortMap() {
+        return portMap;
+    }
+
+    public void setPortMap(LinkedHashMap<Double, Boolean> portMap) {
+        this.portMap = portMap;
+    }
+
+    private LinkedHashMap<Double, Boolean> portMap = new LinkedHashMap<>();
+
     public int x;
     public int y;
 
-    GraphNode(String label, String nodeType ) {
+    GraphNode(String label, String nodeType) {
         this.label = label;
         this.nodeType = nodeType;
     }
+
     GraphNode(String label, String type, boolean isDummyNode) {
         this.label = label;
         this.nodeType = type;
@@ -29,10 +42,10 @@ public class GraphNode {
     String getNodeType() {
         return nodeType;
     }
+
     public String getLabel() {
         return this.label;
     }
-
 
     public int getLayer() {
         return layer;
@@ -42,10 +55,9 @@ public class GraphNode {
         this.layer = layer;
     }
 
-   public boolean isDummyNode(){
+    public boolean isDummyNode() {
         return dummyNode;
     }
-
 
 
     @Override
@@ -59,18 +71,19 @@ public class GraphNode {
     }
 
 
-    TreeNode toTreeNode(){
+    TreeNode toTreeNode() {
         String label = this.label;
         String type = this.getNodeType();
-        return new TreeNode(label,type);
+        return new TreeNode(label, type);
     }
 
 
     char getDfsStatus() {
         return dfsStatus;
     }
+
     void setDfsStatus(char dfsStatus) {
-        if (dfsStatus=='u' || dfsStatus=='v' || dfsStatus=='f')
+        if (dfsStatus == 'u' || dfsStatus == 'v' || dfsStatus == 'f')
             this.dfsStatus = dfsStatus;
         else throw new IllegalArgumentException("dfsStatus can only be set to u, v or f");
     }
