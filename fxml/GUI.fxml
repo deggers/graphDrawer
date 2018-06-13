@@ -32,7 +32,7 @@
                   <Font name="Arial Bold" size="12.0" />
                </font>
             </Button>
-            <Slider fx:id="nodeSizeSlider" min="8" max="12" blockIncrement="0.1" prefHeight="14.0" prefWidth="95.0">
+            <Slider fx:id="nodeSizeSlider" min="14" max="22" blockIncrement="0.1" prefHeight="14.0" prefWidth="95.0">
                <HBox.margin>
                   <Insets left="10.0" right="10.0" />
                </HBox.margin>

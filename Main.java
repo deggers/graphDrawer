@@ -31,21 +31,18 @@ public class Main extends Application {
 
         File file;
         String arg1;
-        if (args.length > 0) {
-            arg1 = args[0];
-        } else  arg1 = "graphML";
+        if (args.length > 0) arg1 = args[0];
+        else arg1 = "graphML";
 
         switch (arg1) {
             case "nh":
                 file = new File("C:\\Users\\gross\\Desktop\\Programmierung\\BioVis\\BioVis18\\Baeume\\Data\\Phylogeny\\DTListenerTest.nh");
                 break;
             case "graphML":
-                if (username.equals("dusty")) {
+                if (username.equals("dusty"))
                     file = new File("C:\\Users\\dusty\\Desktop\\Zeckzer\\Vorlesung\\Baeume_1\\Baeume\\Data\\Software-Engineering\\test.graphml");
-                }
-                else {
+                else
                     file = new File("C:\\Users\\gross\\Desktop\\Programmierung\\BioVis\\BioVis18\\Baeume\\Data\\Software-Engineering\\test.graphml");
-                }
                 break;
             default:
                 file = null;

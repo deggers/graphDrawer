@@ -78,7 +78,7 @@ public class PaneController {
     // DRAWFUNCTIONS
 
     void drawDAG(Graph graph) {
-        drawDAGEdges(graph,4);
+        drawDAGEdges(graph,5);
         drawDAGNodes(graph);
     }
 
