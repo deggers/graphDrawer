@@ -1,6 +1,6 @@
 package controller;
 
-import draw.Arrow;
+import draw.Connector;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ScrollPane;
@@ -12,7 +12,6 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import model.*;
 
-import javax.tools.Tool;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -83,14 +82,9 @@ public class PaneController {
     private void drawDAGEdges(Graph graph){
         for (Edge edge: graph.getEdges()) {
             GraphNode startNode = edge.getStart();
-            int startX = scaleGraphNode(startNode.x);
-            int startY = scaleGraphNode(startNode.y);
-
             GraphNode targetNode = edge.getTarget();
-            int targetX = scaleGraphNode(targetNode.x);
-            int targetY = scaleGraphNode(targetNode.y);
 
-            pane.getChildren().add(new Arrow(startX,startY,targetX,targetY,14));
+            pane.getChildren().add(new Connector(startNode,targetNode,14));
         }
     }
 
@@ -105,11 +99,10 @@ public class PaneController {
         circle = new Circle(scaleGraphNode(node.x), scaleGraphNode(node.y), getNodeSize());
         Tooltip tip = new Tooltip((node.getLabel() + ", " + node.getLayer()));
         Tooltip.install(circle,tip);
-        if (node.isDummyNode()) circle.setFill(Color.LIGHTSKYBLUE);
+        if (node.isDummyNode()) circle.setFill(Color.TRANSPARENT);
         return circle;
     }
-
-    private int scaleGraphNode(int number){
+    public int scaleGraphNode(int number){
         return (number * 4 * getNodeSize()) + OFFSET;
     }
 
