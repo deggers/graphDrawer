@@ -11,6 +11,7 @@ public class GraphNode extends AbstractNode {
     private LinkedHashSet<GraphNode> parents = new LinkedHashSet<>();
     private boolean dummyNode = false;
     private int layer = -1;
+    private int order=0;
 
     private char dfsStatus = 'u'; //unvisited, visited, final
     char getDfsStatus() {
@@ -102,14 +103,23 @@ public class GraphNode extends AbstractNode {
         return children.remove(node);
     }
 
-    //boolean hasChild(Node node){
-    //  return children.contains(node)}
+    // so oder andersum? :D
+    boolean isChild(GraphNode node){
+      return node.children.contains(this);}
 
     boolean addParent(GraphNode node){
         return parents.add(node);
     }
     boolean removeParent(GraphNode node) {
         return parents.remove(node);
+    }
+
+    public int getOrder(){
+        return this.order;
+    }
+
+    public void setOrder(int order){
+        this.order=order;
     }
 
 
