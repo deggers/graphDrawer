@@ -37,6 +37,20 @@ public class Connector extends Path {
         if (ports == 5) connectWith5Ports(edge, angle);
     }
 
+//    private void connectWith5Ports(Edge edge, double angle) {
+//        if (degreeBetween(270-22.5, 270+22.5, angle))
+//            createLineWithAnchor(edge, 270.0);
+//        else if (degreeBetween(315-22.5, 315+22.5, angle))
+//            createLineWithAnchor(edge, 315.0);
+//        else if (degreeBetween(315+22.5, 0, angle) || degreeBetween(0.00,22.5,angle))
+//            createLineWithAnchor(edge, 0.0);
+//        else if (degreeBetween(22.5, 45+22.5, angle))
+//            createLineWithAnchor(edge, 45.0);
+//        else if (degreeBetween(45+22.5, 90+22.5, angle))
+//            createLineWithAnchor(edge, 90.0);
+//        else System.out.println("uups, 5Ports did not found a port!");
+//    }
+
     private void connectWith5Ports(Edge edge, double angle) {
         if (degreeBetween(0, 112.5, angle))
             createLineWithAnchor(edge, 90.0);

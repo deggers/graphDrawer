@@ -87,9 +87,16 @@ public class AssignLayer {
             if (level == g.getNodes().size()) System.out.println("Way to many levels..");
         }
         sorted.put(level, copyG.getIsolatedNodes());
-        for (int layer : sorted.keySet()) {
+
+        // no good idea how to reverse - so naive approach.. --dustyn
+//        LinkedHashMap<Integer, LinkedList<GraphNode>> sortedReversed = new LinkedHashMap<>();
+//        int reverseCounter = sorted.size() + 1;
+//        for (int layer : sorted.keySet())
+//            sortedReversed.put(reverseCounter - layer, sorted.get(layer));
+        //////////////////////////////////////////////////////////////
+
+        for (int layer : sorted.keySet())
             g.insertLayer(layer, sorted.get(layer));
-        }
 
         g.addDummies();
         if (verbose) {

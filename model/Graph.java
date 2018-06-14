@@ -410,7 +410,6 @@ public class Graph {
 
         edgesToDelete.forEach(this::deleteEdge);
         edgesNew.forEach(this::addEdge);
-
     }
 
     private void addEdge(Edge e) {

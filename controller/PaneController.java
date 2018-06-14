@@ -15,6 +15,8 @@ import model.*;
 import java.io.IOException;
 import java.util.Objects;
 
+// TODO Refactor it nicely.. 14.07.17
+
 //@formatter:off
 public class PaneController {
     // CONSTANTS
