@@ -57,7 +57,9 @@ public class Graph {
             GraphNode referencedStartClone = nodeMap.get(clonedStart.getLabel());
             GraphNode referencedTargetClone = nodeMap.get(clonedTarget.getLabel());
 
-            Edge clonedEdge = new Edge(referencedStartClone, referencedTargetClone, originalEdge.edgeType);
+            boolean isReversed = originalEdge.isReversed();
+
+            Edge clonedEdge = new Edge(referencedStartClone, referencedTargetClone, originalEdge.edgeType, isReversed);
             clonedEdges.add(clonedEdge);
 
             // update Hashmaps :)
@@ -337,10 +339,11 @@ public class Graph {
         if (VERBOSE) System.out.printf("Turning: %s to %s \n", u.getLabel(), v.getLabel());
         if (edgeSet.contains(edge)) {
             String edgeType = edge.edgeType;
-            System.out.println("edgeType = " + edgeType);
             if (VERBOSE) System.out.println("Edge in EdgeSet going to be turned");
             deleteEdge(edge);
-            addEdge(new Edge(v, u, edgeType));
+            Edge reversedEdge = new Edge(v, u, edgeType);
+            reversedEdge.setReversed();
+            addEdge(reversedEdge);
         } else System.out.println("EDGE COULDN'T BE TURNED, WTF!");
     }
 
@@ -372,6 +375,7 @@ public class Graph {
         for (Edge edge : edgeSet) {
             GraphNode start = edge.start;
             GraphNode target = edge.target;
+
             int spanningLevels = Math.abs(start.getLayer() - target.getLayer()) - 1;
             if (spanningLevels > 0) {
                 edgesToDelete.add(edge);
@@ -398,10 +402,8 @@ public class Graph {
 
                 for (int i = 0; i < block.size(); i++) { // hoffe das wirft keinen outOfBounds
                     if (!block.get(i).equals(target)) {
-//                        block.get(i).addChild(block.get(i+1)); // except for at target Node, add child i+1
-                        edgesNew.add(new Edge(block.get(i), block.get(i+1),"Graph1")); // likewise, add Edge to edgeList
+                        edgesNew.add(new Edge(block.get(i), block.get(i+1),edge.edgeType, edge.isReversed())); // likewise, add Edge to edgeList
                     }
-//                    if (!block.get(i).equals(start)) block.get(i).addParent(block.get(i-1)); // except for at start Node, add parent i-1
                 }
             }
         } // end-for edge
@@ -482,9 +484,12 @@ public class Graph {
 
     LinkedList<GraphNode> getParentsOf(GraphNode node) {
         LinkedList<GraphNode> parents = new LinkedList<>();
-        for (Edge edge : nodeToEdgesIn.get(node))
-            parents.add(edge.start);
-        return parents;
+        if (nodeToEdgesIn.containsKey(node)){
+            for (Edge edge : nodeToEdgesIn.get(node))
+                parents.add(edge.start);
+            return parents;
+        }
+        return null;
     }
 
     void setEdgeTypes(LinkedList<HelperTypes.EdgeType> edgeTypes) {
@@ -495,7 +500,7 @@ public class Graph {
     Edge getEdgeBetween(GraphNode start, GraphNode end) {
         for (Edge edge : edgeSet)
             if (edge.start.getLabel().equals(start.getLabel()) && edge.target.getLabel().equals(end.getLabel())) {
-                System.out.println("found it !!! edge = " + edge);
+//                System.out.println("found it !!! edge = " + edge);
                 return edge;
             }
         return null;

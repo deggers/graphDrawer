@@ -18,7 +18,7 @@ public class NaiveDraw {
 
 ////      1. Remove all Cycles
         System.out.println("remove all cycles");
-        CycleBreaker.Berger_Shor(partialGraph);
+        CycleBreaker.GreedyCycleRemoval(partialGraph);
 //        System.out.println("cyclefree got " + drawGraph);
 //        if (verbose) {
 //            System.out.println(drawGraph);
@@ -28,7 +28,7 @@ public class NaiveDraw {
 
 ////      2.  Layer Assignment: Vertices are assigned to layers.
         System.out.println("Layer assignment");
-        AssignLayer.topologicalPath(partialGraph);
+        AssignLayer.longestPath(partialGraph);
 //        System.out.println("partialGraph = " + partialGraph);
 //        System.out.println("Partial: \n Nodes: " + partialGraph.getNodes().size() + ", Edges: " + partialGraph.getEdges().size());
 //        System.out.println(partialGraph.getEdges());
@@ -38,6 +38,7 @@ public class NaiveDraw {
 //            System.out.println(drawGraph.copyEdgeSet());
 //            System.out.println("g.getNodeSet() = " + drawGraph.copyNodeSet());
 //        }
+
 
         // simple algo to give nodes an coordinate to draw something :)
         LinkedHashMap<Integer,LinkedList<GraphNode>> layerMap = partialGraph.getLayerMap();

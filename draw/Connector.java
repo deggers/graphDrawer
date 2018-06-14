@@ -6,6 +6,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
+import model.Edge;
 import model.GraphNode;
 
 import java.util.LinkedHashMap;
@@ -16,12 +17,19 @@ import java.util.Objects;
  * @author kn - modified by Dustyn
  */
 public class Connector extends Path {
-    private static final double defaultArrowHeadSize = 6.5;
+    private static final double defaultArrowHeadSize    = 6.0;
+    private static final double defaultStrokeWidth      = 3.0;
+    private static final Color defaultConnectorColor    = Color.BLACK;
 
-    public Connector(GraphNode startNode, GraphNode targetNode, int ports, double arrowHeadSize) {
+    public Connector(Edge edge, int ports) {
         super();
         strokeProperty().bind(fillProperty());
-        setFill(Color.BLACK);
+        if (edge.isReversed()) setFill(Color.RED);
+        else setFill(defaultConnectorColor);
+        setStrokeWidth(defaultStrokeWidth);
+
+        GraphNode startNode = edge.getStart();
+        GraphNode targetNode = edge.getTarget();
 
         double angle = Math.abs(Math.toDegrees(Math.atan2((targetNode.y - startNode.y), (targetNode.x - startNode.x)) - Math.PI / 2.0));
         if (ports == 8) connectWith8Ports(startNode, targetNode, angle);
@@ -30,19 +38,14 @@ public class Connector extends Path {
     }
 
     private void connectWith5Ports(GraphNode startNode, GraphNode targetNode, double angle) {
-//        if (angle >= 0 && angle < 112.5)
         if (degreeBetween(0, 112.5, angle))
             createLineWithAnchor(startNode, targetNode, 90.0);
         else if (degreeBetween(112.5, 157.5, angle))
-//        if (angle >= 112.5 && angle < 157.5)
             createLineWithAnchor(startNode, targetNode, 135.0);
-//        if ( angle >= 157.5 && angle < 202.5)
         else if (degreeBetween(157.5, 202.5, angle))
             createLineWithAnchor(startNode, targetNode, 180);
         else if (degreeBetween(202.5, 247.5, angle))
-//        if (angle >= 202.5 && angle < 247.5)
             createLineWithAnchor(startNode, targetNode, 225);
-//        if (angle >= 247.5 && angle < 360)
         else if (degreeBetween(247.5, 360, angle))
             createLineWithAnchor(startNode, targetNode, 270);
         else System.out.println("uups, 5Ports did not found a port!");
@@ -96,7 +99,7 @@ public class Connector extends Path {
         if (portMap.containsKey(anchorAngle)) {
             createLine(startX, startY, endX, endY);
         } else {
-            createLineWithArrow(startX, startY, endX, endY, targetNode.isDummyNode(), defaultArrowHeadSize);
+            createLineWithArrow(startX, startY, endX, endY, targetNode.isDummyNode());
             portMap.put(anchorAngle, true);
             targetNode.setPortMap(portMap);
         }
@@ -108,7 +111,7 @@ public class Connector extends Path {
         getElements().add(new LineTo(endX, endY));
     }
 
-    private void createLineWithArrow(double startX, double startY, double endX, double endY, boolean isDummy, double arrowHeadSize) {
+    private void createLineWithArrow(double startX, double startY, double endX, double endY, boolean isDummy) {
 
         //Line
         getElements().add(new MoveTo(startX, startY));
@@ -120,11 +123,11 @@ public class Connector extends Path {
             double sin = Math.sin(angle);
             double cos = Math.cos(angle);
             //point1
-            double x1 = (-1.0 / 2.0 * cos + Math.sqrt(3) / 2 * sin) * arrowHeadSize + endX;
-            double y1 = (-1.0 / 2.0 * sin - Math.sqrt(3) / 2 * cos) * arrowHeadSize + endY;
+            double x1 = (-1.0 / 2.0 * cos + Math.sqrt(3) / 2 * sin) * defaultArrowHeadSize + endX;
+            double y1 = (-1.0 / 2.0 * sin - Math.sqrt(3) / 2 * cos) * defaultArrowHeadSize + endY;
             //point2
-            double x2 = (1.0 / 2.0 * cos + Math.sqrt(3) / 2 * sin) * arrowHeadSize + endX;
-            double y2 = (1.0 / 2.0 * sin - Math.sqrt(3) / 2 * cos) * arrowHeadSize + endY;
+            double x2 = (1.0 / 2.0 * cos + Math.sqrt(3) / 2 * sin) * defaultArrowHeadSize + endX;
+            double y2 = (1.0 / 2.0 * sin - Math.sqrt(3) / 2 * cos) * defaultArrowHeadSize + endY;
 
             getElements().add(new LineTo(x1, y1));
             getElements().add(new LineTo(x2, y2));

@@ -15,11 +15,11 @@ import java.util.LinkedList;
 
 public class AssignLayer {
     private static final boolean verbose = false;
-    
+
     private LinkedHashMap<Integer, LinkedList<GraphNode>> layering = new LinkedHashMap<>();
     private LinkedHashMap<GraphNode, Integer> nodeToRank = new LinkedHashMap<>();
 
-//    right now not working
+    //    right now not working
     public static Graph longestPath(Graph g) {
         final boolean optionalCheck = true;
 
@@ -38,13 +38,15 @@ public class AssignLayer {
             if (verbose) System.out.printf("Set U: %s\n", U.toString());
             for (GraphNode node : U) {
                 node.setLayer(currentLayer); // set all nodes in U to currentLayer
-                Z.addAll(layeredGraph.getParentsOf(node)); // compute the union of all parents of nodes in U
+                if (layeredGraph.getParentsOf(node) != null) {
+                    Z.addAll(layeredGraph.getParentsOf(node)); // compute the union of all parents of nodes in U
+                }
             }
             U.clear(); // clear U to compute all nodes that can get a layer in the next step
             for (GraphNode graphNode : Z) {
                 boolean hasNoUnlayeredChildren = true;
                 for (GraphNode gn : layeredGraph.getChildrenFrom(graphNode)) {
-                    if (gn.getLayer()<0/*depends on default value for unlayered nodes*/) {
+                    if (gn.getLayer() < 0/*depends on default value for unlayered nodes*/) {
                         hasNoUnlayeredChildren = false;
                     }
                 }
@@ -58,7 +60,7 @@ public class AssignLayer {
         //all nodes should be layered now, optional check
         if (optionalCheck) {
             for (GraphNode graphNode : layeredGraph.getNodes()) {
-                if (graphNode.getLayer()<0) {
+                if (graphNode.getLayer() < 0) {
                     //if any node is not properly labeled, throw something
                     throw new Error("LongestPath Layering produced an error, as some nodes in the graph remained unlayered. Check for correctness, solitary nodes or disable this check!");
                 }
@@ -69,6 +71,7 @@ public class AssignLayer {
         layeredGraph.addDummies();
         return layeredGraph;
     }
+
     public static void topologicalPath(Graph g) {
         int level = 1;
         Graph copyG = g.copy(g);
@@ -85,7 +88,7 @@ public class AssignLayer {
         }
         sorted.put(level, copyG.getIsolatedNodes());
         for (int layer : sorted.keySet()) {
-           g.insertLayer(layer, sorted.get(layer));
+            g.insertLayer(layer, sorted.get(layer));
         }
 
         g.addDummies();
@@ -101,14 +104,17 @@ public class AssignLayer {
     private LinkedList<GraphNode> getNodesFromLevel(Integer level) {
         return layering.get(level);
     }
+
     private Integer getRank(GraphNode node) {
         return nodeToRank.get(node);
     }
+
     private Integer getSpanOf(Edge edge) {
         GraphNode u = edge.start;
         GraphNode v = edge.target;
         return getRank(u) - getRank(v);
     }
+
     private Edge getLongEdge(Graph g) {
         for (Edge edge : g.getEdges()) {
             if (getSpanOf(edge) > 1) {
@@ -117,6 +123,7 @@ public class AssignLayer {
         }
         return null;
     }
+
     private Boolean layeringIsProper(Graph g) {
        /*   The layering found by a layering algorithm might not
             be proper because only a small fraction of DAGs can be layered properly and also because

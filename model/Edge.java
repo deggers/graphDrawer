@@ -8,6 +8,15 @@ public class Edge {
     GraphNode target;
     String edgeType;
     Double weight;
+    private boolean reversed = false;
+
+    public boolean isReversed() {
+        return this.reversed;
+    }
+
+    void setReversed() {
+        this.reversed = true;
+    }
 
     public GraphNode getStart() {
         return this.start;
@@ -27,10 +36,13 @@ public class Edge {
     }
 
     Edge(GraphNode start, GraphNode target, String edgeType, Double weight) {
-        this.start = start;
-        this.target = target;
-        this.edgeType = edgeType;
+        this(start, target, edgeType);
         this.weight = weight;
+    }
+
+    Edge(GraphNode start, GraphNode target, String edgeType, boolean reversed) {
+        this(start, target, edgeType);
+        this.reversed = reversed;
     }
 
     @Override
