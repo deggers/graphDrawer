@@ -171,6 +171,7 @@ public class GraphMLParser {
                 for (GraphNode mn : nodes) { // add missing nodes for package hierarchy
                     try {
                         sb = new StringBuilder(mn.getLabel());
+                        System.out.println("sb = " + sb);
                         sb.delete(sb.lastIndexOf("."), sb.length());
                         s = sb.toString();
                         if (!nodeHashmap.containsKey(s) && !mapMissingNodes.containsKey(s)) {

@@ -17,9 +17,9 @@ import java.util.Objects;
  * @author kn - modified by Dustyn
  */
 public class Connector extends Path {
-    private static final double defaultArrowHeadSize    = 6.0;
-    private static final double defaultStrokeWidth      = 3.0;
-    private static final Color defaultConnectorColor    = Color.BLACK;
+    private static final double defaultArrowHeadSize = 6.0;
+    private static final double defaultStrokeWidth = 3.0;
+    private static final Color defaultConnectorColor = Color.BLACK;
 
     public Connector(Edge edge, int ports) {
         super();
@@ -32,52 +32,56 @@ public class Connector extends Path {
         GraphNode targetNode = edge.getTarget();
 
         double angle = Math.abs(Math.toDegrees(Math.atan2((targetNode.y - startNode.y), (targetNode.x - startNode.x)) - Math.PI / 2.0));
-        if (ports == 8) connectWith8Ports(startNode, targetNode, angle);
-        if (ports == 4) connectWith4Ports(startNode, targetNode, angle);
-        if (ports == 5) connectWith5Ports(startNode, targetNode, angle);
+//        if (ports == 8) connectWith8Ports(startNode, targetNode, angle);
+//        if (ports == 4) connectWith4Ports(startNode, targetNode, angle);
+        if (ports == 5) connectWith5Ports(edge, angle);
     }
 
-    private void connectWith5Ports(GraphNode startNode, GraphNode targetNode, double angle) {
+    private void connectWith5Ports(Edge edge, double angle) {
         if (degreeBetween(0, 112.5, angle))
-            createLineWithAnchor(startNode, targetNode, 90.0);
+            createLineWithAnchor(edge, 90.0);
         else if (degreeBetween(112.5, 157.5, angle))
-            createLineWithAnchor(startNode, targetNode, 135.0);
+            createLineWithAnchor(edge, 135.0);
         else if (degreeBetween(157.5, 202.5, angle))
-            createLineWithAnchor(startNode, targetNode, 180);
+            createLineWithAnchor(edge, 180);
         else if (degreeBetween(202.5, 247.5, angle))
-            createLineWithAnchor(startNode, targetNode, 225);
+            createLineWithAnchor(edge, 225);
         else if (degreeBetween(247.5, 360, angle))
-            createLineWithAnchor(startNode, targetNode, 270);
+            createLineWithAnchor(edge, 270);
         else System.out.println("uups, 5Ports did not found a port!");
     }
 
-    private void connectWith4Ports(GraphNode startNode, GraphNode targetNode, double angle) {
-        if (angle >= 0 && angle <= 45 || angle < 360 && angle >= 315) {
-            createLineWithAnchor(startNode, targetNode, (double) 0);
-        } else if (angle < 315 && angle >= 225) {
-            createLineWithAnchor(startNode, targetNode, (double) -270);
-        } else if (angle < 225 && angle >= 135) {
-            createLineWithAnchor(startNode, targetNode, (double) -180);
-        } else if (angle < 135 && angle >= 45) {
-            createLineWithAnchor(startNode, targetNode, (double) -90);
-        }
-    }
+//    private void connectWith4Ports(GraphNode startNode, GraphNode targetNode, double angle) {
+//        if (angle >= 0 && angle <= 45 || angle < 360 && angle >= 315) {
+//            createLineWithAnchor(startNode, targetNode, (double) 0);
+//        } else if (angle < 315 && angle >= 225) {
+//            createLineWithAnchor(startNode, targetNode, (double) -270);
+//        } else if (angle < 225 && angle >= 135) {
+//            createLineWithAnchor(startNode, targetNode, (double) -180);
+//        } else if (angle < 135 && angle >= 45) {
+//            createLineWithAnchor(startNode, targetNode, (double) -90);
+//        }
+//    }
+//
+//    private void connectWith8Ports(GraphNode startNode, GraphNode targetNode, double angle) {
+//        if (angle >= 180 - 22.5 && angle <= 180 + 22.5) { // case: bottom - go to 180°
+//            createLineWithAnchor(startNode, targetNode, (double) -180);
+//        } else if (angle >= 225 - 22.5 && angle <= 225 + 22.5) {
+//            createLineWithAnchor(startNode, targetNode, (double) -225);
+//        } else if (angle >= 270 - 22.5 && angle <= 270 + 22.5) {
+//            createLineWithAnchor(startNode, targetNode, (double) -270);
+//        } else if (angle >= 135 - 22.5 && angle <= 135 + 22.5) {
+//            createLineWithAnchor(startNode, targetNode, (double) -135);
+//        } else if (angle >= 90 - 22.5 && angle <= 90 + 22.5) {
+//            createLineWithAnchor(startNode, targetNode, (double) -90);
+//        }
+//    }
 
-    private void connectWith8Ports(GraphNode startNode, GraphNode targetNode, double angle) {
-        if (angle >= 180 - 22.5 && angle <= 180 + 22.5) { // case: bottom - go to 180°
-            createLineWithAnchor(startNode, targetNode, (double) -180);
-        } else if (angle >= 225 - 22.5 && angle <= 225 + 22.5) {
-            createLineWithAnchor(startNode, targetNode, (double) -225);
-        } else if (angle >= 270 - 22.5 && angle <= 270 + 22.5) {
-            createLineWithAnchor(startNode, targetNode, (double) -270);
-        } else if (angle >= 135 - 22.5 && angle <= 135 + 22.5) {
-            createLineWithAnchor(startNode, targetNode, (double) -135);
-        } else if (angle >= 90 - 22.5 && angle <= 90 + 22.5) {
-            createLineWithAnchor(startNode, targetNode, (double) -90);
-        }
-    }
-
-    private void createLineWithAnchor(GraphNode startNode, GraphNode targetNode, double anchorAngle) {
+    private void createLineWithAnchor(Edge edge, double anchorAngle) {
+        GraphNode startNode = edge.getStart();
+        GraphNode targetNode = edge.getTarget();
+        if (edge.isReversed()) startNode = edge.getTarget();
+        if (edge.isReversed()) targetNode = edge.getStart();
         PaneController paneController = Objects.requireNonNull(PaneController.getInstance());
         int startX = paneController.scaleGraphNode(startNode.x);
         int startY = paneController.scaleGraphNode(startNode.y);
@@ -86,11 +90,12 @@ public class Connector extends Path {
         double endX, endY;
         double radius = Objects.requireNonNull(GUIController.getInstance()).getNodeSize();
 
+        LinkedList<Double> coords = new LinkedList<>();
         if (targetNode.isDummyNode()) { // full length of edge necessary
             endX = targetX;
             endY = targetY;
         } else {
-            LinkedList<Double> coords = getPointOnCircumference(targetX, targetY, radius, anchorAngle);
+            coords = getPointOnCircumference(targetX, targetY, radius, anchorAngle, edge.isReversed());
             endX = coords.getFirst();
             endY = coords.getLast();
         }
@@ -99,7 +104,7 @@ public class Connector extends Path {
         if (portMap.containsKey(anchorAngle)) {
             createLine(startX, startY, endX, endY);
         } else {
-            createLineWithArrow(startX, startY, endX, endY, targetNode.isDummyNode());
+            createLineWithArrow(startX, startY, endX, endY, targetNode.isDummyNode(), edge.isReversed());
             portMap.put(anchorAngle, true);
             targetNode.setPortMap(portMap);
         }
@@ -111,7 +116,7 @@ public class Connector extends Path {
         getElements().add(new LineTo(endX, endY));
     }
 
-    private void createLineWithArrow(double startX, double startY, double endX, double endY, boolean isDummy) {
+    private void createLineWithArrow(double startX, double startY, double endX, double endY, boolean isDummy, boolean reversed) {
 
         //Line
         getElements().add(new MoveTo(startX, startY));
@@ -123,11 +128,12 @@ public class Connector extends Path {
             double sin = Math.sin(angle);
             double cos = Math.cos(angle);
             //point1
-            double x1 = (-1.0 / 2.0 * cos + Math.sqrt(3) / 2 * sin) * defaultArrowHeadSize + endX;
-            double y1 = (-1.0 / 2.0 * sin - Math.sqrt(3) / 2 * cos) * defaultArrowHeadSize + endY;
+            double x1, y1, x2, y2;
+            x1 = (-1.0 / 2.0 * cos + Math.sqrt(3) / 2 * sin) * defaultArrowHeadSize + endX;
+            y1 = (-1.0 / 2.0 * sin - Math.sqrt(3) / 2 * cos) * defaultArrowHeadSize + endY;
             //point2
-            double x2 = (1.0 / 2.0 * cos + Math.sqrt(3) / 2 * sin) * defaultArrowHeadSize + endX;
-            double y2 = (1.0 / 2.0 * sin - Math.sqrt(3) / 2 * cos) * defaultArrowHeadSize + endY;
+            x2 = (1.0 / 2.0 * cos + Math.sqrt(3) / 2 * sin) * defaultArrowHeadSize + endX;
+            y2 = (1.0 / 2.0 * sin - Math.sqrt(3) / 2 * cos) * defaultArrowHeadSize + endY;
 
             getElements().add(new LineTo(x1, y1));
             getElements().add(new LineTo(x2, y2));
@@ -135,11 +141,16 @@ public class Connector extends Path {
         }
     }
 
-    private LinkedList<Double> getPointOnCircumference(int x, int y, double radius, double angle) {
+    private LinkedList<Double> getPointOnCircumference(int x, int y, double radius, double angle, boolean reversed) {
         LinkedList<Double> coords = new LinkedList<>();
         angle = Math.abs(angle);
-        coords.add((double) x - radius * Math.sin(Math.toRadians(angle)));
-        coords.add((double) y - radius * Math.cos(Math.toRadians(angle)));
+        if (!reversed) {
+            coords.add((double) x - radius * Math.sin(Math.toRadians(angle)));
+            coords.add((double) y - radius * Math.cos(Math.toRadians(angle)));
+        } else {
+            coords.add((double) x + radius * Math.sin(Math.toRadians(angle)));
+            coords.add((double) y + radius * Math.cos(Math.toRadians(angle)));
+        }
         return coords;
     }
 

@@ -28,7 +28,7 @@ public class NaiveDraw {
 
 ////      2.  Layer Assignment: Vertices are assigned to layers.
         System.out.println("Layer assignment");
-        AssignLayer.longestPath(partialGraph);
+        AssignLayer.topologicalPath(partialGraph);
 //        System.out.println("partialGraph = " + partialGraph);
 //        System.out.println("Partial: \n Nodes: " + partialGraph.getNodes().size() + ", Edges: " + partialGraph.getEdges().size());
 //        System.out.println(partialGraph.getEdges());

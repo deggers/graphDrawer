@@ -10,6 +10,7 @@ public class Edge {
     Double weight;
     private boolean reversed = false;
 
+
     public boolean isReversed() {
         return this.reversed;
     }
