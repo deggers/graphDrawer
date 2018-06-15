@@ -5,14 +5,21 @@ import model.*;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Objects;
 
 public class NaiveDraw {
     private static final boolean VERBOSE = false;
+    private static Graph partialGraph = null;
 
     public static Graph processGraph(Graph theGraph) {
         System.out.println("Graph: \n Nodes: " + theGraph.getNodes().size() + ", Edges: " + theGraph.getEdges().size());
-        String selectedEdgeType = GUIController.getInstance().getSelectedEdgeType();
-        Graph partialGraph = theGraph.copyWithRestrains(selectedEdgeType);
+        String selectedEdgeType = Objects.requireNonNull(GUIController.getInstance()).getSelectedEdgeType();
+        if (partialGraph!=null){
+            if (partialGraph.edgeType == selectedEdgeType && partialGraph.graphname == GUIController.getInstance().getFileName()){
+                return partialGraph;
+            }
+        }
+        partialGraph = theGraph.copyWithRestrains(selectedEdgeType);
         System.out.println("Partial: \n Nodes: " + partialGraph.getNodes().size() + ", Edges: " + partialGraph.getEdges().size());
 
 

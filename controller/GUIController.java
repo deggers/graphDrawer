@@ -122,6 +122,7 @@ public class GUIController {
     private ListIterator<File>          filesIter                   = null;
     private List<File>                  filesInFolder               = null;
 
+    public String getFileName(){return this.fileName;}
 
     public static   GUIController       getInstance() {
         FXMLLoader loader = new FXMLLoader();

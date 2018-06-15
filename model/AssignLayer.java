@@ -88,17 +88,22 @@ public class AssignLayer {
         }
         sorted.put(level, copyG.getIsolatedNodes());
 
+        System.out.println("sortedReversed = " + sorted);
         // no good idea how to reverse - so naive approach.. --dustyn
-//        LinkedHashMap<Integer, LinkedList<GraphNode>> sortedReversed = new LinkedHashMap<>();
-//        int reverseCounter = sorted.size() + 1;
-//        for (int layer : sorted.keySet())
-//            sortedReversed.put(reverseCounter - layer, sorted.get(layer));
+        LinkedHashMap<Integer, LinkedList<GraphNode>> sortedReversed = new LinkedHashMap<>();
+        int reverseCounter = sorted.size() + 1;
+        for (int layer : sorted.keySet())
+            sortedReversed.put(reverseCounter - layer, sorted.get(layer));
         //////////////////////////////////////////////////////////////
+        System.out.println("sortedReversed = " + sortedReversed);
 
         for (int layer : sorted.keySet())
-            g.insertLayer(layer, sorted.get(layer));
+            g.insertLayer(layer, sortedReversed.get(layer));
 
         g.addDummies();
+        System.out.println("g.getLayerMap() = " + g.getLayerMap());
+
+
         if (verbose) {
             System.out.println(g);
             System.out.println(g.getEdges());

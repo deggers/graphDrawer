@@ -19,7 +19,7 @@ public class CrossingMin {
             LinkedList<GraphNode> freeLayer = layerMap.get((layer + 1));
 
             int bestCrossings = Integer.MAX_VALUE;
-            int SHUFFLING = 100000;
+            int SHUFFLING = 100;
             for (int i = 0; i <= SHUFFLING; i++) {
                 Collections.shuffle(freeLayer);
                 int shuffleCrosses = BLCC_naive(graph, fixedLayer, freeLayer);
@@ -28,7 +28,7 @@ public class CrossingMin {
                     layerMap.put(layer + 1, freeLayer);
                     if (VERBOSE) System.out.println("neuer Bestwert!: " + shuffleCrosses + " Kreuzungen");
                     if (bestCrossings == 0)
-                        break;
+                            break;
                 }
             }
         }
@@ -41,21 +41,21 @@ public class CrossingMin {
         int crossings = 0;
         for (int i = 0; i <= fixedLayer.size() - 2; i++) { // -2 because last node cannot account for more crossings
             GraphNode fixedNode = fixedLayer.get(i);
-            if (nodeToEdgesIn.containsKey(fixedNode)) {
-                LinkedList<Edge> edgesTo = nodeToEdgesIn.get(fixedNode);
+            if (nodeToEdgesOut.containsKey(fixedNode)) {
+                LinkedList<Edge> edgesTo = nodeToEdgesOut.get(fixedNode);
                 LinkedList<GraphNode> targets = new LinkedList<>();
                 for (Edge edge : edgesTo)
-                    targets.add(edge.start);   // e.g. Node1 and Node3
+                    targets.add(edge.target);   // e.g. Node1 and Node3
                     for (int k = 0; k <= freeLayer.size() - 1; k++) {
                         GraphNode freeNode = freeLayer.get(k);
                         if (targets.contains(freeNode))
                             if (k > i )
                                 for (int subIndex = 0; subIndex <= k - i; subIndex++) {
                                     GraphNode possibleCrossingCausingNode = freeLayer.get(subIndex);
-                                    if (nodeToEdgesOut.containsKey(possibleCrossingCausingNode)) {
-                                        LinkedList<Edge> possibleCrossingEdges = nodeToEdgesOut.get(possibleCrossingCausingNode);
+                                    if (nodeToEdgesIn.containsKey(possibleCrossingCausingNode)) {
+                                        LinkedList<Edge> possibleCrossingEdges = nodeToEdgesIn.get(possibleCrossingCausingNode);
                                         for (Edge maybeCrossingEdge : possibleCrossingEdges) {
-                                            GraphNode pointedNode = maybeCrossingEdge.target;
+                                            GraphNode pointedNode = maybeCrossingEdge.start;
                                             int IndexOfPointedNode = fixedLayer.indexOf(pointedNode);
                                             if (IndexOfPointedNode > i)
                                                 crossings++;

@@ -18,7 +18,7 @@ import java.util.Objects;
  */
 public class Connector extends Path {
     private static final double defaultArrowHeadSize = 6.0;
-    private static final double defaultStrokeWidth = 3.0;
+    private static final double defaultStrokeWidth = 1.0;
     private static final Color defaultConnectorColor = Color.BLACK;
 
     public Connector(Edge edge, int ports) {
@@ -62,7 +62,7 @@ public class Connector extends Path {
             createLineWithAnchor(edge, 225);
         else if (degreeBetween(247.5, 360, angle))
             createLineWithAnchor(edge, 270);
-        else System.out.println("uups, 5Ports did not found a port!");
+        else createLineWithAnchor(edge, 270);
     }
 
 //    private void connectWith4Ports(GraphNode startNode, GraphNode targetNode, double angle) {

@@ -1,6 +1,6 @@
 package model;
 //@formatter:off
-import java.util.*;
+import controller.GUIController;import java.util.*;
 
 public class Graph {
     private static final boolean VERBOSE = false;
@@ -23,15 +23,17 @@ public class Graph {
     LinkedHashMap<GraphNode, LinkedList<Edge>> getHashmap_nodeToEdgeIn() {
         return nodeToEdgesIn;
     }
-
+    public final String edgeType;
+    public final String graphname;
 
     // Constructor
-    Graph(LinkedHashSet<Edge> inputEdges) {
+    Graph(LinkedHashSet<Edge> inputEdges, String edgeType) {
         LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToEdgesOut = new LinkedHashMap<>();
         LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToEdgesIn = new LinkedHashMap<>();
         LinkedHashMap<Integer, GraphNode> nodeToLayer = new LinkedHashMap<>();
         LinkedHashMap<Integer, LinkedList<GraphNode>> layerMap = new LinkedHashMap<>();
-
+        this.edgeType = edgeType;
+        graphname = Objects.requireNonNull(GUIController.getInstance()).getFileName();
         LinkedHashSet<GraphNode> clonedNodes = new LinkedHashSet<>();
         LinkedHashMap<String, GraphNode> nodeMap = new LinkedHashMap<>();
         LinkedHashSet<Edge> clonedEdges = new LinkedHashSet<>();
@@ -99,7 +101,7 @@ public class Graph {
 
     public Graph copyWithRestrains(String edgeType) {
         LinkedHashSet<Edge> relevantEdges = new LinkedHashSet<>(getEdgesOfType(edgeType));
-        return new Graph(relevantEdges);
+        return new Graph(relevantEdges, edgeType);
     }
 
 
@@ -226,7 +228,7 @@ public class Graph {
 
     /// needs to do something !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     Graph copy(Graph g) {
-        return new Graph(g.getEdges());
+        return new Graph(g.getEdges(), g.edgeType);
     }
 
     LinkedList<GraphNode> getIsolatedNodes() {
@@ -386,7 +388,7 @@ public class Graph {
                 for (int i = spanningLevels; i > 0; i--) { // for every additional spanned level
                     String label = "Dummy-" + i + "; from: " + start.getLabel() + " to: " + target.getLabel() + "|";
                     GraphNode node = new GraphNode(label, "Dummy", true); // create a dummy with a proper label
-                    int layer = target.getLayer() + i;
+                    int layer = target.getLayer() - i;
                     node.setLayer(layer);
 
                     LinkedList<GraphNode> tempList = new LinkedList<>();

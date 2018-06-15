@@ -209,7 +209,7 @@ public class GraphMLParser {
             Duration dur = Duration.ofNanos(startTime - stopTime);
             System.out.println("Estimated elapsed time: " + (dur));
 
-            Graph graph = new Graph(edges);
+            Graph graph = new Graph(edges, null);
             graph.setEdgeTypes(edgeTypes);
             return graph;
 
