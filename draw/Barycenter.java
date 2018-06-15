@@ -1,6 +1,7 @@
 package draw;
 
-import model.DrawableGraph;
+import java.util.ArrayList;
+import java.util.List;
 
 /*  PHASE 1:
 Step 1: M*= M0, K* = K(M0)
@@ -9,65 +10,69 @@ STep 3: if K(M1) < K* then M*= M1 and K*= K(M1)
 Step 4: M2= bC(M1)   = reorder columns
 Step 5: If K(M2) <K* then M*= M2 and K*= K(M2)
 step 6: if M0 and M2 equal OR # of iterations in Phase 1 attains an initially given number, Phase 1 STOPPED, goto 7, else goto Step 2
-
  */
 
-// problem: wiederholungen, zugriff auf die jeweiligen matrizen und benennung der matrizen???
-
 public class Barycenter {
-    private DrawableGraph drawableGraph;
-    private BarycenterMatrix M0 = new BarycenterMatrix(drawableGraph, 0);
-    private BarycenterMatrix MStar = M0; // equals M*, solution matrix
-    private int crossing = 0, crossingsStar = M0.getCrossings(); // equals K and K*
-    private int iterations1=0, iterations2=0;
+    private model.Graph graph;
+    private List<BarycenterMatrix> matrices = new ArrayList<>();
+    private BarycenterMatrix M0 = new BarycenterMatrix(graph, 0);
+    private BarycenterMatrix MStar = M0, Mtemp = M0; // MStar equals M*, solution matrix
+    private int crossing = 0, MinCrossings = M0.getCrossings(); // equals K and K*
+    private int iterations1 = 0, iterations2 = 0;
 
-    public Barycenter(DrawableGraph drawableGraph) {
-        this.drawableGraph = drawableGraph;
+    public Barycenter(model.Graph graph) {
+        this.graph = graph;
     }
 
-    public void phase1() {  // problem: namenskonflikte!!!!!
-        iterations1 ++;
-        BarycenterMatrix M1 = M0.orderByRow();      // Step 2
+    public void phase1() {
+        iterations1++;
+        matrices.add(Mtemp.orderByRow());              // Step 2: M1= M0.orderByRow
 
-        if (M1.getCrossings() < crossingsStar) {    // Step 3
-            MStar = M1;
-            crossingsStar = M1.getCrossings();
+        Mtemp = matrices.get((matrices.size() - 1));   // Mtemp= M1
+
+        if (Mtemp.getCrossings() < MinCrossings) {    // Step 3
+            MStar = Mtemp;
+            MinCrossings = Mtemp.getCrossings();
         }
 
-        BarycenterMatrix M2 = M1.orderByColumn();   // Step 4
+        matrices.add(Mtemp.orderByColumn());        // Step 4: M2 = M1.orderByColumn();
+        Mtemp = matrices.get((matrices.size() - 1));   // Mtemp= M2;
 
-        if( M2.getCrossings() < crossingsStar){     // Step 5
-            MStar= M2;
-            crossingsStar= M2.getCrossings();
+        if (Mtemp.getCrossings() < MinCrossings) {     // Step 5
+            MStar = Mtemp;
+            MinCrossings = Mtemp.getCrossings();
         }
 
-        if( M0.equals(M2) || iterations1 >10){ // anzahl iterations sinnvolle größe wählen als abbruchkriterim
+        if (M0.equals(Mtemp) || iterations1 > 10) { // anzahl iterations sinnvolle größe wählen als abbruchkriterim
             phase2();
         } else {
             phase1();
         }
     }
 
-    public void phase2(){
+    public void phase2() {
         iterations2++;
-      //  BarycenterMatrix M3= M2.orderByRow();   // Step 7
-        // Step 8:
-        // if barycenters of cols of M3 are nor arranged in an increasing order, go to Step 11 with M0= M3
-        // else goto Step 9
 
-        //BarycenterMatrix M4= M3.orderByColumn();    // Step 9
+        matrices.add(Mtemp.reverseRows());              // Step 7  M3= M2 reverse rows with equal bary  reversion
+        Mtemp = matrices.get((matrices.size() - 1));   // Mtemp= M3;
 
-        //Step 10:
-        // if the bary of M4 are nor arranged in an increasing order, goto step 11 with M0= M4
-        // else terminate calc
-
-        if (iterations2 >10) { }        //Step 11:if the number of iterations in phase 2 attains limit terminate
-        else{
-            phase1();
+        if (!Mtemp.columnsAreIncreasing()) {           // Step 8:
+            if (iterations2 > 10) {  // terminate
+            } else {
+                phase1();                               // go to step 2 with M0= M3
+            }
         }
 
-    }
+        matrices.add(Mtemp.reverseColumns());           // Step 9 M4= M3 reverse col with equal bary
+        Mtemp = matrices.get((matrices.size() - 1));
 
+        if (!Mtemp.rowsAreIncreasing()) {                // Step 10
+            if (iterations2 > 10) {   // terminate
+            } else {
+                phase1();                               // go to step 2 with M0= M4
+            }
+        }
+    }
 
 
 }

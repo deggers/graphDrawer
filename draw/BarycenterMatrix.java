@@ -1,6 +1,6 @@
 package draw;
 
-import model.DrawableGraph;
+import model.Graph;
 import model.GraphNode;
 
 import java.util.ArrayList;
@@ -10,8 +10,11 @@ public class BarycenterMatrix {
     private List<GraphNode> rows = new ArrayList<>();
     private List<GraphNode> columns = new ArrayList<>();
     private int[][] matrix;
+    private List<Double> rowBary = new ArrayList<>();
+    private List<Double> columnBary = new ArrayList<>();
 
-    public BarycenterMatrix(DrawableGraph graph, int level) {
+
+    public BarycenterMatrix(Graph graph, int level) {
         for (GraphNode g : graph.copyNodeSet()) {
             if (g.level == level) {
                 rows.add(g);
@@ -56,19 +59,44 @@ public class BarycenterMatrix {
         return this;
     }
 
+    public BarycenterMatrix reverseRows(){
+        return this;
 
-    public double getRowBarycenter(){
+    }
+
+    public BarycenterMatrix reverseColumns(){
+        return this;
+
+    }
+
+
+    public double calcRowBarycenter(){
         return 0.0;
     }
 
-    public double getColumnBarycenter(){
+    public double calcColumnBarycenter(){
         return 0.0;
     }
 
+    public boolean rowsAreIncreasing(){
+        return false;
+    }
+
+    public boolean columnsAreIncreasing(){
+        return false;
+    }
 
     //equals funktion schreiben um matrizen auf gleichheit zu prüfen?
     @Override
     public boolean equals(Object obj) {
         return super.equals(obj);
     }
+
+/*    public List<Double> getRowBarys() {
+        return rowBary;
+    }
+
+    public List<Double> getColumnBarys() {
+        return columnBary;
+    }*/
 }
