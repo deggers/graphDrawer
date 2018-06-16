@@ -103,9 +103,6 @@ public class GraphNode extends AbstractNode {
         return children.remove(node);
     }
 
-    // so oder andersum? :D
-    boolean isChild(GraphNode node){
-      return node.children.contains(this);}
 
     boolean addParent(GraphNode node){
         return parents.add(node);
