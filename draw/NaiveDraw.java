@@ -8,7 +8,7 @@ public class NaiveDraw {
 
     public static GraphMLGraph processGraph(GraphMLGraph theGraph) throws Exception {
         String selectedEdgeType = GUIController.getInstance().getSelectedEdgeType();
-        drawableGraph drawGraph = new drawableGraph(theGraph,selectedEdgeType);
+        DrawableGraph drawGraph = new DrawableGraph(theGraph,selectedEdgeType);
         System.out.println("drawGraph got " + drawGraph);
 
 //      1. Remove all Cycles

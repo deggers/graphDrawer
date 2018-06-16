@@ -21,13 +21,13 @@ public class AssignLayer {
     private LinkedHashMap<GraphNode, Integer> nodeToRank = new LinkedHashMap<>();
 
 //    right now not working
-    public static drawableGraph longestPath(drawableGraph g) {
+    public static DrawableGraph longestPath(DrawableGraph g) {
         final boolean optionalCheck = true;
 
         LinkedHashSet<GraphNode> U = new LinkedHashSet<>(); // set of nodes that will get a layer in this step
         LinkedHashSet<GraphNode> Z = new LinkedHashSet<>(); // set of all parents of nodes in U
         int currentLayer = 1;
-        drawableGraph layeredGraph = g.copy(g);
+        DrawableGraph layeredGraph = g.copy(g);
         if (verbose) System.out.println("Deleting isolated nodes, if any.");
         //layeredGraph.deleteIsolatedNodes(); //hope this works
         //layeredGraph.getIsolatedNodes().forEach(layeredGraph::justRemoveNode);
@@ -70,9 +70,9 @@ public class AssignLayer {
         layeredGraph.addDummies();
         return layeredGraph;
     }
-    public static void topologicalPath(drawableGraph g) {
+    public static void topologicalPath(DrawableGraph g) {
         int level = 1;
-        drawableGraph copyG = g.copy(g);
+        DrawableGraph copyG = g.copy(g);
         LinkedHashMap<Integer, LinkedList<GraphNode>> sorted = new LinkedHashMap<>();
         LinkedList<GraphNode> sinks;
 
@@ -113,7 +113,7 @@ public class AssignLayer {
         GraphNode v = (GraphNode) edge.target;
         return getRank(u) - getRank(v);
     }
-    private Edge getLongEdge(drawableGraph g) {
+    private Edge getLongEdge(DrawableGraph g) {
         for (Edge edge : g.copyEdgeSet()) {
             if (getSpanOf(edge) > 1) {
                 return edge;
@@ -121,7 +121,7 @@ public class AssignLayer {
         }
         return null;
     }
-    private Boolean layeringIsProper(drawableGraph g) {
+    private Boolean layeringIsProper(DrawableGraph g) {
        /*   The layering found by a layering algorithm might not
             be proper because only a small fraction of DAGs can be layered properly and also because
             a proper layering may not satisfy other layering requirements.

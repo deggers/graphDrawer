@@ -13,14 +13,14 @@ step 6: if m0 and M2 equal OR # of iterations in Phase 1 attains an initially gi
  */
 
 public class Barycenter {
-    private model.Graph graph;
+    private model.DrawableGraph graph;
     private List<BarycenterMatrix> matrices = new ArrayList<>();
     private BarycenterMatrix m0 = new BarycenterMatrix(graph, 0);
     private BarycenterMatrix mStar = m0, mTemp = m0;                        // mStar equals M*, solution matrix
     private int crossing = 0, minCrossings = m0.getCrossings();             // equals K and K*
     private int iterations1 = 0, iterations2 = 0;
 
-    public Barycenter(model.Graph graph) {
+    public Barycenter(model.DrawableGraph graph) {
         this.graph = graph;
     }
 

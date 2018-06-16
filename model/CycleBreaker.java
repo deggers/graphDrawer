@@ -16,10 +16,10 @@ public class CycleBreaker {
     private static HashSet<Edge> turnedEdges = new LinkedHashSet<>(); //in their original form
 
 
-    public static void GreedyCycleRemoval(drawableGraph g){
+    public static void GreedyCycleRemoval(DrawableGraph g){
 /*        The first polynomial-time algorithm for solving the minimum FAS problem with an approximation
           ratio less than 2 in the worst case */
-        drawableGraph copyG = g.copy(g);
+        DrawableGraph copyG = g.copy(g);
         LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToEdgeIn = copyG.getHashmap_nodeToEdgeIn();
         LinkedHashMap<GraphNode, LinkedList<Edge>> nodeToEdgeOut = copyG.getHashmap_nodeToEdgeOut();
         LinkedHashSet<Edge> safeEdges = new LinkedHashSet<>();
@@ -50,7 +50,7 @@ public class CycleBreaker {
         }
         if  (copyG.copyNodeSet().size() >0 || copyG.copyEdgeSet().size() > 0) System.out.println("something wrong in Greedy Cycle Removal - got left Nodes or Edges");
     }
-    public static void DFS_Florian(drawableGraph g) {
+    public static void DFS_Florian(DrawableGraph g) {
         //Tiefensuche um Zyklen zu entfernen
         HashMap<String, GraphNode> namesMap = new HashMap<>();
         for (GraphNode graphNode : g.copyNodeSet()) {

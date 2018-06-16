@@ -1,6 +1,6 @@
 package draw;
 
-import model.Graph;
+import model.DrawableGraph;
 import model.GraphNode;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ public class BarycenterMatrix {
     private List<Double> columnBary = new ArrayList<>();
 
 
-    public BarycenterMatrix(Graph graph, int level) {
+    public BarycenterMatrix(DrawableGraph graph, int level) {
         int order1 = 0, order2 = 0;
         for (GraphNode g : graph.copyNodeSet()) {
             if (g.level == level) {
