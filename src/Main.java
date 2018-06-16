@@ -50,7 +50,7 @@ public class Main {
             this.nodes.addAll(deepClonedNodesMap.values());
         }
 
-        private void updateHashmaps(Edge e) {
+        private void    updateHashmaps(Edge e) {
             if (!edgesIn.containsKey(e.tail))       edgesIn.put(e.tail, new LinkedList<>());
             if (!edgesIn.containsKey(e.head))       edgesIn.put(e.head, new LinkedList<>());
             if (!edgesOut.containsKey(e.tail))      edgesOut.put(e.tail,new LinkedList<>());
@@ -59,30 +59,7 @@ public class Main {
             edgesIn.get(e.head).add(e);
             edgesOut.get(e.tail).add(e);
         }
-
-        void     removeEdge(Edge edge){
-            if (edge != null) {
-            edges.remove(edge);
-            Node tail = edge.tail;
-            Node head = edge.head;
-            edgesOut.get(tail).remove(edge);
-            edgesIn.get(head).remove(edge);
-            deleteAll_IsolatedNodes();
-
-            }
-            else System.out.println("Could not delete Edge");
-        }
-
-        void     deleteAll_IsolatedNodes(){
-            LinkedList<Node> nodesToBeRemoved = new LinkedList<>();
-            nodes.stream().filter(node -> inDegree(node) == 0 && outDegree(node) == 0).forEach(nodesToBeRemoved::add);
-            nodesToBeRemoved.forEach(this::removeNode);
-            nodesToBeRemoved.forEach(node -> {
-                edgesOut.remove(node);
-                edgesIn.remove(node);});
-            }
-
-        private void removeNode(Node node) {
+        private void    removeNode(Node node) {
             LinkedList<Edge> looseEdges = edgesOut.get(node);
             LinkedList<Edge> edgesToBeRemoved = new LinkedList<>();
 
@@ -99,9 +76,11 @@ public class Main {
             nodes.remove(node);
             nodesMap.remove(node.label);
             deleteAll_IsolatedNodes();}
-
-        int             outDegree(Node node){ return edgesOut.containsKey(node) ? edgesOut.get(node).size() : 0;}
-        int             inDegree(Node node) { return  edgesIn.containsKey(node) ? edgesIn.get(node).size()  : 0;}
+        private void    updateNodesAndNodesMap(Node node){
+            if (!nodesMap.containsKey(node.label))
+                nodesMap.put(node.label,node);
+                nodes.add(node);
+        }
         void            addEdge(Edge edge)  {
             this.edges.add(edge);
             updateNodesAndNodesMap(edge.tail);
@@ -115,12 +94,32 @@ public class Main {
             if (edgesIn.containsKey(head))              edgesIn.get(head).add(edge);
             else edgesIn.put(head,new LinkedList<>(Collections.singletonList(edge)));
         }
+        void            removeEdge(Edge edge){
+            if (edge != null) {
+            edges.remove(edge);
+            Node tail = edge.tail;
+            Node head = edge.head;
+            edgesOut.get(tail).remove(edge);
+            edgesIn.get(head).remove(edge);
+            deleteAll_IsolatedNodes();
 
-        private void updateNodesAndNodesMap(Node node){
-            if (!nodesMap.containsKey(node.label))
-                nodesMap.put(node.label,node);
-                nodes.add(node);
+            }
+            else System.out.println("Could not delete Edge");
         }
+
+        // TODO addNode
+
+        void            deleteAll_IsolatedNodes(){
+            LinkedList<Node> nodesToBeRemoved = new LinkedList<>();
+            nodes.stream().filter(node -> inDegree(node) == 0 && outDegree(node) == 0).forEach(nodesToBeRemoved::add);
+            nodesToBeRemoved.forEach(this::removeNode);
+            nodesToBeRemoved.forEach(node -> {
+                edgesOut.remove(node);
+                edgesIn.remove(node);});
+            }
+        int             outDegree(Node node){ return edgesOut.containsKey(node) ? edgesOut.get(node).size() : 0;}
+        int             inDegree(Node node) { return  edgesIn.containsKey(node) ? edgesIn.get(node).size()  : 0;}
+
 
         // getter and Setter Area :)
         LinkedHashMap<Node,LinkedList<Edge>>    getEdgesInMap(){ return this.edgesIn; }
@@ -133,10 +132,7 @@ public class Main {
             System.out.println(String.format("No Edge found for tail: '%s' to head: '%s'",tail,head));
             return null;
         }
-
-
-
-        @Override   public String   toString() { return "Nodes: " + nodes + " and \nEdges: " + edges; }
+        @Override   public String               toString() { return "Nodes: " + nodes + " and \nEdges: " + edges; }
     }
 
 
