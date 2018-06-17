@@ -1,5 +1,6 @@
 package draw;
 
+import model.Graph;
 import model.GraphNode;
 
 import java.util.ArrayList;
@@ -7,20 +8,28 @@ import java.util.List;
 
 
 public class Barycenter {
+    private Graph graph;
     private List<BarycenterMatrix> matrices = new ArrayList<>();
     private BarycenterMatrix m0;
     // ?????? für was braucht man die beste matrix m* ?
     private BarycenterMatrix mStar, mTemp;                                   // mStar equals M*, solution matrix
     private int iterations1 = 0, iterations2 = 0, minCrossings;             // equals K and K*
 
-    public Barycenter(model.DrawableGraph graph) {
+
+    public static Graph barycenterAlgo(Graph graph){
+        Barycenter(graph);
+        return graph;
+    }
+
+    public Barycenter(Graph graph) {
+        this.graph= graph;
         int graphDepth = 0;
         for (GraphNode n : graph.copyNodeSet()) {
             if (n.getLayer() > graphDepth) {
                 graphDepth = n.getLayer();
             }
         }
-        for (int layers = 0; layers < graphDepth; layers++) {             // < graphDepth, because matrix always level i and i+1
+        for (int layers = 1; layers < graphDepth; layers++) {             // layers start at 1, < graphDepth, because matrix always level i and i+1
             m0 = new BarycenterMatrix(graph, layers);
             mStar = m0;
             mTemp = m0;

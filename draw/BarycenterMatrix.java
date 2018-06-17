@@ -20,10 +20,12 @@ public class BarycenterMatrix {
         for (GraphNode g : graph.copyNodeSet()) {
             if (g.level == level) {
                 g.setOrder(order1);
+                g.x= order1;
                 rows.add(g);
                 order1++;
             } else if (g.level == (level + 1)) {
                 g.setOrder(order2);
+                g.x=order2;
                 columns.add(g);
                 order2++;
             }
@@ -84,7 +86,9 @@ public class BarycenterMatrix {
                 if (rowBary.get(i) < rowBary.get(prev)) {
                     Collections.swap(rowBary, i, prev);
                     rows.get(i).setOrder(prev);
+                    rows.get(i).x= prev;
                     rows.get(prev).setOrder(i);
+                    rows.get(prev).x=i;
                     Collections.swap(rows, i, prev);
                     change = true;
                 }
@@ -102,7 +106,9 @@ public class BarycenterMatrix {
                 if(columnBary.get(i)< columnBary.get(prev)){
                     Collections.swap(columnBary, i, prev);
                     columns.get(i).setOrder(prev);
+                    columns.get(i).x= prev;
                     columns.get(prev).setOrder(i);
+                    columns.get(prev).x=i;
                     Collections.swap(columns, i, prev);
                     change= true;
                 }
@@ -120,7 +126,9 @@ public class BarycenterMatrix {
             if (rowBary.get(i) == rowBary.get(prev)) {
                 Collections.swap(rowBary, i, prev);
                 rows.get(i).setOrder(prev);
+                rows.get(i).x=prev;
                 rows.get(prev).setOrder(i);
+                rows.get(prev).x=i;
                 Collections.swap(rows, i, prev);
             }
         }
@@ -133,7 +141,9 @@ public class BarycenterMatrix {
             if(columnBary.get(i) == columnBary.get(prev)){      // klappt == bei double?
                 Collections.swap(columnBary, i, prev);
                 columns.get(i).setOrder(prev);
+                columns.get(i).x=prev;
                 columns.get(prev).setOrder(i);
+                columns.get(prev).x=i;
                 Collections.swap(columns, i, prev);
             }
         }
