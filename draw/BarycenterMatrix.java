@@ -70,8 +70,8 @@ public class BarycenterMatrix {
                 }
                 break;
         }
-        System.out.println("level = " + level+ " , direction: = " + updown
-                + " ,rows.size() = " + rows.size()+" ,columns.size() = " + columns.size());
+        //System.out.println("level = " + level+ " , direction: = " + updown
+         //       + " ,rows.size() = " + rows.size()+" ,columns.size() = " + columns.size());
 
         matrix = new int[rows.size()][columns.size()];
         calcMatrixAndBarys(upDown);
@@ -121,7 +121,7 @@ public class BarycenterMatrix {
             }
             tempBary= tempBary/ (double) sumcount;
             rowBary.add(tempBary);
-            System.out.println("row no: " + k + " rowbary = " + tempBary);
+            //System.out.println("row no: " + k + " rowbary = " + tempBary);
         }
         for (int l = 0; l < columns.size(); l++) {      // calcColumnBary
             int sumcount=0;
@@ -135,7 +135,7 @@ public class BarycenterMatrix {
             }
             tempBary= tempBary / (double)sumcount;
             columnBary.add(tempBary);
-            System.out.println(" col no: " + l + " colbary = " + tempBary);
+            //System.out.println(" col no: " + l + " colbary = " + tempBary);
         }
     }
 
@@ -163,8 +163,8 @@ public class BarycenterMatrix {
                 change = false;
                 for (int i = 1; i < rowBary.size(); i++) {// bis < size oder <= ?
                     int prev = i - 1;
-                    System.out.println("rowBary size= " + rowBary.size());
-                    System.out.println("row = "+ i +" rowB = " + rowBary.get(i)+ " rowb prev   "+ rowBary.get(prev));
+                    //System.out.println("rowBary size= " + rowBary.size());
+                    //System.out.println("row = "+ i +" rowB = " + rowBary.get(i)+ " rowb prev   "+ rowBary.get(prev));
 
                         if(Double.compare(rowBary.get(i), rowBary.get(prev)) < 0 ) {
                         Collections.swap(rowBary, i, prev);
@@ -172,12 +172,12 @@ public class BarycenterMatrix {
                         rows.get(prev).x = i;
                         Collections.swap(rows, i, prev);
                         change = true;
-                        System.out.println("swapped");
+                        //System.out.println("swapped");
                     }
                 }
             }
             calcMatrixAndBarys(upDown);                   // alles neu berech
-        }   System.out.println("orderByrow done");
+        }   //System.out.println("orderByrow done");
     }
 
     public void orderByColumn() {
@@ -187,7 +187,7 @@ public class BarycenterMatrix {
                 change = false;
                 for (int i = 1; i < columns.size(); i++) {
                     int prev = i - 1;
-                    System.out.println("colb = " + columnBary.get(i)+ " colb prev   "+ columnBary.get(prev));
+                    //System.out.println("colb = " + columnBary.get(i)+ " colb prev   "+ columnBary.get(prev));
 
                     if (Double.compare(columnBary.get(i),columnBary.get(prev)) <0 ) {
                         Collections.swap(columnBary, i, prev);
@@ -195,12 +195,12 @@ public class BarycenterMatrix {
                         columns.get(prev).x = i;
                         Collections.swap(columns, i, prev);
                         change = true;
-                        System.out.println("swapped");
+                        //System.out.println("swapped");
                     }
                 }
             }
             calcMatrixAndBarys(upDown);
-        }   System.out.println("order by col done");
+        }   //System.out.println("order by col done");
     }
 
 
@@ -217,7 +217,7 @@ public class BarycenterMatrix {
                     Collections.swap(rows, i, prev);
                 }
             }
-        } System.out.println("reverse row done");
+        } //System.out.println("reverse row done");
         calcMatrixAndBarys(upDown);
     }
 
@@ -232,7 +232,7 @@ public class BarycenterMatrix {
                     Collections.swap(columns, i, prev);
                 }
             }
-        }  System.out.println("reverse col done");
+        }  //System.out.println("reverse col done");
         calcMatrixAndBarys(upDown);
     }
 

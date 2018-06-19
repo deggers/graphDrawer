@@ -28,38 +28,38 @@ public class Barycenter {
             }
         }
         for (int layers = 1; layers < graphDepth; layers++) {             // layers start at 1, < graphDepth, because matrix always level i and i+1
-            System.out.println("starting down for layer: "+ layers);
+            //System.out.println("starting down for layer: "+ layers);
             m0 = new BarycenterMatrix(graph, layers, "down");
             mStar = m0;
             mTemp = m0;
             minCrossings = m0.getCrossings();
-            System.out.println("minCrossings in beginning = " + minCrossings);
+            //System.out.println("minCrossings in beginning = " + minCrossings);
             iterations1=0;
             phase1();
-        }            System.out.println("down finished");
+        }            //System.out.println("down finished");
 
         for(int layers=graphDepth; layers>1; layers--){
-            System.out.println("starting up for layer: "+ layers);
+            //System.out.println("starting up for layer: "+ layers);
             m0 = new BarycenterMatrix(graph, layers, "up");
             mStar = m0;
             mTemp = m0;
             minCrossings = m0.getCrossings();
-            System.out.println("minCrossings in beginning = " + minCrossings);
+            //System.out.println("minCrossings in beginning = " + minCrossings);
             iterations1=0;
             phase1();
-        }            System.out.println("up finished");
+        }            //System.out.println("up finished");
 
     }
 
     private void phase1() {
         iterations1++;
-        System.out.println("iterations1 = " + iterations1);
+        //System.out.println("iterations1 = " + iterations1);
         mTemp.orderByRow();
-        System.out.println("mTemp crossings = " + mTemp.getCrossings() + " min cross = "+ minCrossings);
+        //System.out.println("mTemp crossings = " + mTemp.getCrossings() + " min cross = "+ minCrossings);
         if (mTemp.getCrossings() < minCrossings) {    // Step 3
             mStar = mTemp;
             minCrossings = mTemp.getCrossings();
-            System.out.println("new minCrossings = " + minCrossings);
+            //System.out.println("new minCrossings = " + minCrossings);
         }
 
         mTemp.orderByColumn();
@@ -78,7 +78,7 @@ public class Barycenter {
 
     private void phase2() {
         iterations2++;
-        System.out.println("iterations2 = " + iterations2);
+        //System.out.println("iterations2 = " + iterations2);
         mTemp.reverseRows();
 
         if (!mTemp.columnsAreIncreasing()) {           // Step 8:
