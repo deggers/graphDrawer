@@ -47,19 +47,20 @@ public class NaiveDraw {
 //        }
 
         System.out.println("Crossing Minimization");
-        CrossingMin.naiveAlgo(partialGraph);
-        System.out.println("from x crossing to y crossing :)");
+       // CrossingMin.naiveAlgo(partialGraph);
+        Barycenter.barycenterAlgo(partialGraph);
+        //System.out.println("from x crossing to y crossing :)");
 
 
         // simple algo to give nodes an coordinate to draw something :)
         LinkedHashMap<Integer,LinkedList<GraphNode>> layerMap = partialGraph.getLayerMap();
         for (int layer : layerMap.keySet()) {
-            int x = 1;
+          //  int x = 1;
             System.out.println("layer = " + layerMap.get(layer));
             for (GraphNode node : layerMap.get(layer)) {
                 node.y = layer;
-                node.x = x;
-                x++;
+               // node.x = x;
+                //x++;
             }
         }
 
