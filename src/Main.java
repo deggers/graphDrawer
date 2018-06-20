@@ -1,41 +1,35 @@
+import java.io.File;
 import java.util.*;
+
+import Sugiyama.AssignLayer;
+import Sugiyama.CrossingMin;
+import Sugiyama.CycleBreaker;
+import controller.ParseController;
+import structure.Graph;
 
 //@formatter:off
 public class Main {
+    private static File file = new File("C:\\Users\\dusty\\Desktop\\Zeckzer\\Vorlesung\\Baeume_1\\Baeume\\Data\\Software-Engineering\\test.graphml");
 
     public static void main(String[] args) {
 
-//        if (new Edge(new GraphNode("a"), new GraphNode("b")).equals(new Edge(new GraphNode("a"), new GraphNode("b")))){
-//            System.out.println("new Edge( new Node, new Node)!");}
+        ParseController.INSTANCE.initParsing(file);
+        Graph theWholeGraph = ParseController.INSTANCE.getGraph();
+        Graph partialGraph = theWholeGraph.copyWithRestrains("Graph1");
+        System.out.println("partialGraph = " + partialGraph);
 
-        LinkedHashSet<Edge> edges = new LinkedHashSet<>();
-        edges.add(new Edge(new GraphNode("o_one"),new GraphNode("o_two")));
-        edges.add(new Edge(new GraphNode("o_two"),new GraphNode("o_three")));
-        edges.add(new Edge(new GraphNode("o_three"), new GraphNode("o_one")));
-//        edges.add(new Edge(new GraphNode("o_three"), new GraphNode("o_four")));
-
-        LinkedList<GraphNode> testNodes = new LinkedList<>();
-        for (Edge edge : edges){
-            testNodes.add(edge.tail);
-            testNodes.add(edge.head);
-        }
-        LinkedHashSet<GraphNode> testHashNodes = new LinkedHashSet<>(testNodes);
-        System.out.println(testHashNodes.contains(new GraphNode("o_one"))? "contains" : "not contained!");
+        System.out.println("Beginn with Sugiyama.CycleBreaker\n");
+        CycleBreaker.GreedyCycleRemoval(partialGraph);
 
 
+        System.out.println("Beginn with LayerAssignment\n");
+        AssignLayer.topologicalPath(partialGraph);
 
-        Graph graph = new Graph(edges);
-        System.out.println(String.format("Actual Graph: \n%s\n",graph));
-        CycleBreaker.DFS_Florian(graph);
-        System.out.println(String.format("Actual Graph: \n%s\n",graph));
 
-        AssignLayer.longestPath(graph);
-
-        System.out.println("graph = " + graph);
-
-//        Graph clonedG = new Graph(graph);
-//        System.out.println(String.format("Actual clonedG: \n%s\n",clonedG));
-
+        System.out.println("Beginn with Sugiyama.CrossingMin\n");
+        CrossingMin.naiveAlgo(partialGraph);
+        System.out.println("partialGraph = " + partialGraph.getLayerMap());
+        System.out.println("partialGraph.getEdges() = " + partialGraph.getEdges());
+        System.out.println("Crossings = " + partialGraph.getCrossings());
     }
-
 }

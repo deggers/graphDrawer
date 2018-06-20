@@ -1,4 +1,4 @@
-/*
+package Sugiyama;/*
 Consider a DAG G = (V, E) with a set of vertices V and a set of edges E. Let L =
 {L0, L1, . . . , Lh} be a partition of the vertex set of G into h ≥ 1 subsets such that if
 (u, v) ∈ E with u ∈ Lj and v ∈ Li then i < j. L is called a layering of G and the sets L0,
@@ -7,7 +7,8 @@ of partitioning the vertex set of a graph into layers is known as the layering p
 layer assignment problem
  */
 
-import sun.awt.image.ImageWatched;
+import structure.Graph;
+import structure.GraphNode;
 
 import java.util.*;
 
@@ -16,10 +17,10 @@ public class AssignLayer {
     private static final int DEFAULT_LAYER_STARTING = 1;
     private static final boolean VERBOSE = false;
 
-    static void longestPath(Graph g) {
+    public static void longestPath(Graph g) {
         final boolean OPTIONAL_CHECK = true;
 
-        LinkedHashSet<GraphNode> U = new LinkedHashSet<>(); // set of nodes that will get a layer in this step
+        LinkedHashSet<GraphNode> U; // set of nodes that will get a layer in this step
         LinkedHashSet<GraphNode> Z = new LinkedHashSet<>(); // set of all parents of nodes in U
         LinkedHashMap<Integer, LinkedList<GraphNode>> layerMap = new LinkedHashMap<>();
 
@@ -50,20 +51,21 @@ public class AssignLayer {
         }
         //all nodes should be layered now, optional check
         if (OPTIONAL_CHECK) {
-            for (GraphNode graphNode : g.getNodes()) {
+            for (GraphNode graphNode : g.getNodes().values()) {
                 if (graphNode.getLayer() == DEFAULT_LAYER_UNSET) {
                     System.out.println("graphNode unlayered! = " + graphNode);
                     throw new Error("LongestPath Layering produced an error, as some nodes in the graph remained unlayered. Check for correctness, solitary nodes or disable this check!");
                 }
             }
         }
-//        g.reverseLayerOrder();
         g.insertLayer(layerMap);
+        g.reverseLayerOrder();
         g.addDummies();
     }
-    static void topologicalPath(Graph g) {
+    public static void topologicalPath(Graph g) {
         int level = DEFAULT_LAYER_STARTING;
         Graph copyG = new Graph(g);
+
         LinkedHashMap<Integer, LinkedList<GraphNode>> sorted = new LinkedHashMap<>();
         LinkedList<GraphNode> sinks;
 
@@ -71,13 +73,14 @@ public class AssignLayer {
             sinks = copyG.getAllSinks();
             sorted.put(level, sinks);
             sinks.forEach(copyG::removeIngoingEdges);
-            copyG.getNodes().removeAll(sinks);
+            copyG.getNodes().values().removeAll(sinks);
+            copyG.getNodes().keySet().removeAll(sinks);
             level += 1;
             if (VERBOSE && level == g.getNodes().size()) System.out.println("\n#Nodes = #Layer\n");
         } sorted.put(level, copyG.getIsolatedNodes());
 
         g.insertLayer(sorted);
-//        g.reverseLayerOrder();
+        g.reverseLayerOrder();
         g.addDummies();
 
         if (VERBOSE) { System.out.println(g);
