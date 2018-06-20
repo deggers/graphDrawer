@@ -3,25 +3,23 @@ package draw;
 import model.Graph;
 import model.GraphNode;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
 public class Barycenter {
-    private Graph graph;
     private BarycenterMatrix m0;
     private BarycenterMatrix mStar, mTemp;                                   // mStar equals M*, solution matrix
-    private int iterations1 = 0, iterations2 = 0, minCrossings=10000, graphDepth;             // equals K and K*
+    private int iterations1 = 0;
+    private int iterations2 = 0;
+    private int minCrossings = 10000;
 
 
-    public static Graph barycenterAlgo(Graph graph){
-        Barycenter b= new Barycenter(graph);
-        return graph;
+    public static void barycenterAlgo(Graph graph) {
+        Barycenter b = new Barycenter(graph);
     }
 
     public Barycenter(Graph graph) {
-        this.graph= graph;
-        graphDepth = 1;
+        int graphDepth = 1;
         for (GraphNode n : graph.getNodes()) {
             if (n.getLayer() > graphDepth) {
                 graphDepth = n.getLayer();
@@ -29,26 +27,45 @@ public class Barycenter {
         }
         for (int layers = 1; layers < graphDepth; layers++) {             // layers start at 1, < graphDepth, because matrix always level i and i+1
             //System.out.println("starting down for layer: "+ layers);
+            minCrossings = Integer.MAX_VALUE;
             m0 = new BarycenterMatrix(graph, layers, "down");
-            mStar = m0;
-            mTemp = m0;
+            mStar = m0.copy();
+            mTemp = m0.copy();
             minCrossings = m0.getCrossings();
             //System.out.println("minCrossings in beginning = " + minCrossings);
-            iterations1=0;
+            iterations1 = 0;
             phase1();
         }            //System.out.println("down finished");
 
-        for(int layers=graphDepth; layers>1; layers--){
+        for (int layers = graphDepth; layers > 1; layers--) {
             //System.out.println("starting up for layer: "+ layers);
+            minCrossings = Integer.MAX_VALUE;
             m0 = new BarycenterMatrix(graph, layers, "up");
-            mStar = m0;
-            mTemp = m0;
+            mStar = m0.copy();
+            mTemp = m0.copy();
             minCrossings = m0.getCrossings();
             //System.out.println("minCrossings in beginning = " + minCrossings);
-            iterations1=0;
+            iterations1 = 0;
             phase1();
+
         }            //System.out.println("up finished");
 
+/*        for(Map.Entry<Integer, LinkedList<GraphNode>> entry : graph.getLayerMap().entrySet()) {
+            System.out.println(" on layer: " + entry.getKey());
+            for (GraphNode graphNode : entry.getValue()) {
+                System.out.println(graphNode.getLabel() + ": " + graphNode.x);
+            }
+        }*/
+        // stattdessen die layer map ändern, also die reihenfolge der knoten
+         for (GraphNode gn : graph.getNodes()) {
+            for (GraphNode g : mStar.getRows()) {
+                if (gn.equals(g)) {
+                    gn.x = g.x;
+                }
+            }
+        }
+        
+       // graph.getLayerMap().put
     }
 
     private void phase1() {
@@ -57,7 +74,7 @@ public class Barycenter {
         mTemp.orderByRow();
         //System.out.println("mTemp crossings = " + mTemp.getCrossings() + " min cross = "+ minCrossings);
         if (mTemp.getCrossings() < minCrossings) {    // Step 3
-            mStar = mTemp;
+            mStar = mTemp.copy();
             minCrossings = mTemp.getCrossings();
             //System.out.println("new minCrossings = " + minCrossings);
         }
@@ -65,11 +82,12 @@ public class Barycenter {
         mTemp.orderByColumn();
 
         if (mTemp.getCrossings() < minCrossings) {     // Step 5
-            mStar = mTemp;
+            mStar = mTemp.copy();
             minCrossings = mTemp.getCrossings();
         }
 
-        if (m0.equals(mTemp) || iterations1 > 10) { // anzahl iterations sinnvolle größe wählen als abbruchkriterim
+        if (m0.equals(mTemp) || iterations1 > 100) { // anzahl iterations sinnvolle größe wählen als abbruchkriterim
+            iterations2 = 0;
             phase2();
         } else {
             phase1();
@@ -83,7 +101,7 @@ public class Barycenter {
 
         if (!mTemp.columnsAreIncreasing()) {           // Step 8:
             step11();                                      // go to step 2 with m0= M3
-        } else{
+        } else {
             mTemp.reverseColumns();
 
             if (!mTemp.rowsAreIncreasing()) {                // Step 10
@@ -92,8 +110,8 @@ public class Barycenter {
         }
     }
 
-    private void step11(){
-        if(iterations2<10){
+    private void step11() {
+        if (iterations2 < 100) {
             phase1();
         }
     }

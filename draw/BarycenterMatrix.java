@@ -7,7 +7,6 @@ import model.GraphNode;
 import java.util.*;
 
 public class BarycenterMatrix {
-    private Graph graph;
     private Map<GraphNode, LinkedList<GraphNode>> nodesAreConnected = new HashMap<>();
     private List<GraphNode> rows = new ArrayList<>();
     private List<GraphNode> columns = new ArrayList<>();
@@ -16,13 +15,13 @@ public class BarycenterMatrix {
     private List<Double> columnBary = new ArrayList<>();
     private String upDown;
 
+    private BarycenterMatrix() {
+    }
 
     public BarycenterMatrix(Graph graphInput, int level, String updown) {
-        this.graph= graphInput;
-        this.upDown= updown;
-        int order = 0;
+        this.upDown = updown;
 
-        for (Iterator<Edge> iterator = graph.getEdges().iterator(); iterator.hasNext(); ) {
+        for (Iterator<Edge> iterator = graphInput.getEdges().iterator(); iterator.hasNext(); ) {
             Edge edge = iterator.next();
             GraphNode u = (GraphNode) edge.getStart();
             GraphNode v = (GraphNode) edge.getTarget();
@@ -46,24 +45,25 @@ public class BarycenterMatrix {
             }
         }
 
-        for(GraphNode g: graph.getLayerMap().get(level)){
+        int order = 0;
+        for (GraphNode g : graphInput.getLayerMap().get(level)) {
             g.x = order;
             rows.add(g);
             order++;
         }
-        order=0;
+        order = 0;
 
-        switch (upDown){
-            case("down"):
-                for(GraphNode g: graph.getLayerMap().get(level+1)){
+        switch (upDown) {
+            case ("down"):
+                for (GraphNode g : graphInput.getLayerMap().get(level + 1)) {
                     g.x = order;
                     columns.add(g);
                     order++;
                 }
                 break;
 
-            case("up"):
-                for(GraphNode g: graph.getLayerMap().get(level-1)){
+            case ("up"):
+                for (GraphNode g : graphInput.getLayerMap().get(level - 1)) {
                     g.x = order;
                     columns.add(g);
                     order++;
@@ -71,7 +71,7 @@ public class BarycenterMatrix {
                 break;
         }
         //System.out.println("level = " + level+ " , direction: = " + updown
-         //       + " ,rows.size() = " + rows.size()+" ,columns.size() = " + columns.size());
+        //       + " ,rows.size() = " + rows.size()+" ,columns.size() = " + columns.size());
 
         matrix = new int[rows.size()][columns.size()];
         calcMatrixAndBarys(upDown);
@@ -82,8 +82,8 @@ public class BarycenterMatrix {
     private void calcMatrixAndBarys(String updown) {
         rowBary.clear();
         columnBary.clear();
-        switch (updown){
-            case("down"):
+        switch (updown) {
+            case ("down"):
                 for (int i = 0; i < rows.size(); i++) {
                     for (int j = 0; j < columns.size(); j++) {
                         if (nodesAreConnected.get(rows.get(i)).contains((columns.get(j)))
@@ -93,8 +93,9 @@ public class BarycenterMatrix {
                             matrix[i][j] = 0;
                         }
                     }
-                } break;
-            case("up"):
+                }
+                break;
+            case ("up"):
                 for (int i = 0; i < rows.size(); i++) {
                     for (int j = 0; j < columns.size(); j++) {
                         if (nodesAreConnected.get(rows.get(i)).contains((columns.get(j)))
@@ -106,25 +107,26 @@ public class BarycenterMatrix {
                             //System.out.println("set 0");
                         }
                     }
-                }break;
+                }
+                break;
         }
 
         for (int k = 0; k < rows.size(); k++) {     // calcRowBarycenter
-            int sumcount=0;
+            int sumcount = 0;
             double tempBary = 0;
             for (int l = 0; l < columns.size(); l++) {
                 int temp = matrix[k][l];
                 if (temp != 0) {
                     tempBary += (((l + 1.0) * matrix[k][l]));
-                    sumcount ++;
+                    sumcount++;
                 }
             }
-            tempBary= tempBary/ (double) sumcount;
+            tempBary = tempBary / (double) sumcount;
             rowBary.add(tempBary);
             //System.out.println("row no: " + k + " rowbary = " + tempBary);
         }
         for (int l = 0; l < columns.size(); l++) {      // calcColumnBary
-            int sumcount=0;
+            int sumcount = 0;
             double tempBary = 0;
             for (int k = 0; k < rows.size(); k++) {
                 int temp = matrix[k][l];
@@ -133,7 +135,7 @@ public class BarycenterMatrix {
                     sumcount++;
                 }
             }
-            tempBary= tempBary / (double)sumcount;
+            tempBary = tempBary / (double) sumcount;
             columnBary.add(tempBary);
             //System.out.println(" col no: " + l + " colbary = " + tempBary);
         }
@@ -157,18 +159,18 @@ public class BarycenterMatrix {
 
 
     public void orderByRow() {              // order bary ascending, for nodes only change x coord
-        if(rowBary.size() >1){
+        if (rowBary.size() > 1) {
             boolean change = true;
             while (change) {
                 change = false;
-                for (int i = 1; i < rowBary.size(); i++) {// bis < size oder <= ?
+                for (int i = 1; i < rowBary.size(); i++) {
                     int prev = i - 1;
-                    //System.out.println("rowBary size= " + rowBary.size());
-                    //System.out.println("row = "+ i +" rowB = " + rowBary.get(i)+ " rowb prev   "+ rowBary.get(prev));
 
-                        if(Double.compare(rowBary.get(i), rowBary.get(prev)) < 0 ) {
+                    if (Double.compare(rowBary.get(i), rowBary.get(prev)) < 0) {
                         Collections.swap(rowBary, i, prev);
+                        //System.out.println("rows.get(i).x =" + rows.get(i) + " gets x coor= " + prev);
                         rows.get(i).x = prev;
+                        //System.out.println("rows.get(prev).x =" + rows.get(prev) + " gets x coor= " + i);
                         rows.get(prev).x = i;
                         Collections.swap(rows, i, prev);
                         change = true;
@@ -181,7 +183,7 @@ public class BarycenterMatrix {
     }
 
     public void orderByColumn() {
-        if (columnBary.size()>1){
+        if (columnBary.size() > 1) {
             boolean change = true;
             while (change) {
                 change = false;
@@ -189,9 +191,11 @@ public class BarycenterMatrix {
                     int prev = i - 1;
                     //System.out.println("colb = " + columnBary.get(i)+ " colb prev   "+ columnBary.get(prev));
 
-                    if (Double.compare(columnBary.get(i),columnBary.get(prev)) <0 ) {
+                    if (Double.compare(columnBary.get(i), columnBary.get(prev)) < 0) {
                         Collections.swap(columnBary, i, prev);
+                        // System.out.println("rcol.get(i).x =" + columns.get(i) + " gets x coor= " + prev);
                         columns.get(i).x = prev;
+                        //System.out.println("cols.get(prev).x =" + columns.get(prev) + " gets x coor= " + i);
                         columns.get(prev).x = i;
                         Collections.swap(columns, i, prev);
                         change = true;
@@ -207,10 +211,10 @@ public class BarycenterMatrix {
     // REVERSION: reorder rows/ cols with equal barycenters
     // noch nicht sicher ob das so stimmt
     public void reverseRows() {
-        if(rows.size()>1){
+        if (rows.size() > 1) {
             for (int i = 1; i < rowBary.size(); i++) {
                 int prev = i - 1;
-                if (Double.compare(rowBary.get(i) , rowBary.get(prev)) == 0) {
+                if (Double.compare(rowBary.get(i), rowBary.get(prev)) == 0) {
                     Collections.swap(rowBary, i, prev);
                     rows.get(i).x = prev;
                     rows.get(prev).x = i;
@@ -222,7 +226,7 @@ public class BarycenterMatrix {
     }
 
     public void reverseColumns() {
-        if(columns.size()>1){
+        if (columns.size() > 1) {
             for (int i = 1; i < columns.size(); i++) {
                 int prev = i - 1;
                 if (Double.compare(columnBary.get(i), columnBary.get(prev)) == 0) {
@@ -257,7 +261,18 @@ public class BarycenterMatrix {
         return true;
     }
 
-  //equals funktion schreiben um matrizen auf gleichheit zu prüfen?
+    public BarycenterMatrix copy() {
+        BarycenterMatrix other = new BarycenterMatrix();
+        other.columns = new ArrayList<>(this.columns);
+        other.rows = new ArrayList<>(this.rows);
+        other.nodesAreConnected = new HashMap<>(this.nodesAreConnected);
+        other.upDown = this.upDown;
+        other.matrix = new int[rows.size()][columns.size()];
+        other.calcMatrixAndBarys(other.upDown);
+        return other;
+    }
+
+    //equals funktion schreiben um matrizen auf gleichheit zu prüfen?
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -265,26 +280,33 @@ public class BarycenterMatrix {
 
         BarycenterMatrix mat = (BarycenterMatrix) obj;
 
-        // vergleichen ob die x coord der knoten gleich
-
-     if(rows.size() != ((BarycenterMatrix) obj).rows.size()
-                || columns.size() != ((BarycenterMatrix) obj).columns.size()){
+        if (rows.size() != ((BarycenterMatrix) obj).rows.size()
+                || columns.size() != ((BarycenterMatrix) obj).columns.size()) {
             return false;
         }
-        for(int i=0; i<rows.size();i++){
-            if(! (rows.get(i).x == (((BarycenterMatrix) obj).rows.get(i)).x)) return false;
-            if (!rowBary.get(i).equals(((BarycenterMatrix) obj).rowBary.get(i) )) return false;
+
+        for (int i = 0; i < rows.size(); i++) {
+            if (rows.get(i) != mat.getRows().get(i)) {
+                return false;
+            }
         }
-        for(int i=0; i<columns.size();i++) {
-            if (!(columns.get(i).x == (((BarycenterMatrix) obj).columns.get(i)).x)) return false;
-            if (!columnBary.get(i).equals(((BarycenterMatrix) obj).columnBary.get(i))) return false;
+
+        for (int i = 0; i < columns.size(); i++) {
+            if (columns.get(i) != mat.getColumns().get(i)) {
+                return false;
+            }
         }
         return true;
     }
 
+    public List<GraphNode> getRows() {
+        return rows;
+    }
 
-
-/*    public List<Double> getRowBarys() {
+    public List<GraphNode> getColumns() {
+        return columns;
+    }
+    /*    public List<Double> getRowBarys() {
         return rowBary;
     }
     public List<Double> getColumnBarys() {
