@@ -1,5 +1,4 @@
 import java.io.File;
-import java.util.*;
 
 import Sugiyama.AssignLayer;
 import Sugiyama.CrossingMin;
@@ -21,15 +20,14 @@ public class Main {
         System.out.println("Beginn with Sugiyama.CycleBreaker\n");
         CycleBreaker.GreedyCycleRemoval(partialGraph);
 
-
         System.out.println("Beginn with LayerAssignment\n");
         AssignLayer.topologicalPath(partialGraph);
 
 
         System.out.println("Beginn with Sugiyama.CrossingMin\n");
-        CrossingMin.naiveAlgo(partialGraph);
-        System.out.println("partialGraph = " + partialGraph.getLayerMap());
-        System.out.println("partialGraph.getEdges() = " + partialGraph.getEdges());
+        CrossingMin.allPermutation(partialGraph,true);
         System.out.println("Crossings = " + partialGraph.getCrossings());
+        System.out.println(partialGraph.getLayerMap());
+        System.out.println("partialGraph.getEdges() = " + partialGraph.getEdges());
     }
 }

@@ -5,44 +5,52 @@ import structure.*;
 import java.util.*;
 
 public class CrossingMin {
-    private static boolean VERBOSE = false;
-    private static boolean DEBUG = false;
+    private static boolean VERBOSE = true;
+    private static boolean DEBUG = true ;
+    private static LinkedHashMap<Integer, LinkedList<GraphNode>> layerMap;
 
-    public static Graph naiveAlgo(Graph graph) {
-        LinkedHashMap<Integer, LinkedList<GraphNode>> layerMap = graph.getLayerMap();
+    public static Graph allPermutation(Graph graph, boolean bidirectional) {
+        layerMap = graph.getLayerMap();
         int numOfLayer = layerMap.keySet().size();
 
-        for (int layer = 1; layer <= numOfLayer - 1; layer++) {
-
-            if (VERBOSE) System.out.println("fixedLayer = " + layer);
-            if (VERBOSE) System.out.println("freeLayer = " + (layer + 1));
-            LinkedList<GraphNode> fixedLayer = layerMap.get(layer);
-            LinkedList<GraphNode> freeLayer = layerMap.get((layer + 1));
-
-            int bestCrossings = Integer.MAX_VALUE;
-            ArrayList<LinkedList<GraphNode>> ListOfAllPermutation;
-            ListOfAllPermutation = graph.heapGenerate(freeLayer.size(), freeLayer, new ArrayList<>());
-            if (VERBOSE) System.out.println("Checking " + ListOfAllPermutation.size() + " Permutations :)");
-            for (LinkedList<GraphNode> permutationOfFreeLayer : ListOfAllPermutation) {
-                int shuffleCrosses = BLCC_naive(graph, fixedLayer, permutationOfFreeLayer);
-                if (VERBOSE && DEBUG) System.out.printf("for layer %d with order %s found %s crossings%n",(layer+1),permutationOfFreeLayer,shuffleCrosses);
-                if (shuffleCrosses < bestCrossings) {
-                    bestCrossings = shuffleCrosses;
-                    graph.setCrossings("L" + layer + "-L" + (layer+1),bestCrossings );
-                    layerMap.put(layer + 1, permutationOfFreeLayer);
-                    if (VERBOSE) System.out.println("neuer Bestwert!: " + shuffleCrosses + " Kreuzungen");
-                    if (bestCrossings == 0) break;
-                }
-            }
-        }
+        if (bidirectional) {
+            for (int layer = 1; layer <= numOfLayer - 1; layer++)
+                workOnLayers(graph, layer, (layer + 1), "top-down");
+            for (int layer = numOfLayer; layer > 1; layer--)
+                workOnLayers(graph, layer, (layer - 1),"down-top"); }
+        else for (int layer = 1; layer <= numOfLayer - 1; layer++)
+                workOnLayers(graph, layer, (layer + 1),"top-down");
         return graph;
     }
 
-    private static int BiLayerCrossingCounter_naive(Graph g, LinkedList<Graph> fixedLayer, LinkedList<Graph> freeLayer) {
-        return 1;
+    private static void workOnLayers(Graph graph, int indexFixed, int indexFree, String direction) {
+        layerMap = graph.getLayerMap();
+        if (VERBOSE) System.out.println("fixedLayer = " + indexFixed);
+        if (VERBOSE) System.out.println("freeLayer = " + indexFree);
+        LinkedList<GraphNode> fixedLayer = layerMap.get(indexFixed);
+        LinkedList<GraphNode> freeLayer = layerMap.get(indexFree);
+
+        int bestCrossings = Integer.MAX_VALUE;
+        ArrayList<LinkedList<GraphNode>> ListOfAllPermutation;
+        ListOfAllPermutation = graph.heapGenerate(freeLayer.size(), freeLayer, new ArrayList<>());
+        if (VERBOSE) System.out.println("Checking " + ListOfAllPermutation.size() + " Permutations :)");
+        for (LinkedList<GraphNode> permutationOfFreeLayer : ListOfAllPermutation) {
+            int shuffleCrosses = BLCC_naive(graph, fixedLayer, permutationOfFreeLayer, direction);
+            if (VERBOSE && DEBUG) System.out.printf("for layer %d with order %s found %s crossings%n",indexFree,permutationOfFreeLayer,shuffleCrosses);
+            if (shuffleCrosses < bestCrossings) {
+                bestCrossings = shuffleCrosses;
+                graph.setCrossings("L" + indexFixed + "-L" + indexFree, bestCrossings );
+                System.out.println("layerMap = " + layerMap);
+                System.out.println("permutationOfFreeLayer = " + permutationOfFreeLayer);
+                layerMap.put(indexFree, permutationOfFreeLayer);
+                System.out.println("layerMap = " + layerMap);
+                if (VERBOSE) System.out.println("neuer Bestwert!: " + bestCrossings + " Kreuzungen");
+                if (bestCrossings == 0) break;
+            }
+        }
     }
 
-    private static int BLCC_naive(Graph g, LinkedList<GraphNode> fixedLayer, LinkedList<GraphNode> freeLayer) {
+    private static int BLCC_naive(Graph g, LinkedList<GraphNode> fixedLayer, LinkedList<GraphNode> freeLayer, String direction) {
         LinkedHashMap<GraphNode, LinkedList<Edge>> edgesIn = g.getEdgesInMap();
         LinkedHashMap<GraphNode, LinkedList<Edge>> edgesOut = g.getEdgesOutMap();
 
@@ -50,7 +58,9 @@ public class CrossingMin {
         for (int i = 0; i <= fixedLayer.size() - 1; i++) { // -2 because last node cannot account for more crossings
             GraphNode fixedNode = fixedLayer.get(i);
             int fixedLayerInt = fixedNode.getLayer();
-            int freeLayerInt = fixedNode.getLayer() + 1;
+            int freeLayerInt;
+            if (direction.equals("top-down")) freeLayerInt = fixedNode.getLayer() + 1;
+            else freeLayerInt = fixedNode.getLayer() - 1;
             if (VERBOSE && DEBUG) System.out.println("\nfixedNode = " + fixedNode);
             LinkedList<GraphNode> adjacentToFixedNodes = new LinkedList<>();
             if (edgesOut.containsKey(fixedNode)) adjacentToFixedNodes.addAll(g.getChildren(fixedNode));

@@ -43,7 +43,7 @@ public class Naive {
         System.out.println(partialGraph.getEdgesOutMap());
 
         System.out.println("Crossing Minimization");
-        CrossingMin.naiveAlgo(partialGraph);
+        CrossingMin.allPermutation(partialGraph,true);
         System.out.println("from x crossing to y crossing :)");
 
 
