@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 public class GUIController {
     //@formatter:off
     private static final LinkedList<String> CYCLEREMOVAL = new LinkedList<>(Arrays.asList("Greedy_Eades'90","BergerShor'87","DFS_Florian"));
-    private static final LinkedList<String> LAYERASSIGNER = new LinkedList<>(Arrays.asList("Topologische Suche", "Longest Path"));
+    private static final LinkedList<String> LAYERASSIGNER = new LinkedList<>(Arrays.asList("TopoSort", "Longest Path"));
     private static final LinkedList<String> HORIZONTALLAYOUT = new LinkedList<>(Arrays.asList("theOneAndOnly"));
 
     private PaneController              paneController              = null;
@@ -178,8 +178,16 @@ private ParseController             parseInstance                   = ParseContr
     public void drawOnAction(ActionEvent event) {
         if (parseInstance.getGraph() != null) {
             paneController.cleanPane();
+            choiceBox_1.setDisable(true);
+            choiceBox_2.setDisable(true);
+            choiceBox_3.setDisable(true);
+            choiceBox_4.setDisable(true);
             Graph naiveDraw = Sugiyama.processGraph(parseInstance.getGraph());
             paneController.drawDAG(naiveDraw);
+            choiceBox_1.setDisable(false);
+            choiceBox_2.setDisable(false);
+            choiceBox_3.setDisable(false);
+            choiceBox_4.setDisable(false);
         }
     }
 

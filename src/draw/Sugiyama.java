@@ -13,12 +13,17 @@ public class Sugiyama {
     private static Graph partialGraph = null;
 
     public static Graph processGraph(Graph theGraph) {
+        GUIController GUIinstance = GUIController.getInstance();
+
 
         if (VERBOSE) System.out.println("Graph: \n Nodes: " + theGraph.getNodes().size() + ", Edges: " + theGraph.getEdges().size());
         String selectedEdgeType = Objects.requireNonNull(GUIController.getInstance()).getSelectedEdgeType();
         partialGraph = theGraph.copyWithRestrains(selectedEdgeType);
         partialGraph.resetAllPorts();
+        System.out.println("Working on Graph with EdgeType: " + selectedEdgeType);
         if (VERBOSE) System.out.println("Partial: \n Nodes: " + partialGraph.getNodes().size() + ", Edges: " + partialGraph.getEdges().size());
+
+        // make all buttons grey so you need, it's working...
 
 
 //        if (partialGraph!=null){
@@ -36,7 +41,9 @@ public class Sugiyama {
 
         switch (selectedCycleRemovalAlgo) {
             case "Greedy_Eades'90"  : CycleBreaker.GreedyCycleRemoval(partialGraph);  break;
-            default                 : System.out.println("unknown algo selected, wtf!");
+            case "BergerShor'87"    : CycleBreaker.Berger_Shor(partialGraph); break;
+            case "DFS_Florian"      : CycleBreaker.DFS_Florian(partialGraph); break;
+            default                 : System.out.println("unknown algo selected, wtf!"); break;
         }
 
 
@@ -44,7 +51,9 @@ public class Sugiyama {
         System.out.println("Layer assignment");
 
         switch (GUIController.getInstance().getSelectedLayerAssigner()) {
-            case "Topologische Suche" : AssignLayer.topologicalPath(partialGraph);
+            case "TopoSort"             : AssignLayer.topologicalPath(partialGraph); break;
+            case "Longest Path"         : AssignLayer.longestPath(partialGraph); break;
+            default                     : System.out.println(" mistake in AssignlayerSugyi"); break;
         }
 
 
