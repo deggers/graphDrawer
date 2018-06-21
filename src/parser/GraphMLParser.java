@@ -61,8 +61,6 @@ public class GraphMLParser {
                                         case "attr.name":
                                             break;
                                         case "attr.type":
-                                            graph.addEdgeType(attributeValue);
-//                                            ktype = attributeValue;
                                             if (DEBUG && !attributeValue.equalsIgnoreCase("double")) {
                                                 System.out.println("Warning: non-standard EdgeType added: " + attributeValue);
                                             }

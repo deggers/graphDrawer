@@ -311,7 +311,9 @@ public class    Graph {
         this.crossings.put(layer, crossings);
     }
 
-
+    public void resetAllPorts(){
+        this.nodes.values().forEach(GraphNode::resetPortMap);
+    }
     public void addEdgeType(String edgeType) {
         if (!edgeTypes.contains(edgeType))
             edgeTypes.add(edgeType);

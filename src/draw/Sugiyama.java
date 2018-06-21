@@ -8,14 +8,19 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Objects;
 
-public class Naive {
+public class Sugiyama {
     private static final boolean VERBOSE = false;
     private static Graph partialGraph = null;
 
     public static Graph processGraph(Graph theGraph) {
-        System.out.println("Graph: \n Nodes: " + theGraph.getNodes().size() + ", Edges: " + theGraph.getEdges().size());
+
+        if (VERBOSE) System.out.println("Graph: \n Nodes: " + theGraph.getNodes().size() + ", Edges: " + theGraph.getEdges().size());
         String selectedEdgeType = Objects.requireNonNull(GUIController.getInstance()).getSelectedEdgeType();
         partialGraph = theGraph.copyWithRestrains(selectedEdgeType);
+        partialGraph.resetAllPorts();
+        if (VERBOSE) System.out.println("Partial: \n Nodes: " + partialGraph.getNodes().size() + ", Edges: " + partialGraph.getEdges().size());
+
+
 //        if (partialGraph!=null){
 //            if (partialGraph.edgeType == selectedEdgeType && partialGraph.graphname == GUIController.getInstance().getFileName()){
 //                partialGraph.resetAllPorts();
@@ -23,18 +28,26 @@ public class Naive {
 //            }
 //        }
 
+        if (VERBOSE) System.out.println("remove all cycles");
+        String selectedCycleRemovalAlgo = GUIController.getInstance().getSelectedCycleRemovalAlgo();
+        System.out.println("selectedCycleRemovalAlgo = " + selectedCycleRemovalAlgo);
+        if (selectedCycleRemovalAlgo == null) throw new RuntimeException ("no CycleRemovalAlgo selected!");
 
-        // comment
-        System.out.println("Partial: \n Nodes: " + partialGraph.getNodes().size() + ", Edges: " + partialGraph.getEdges().size());
 
-////      1. Remove all Cycles
-        System.out.println("remove all cycles");
-        CycleBreaker.GreedyCycleRemoval(partialGraph);
+        switch (selectedCycleRemovalAlgo) {
+            case "Greedy_Eades'90"  : CycleBreaker.GreedyCycleRemoval(partialGraph);  break;
+            default                 : System.out.println("unknown algo selected, wtf!");
+        }
 
 
 ////      2.  Layer Assignment: Vertices are assigned to layers.
         System.out.println("Layer assignment");
-        AssignLayer.topologicalPath(partialGraph);
+
+        switch (GUIController.getInstance().getSelectedLayerAssigner()) {
+            case "Topologische Suche" : AssignLayer.topologicalPath(partialGraph);
+        }
+
+
 
 
         System.out.println("Crossing Minimization");

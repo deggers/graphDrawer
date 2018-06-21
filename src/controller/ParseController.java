@@ -35,8 +35,6 @@ public enum ParseController{
     private boolean parseNewick(File file) {
         try {
             Tree newickTree = TreeParserNewick.parseFileToTree(file);
-            requireNonNull(GUIController.getInstance()).choiceBoxEdgeType.setDisable(true);
-            requireNonNull(GUIController.getInstance()).choiceBoxRoot.setDisable(true);
             setTree(newickTree);
             setGraph(null);
             return true;}
