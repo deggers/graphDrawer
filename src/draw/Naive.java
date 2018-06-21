@@ -23,6 +23,8 @@ public class Naive {
 //            }
 //        }
 
+
+        // comment
         System.out.println("Partial: \n Nodes: " + partialGraph.getNodes().size() + ", Edges: " + partialGraph.getEdges().size());
 
 ////      1. Remove all Cycles
