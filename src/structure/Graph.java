@@ -7,12 +7,20 @@ public class    Graph {
     private LinkedHashMap<String, Integer> crossings = new LinkedHashMap<>();
     private LinkedHashSet<Edge> edges = new LinkedHashSet<>();
     private LinkedHashMap<GraphNode,GraphNode> nodes = new LinkedHashMap<>();
-    private ArrayList<LinkedList<String>> edgeTypes = new ArrayList<>();
+    private ArrayList<String> edgeTypes = new ArrayList<>();
     private LinkedHashMap<GraphNode, LinkedList<Edge>> edgesIn = new LinkedHashMap<>();
     private LinkedHashMap<GraphNode, LinkedList<Edge>> edgesOut = new LinkedHashMap<>();
     private LinkedHashMap<Integer, LinkedList<GraphNode>> layerMap = new LinkedHashMap<>();
 
-    public Graph() {}
+    public Graph() {
+        this.crossings = new LinkedHashMap<>();
+        this.edges = new LinkedHashSet<>();
+        this.nodes = new LinkedHashMap<>();
+        this.edgeTypes = new ArrayList<>();
+        this.edgesIn = new LinkedHashMap<>();
+        this.edgesOut = new LinkedHashMap<>();
+        this.layerMap = new LinkedHashMap<>();
+    }
 
     public Graph(Graph graph) { // copyconstructor!
         for (Edge e : graph.edges) {
@@ -21,7 +29,7 @@ public class    Graph {
             if (!nodes.containsKey(deepTail)) nodes.put(deepTail,deepTail);
             if (!nodes.containsKey(deepHead)) nodes.put(deepHead,deepHead);
 
-            Edge deepClonedEdge = new Edge(nodes.get(e.tail), nodes.get(e.head), e.getEdgeType());
+            Edge deepClonedEdge = new Edge(nodes.get(e.tail), nodes.get(e.head), e.getEdgeType(),e.isReversed());
             this.edges.add(deepClonedEdge);
             addToHashmap(deepClonedEdge);}
         this.insertLayer(graph.layerMap);
@@ -59,7 +67,6 @@ public class    Graph {
         nodes.remove(graphNode);
         deleteAll_IsolatedNodes();
     }
-
     public void addEdge(String tail,String head){
         GraphNode tailNode = new GraphNode(tail);
         GraphNode headNode = new GraphNode(head);
@@ -73,7 +80,6 @@ public class    Graph {
         if (edgesIn.containsKey(headNode)) edgesIn.get(headNode).add(edge);
         else edgesIn.put(headNode, new LinkedList<>(Collections.singletonList(edge)));
     }
-
     public void addEdge(Edge edge) {
         this.edges.add(edge);
         if (!nodes.containsKey(edge.tail)) nodes.put(edge.tail, edge.tail);
@@ -216,6 +222,10 @@ public class    Graph {
         LinkedList<Edge> edgesToDelete = new LinkedList<>();
         LinkedList<Edge> edgesNew = new LinkedList<>();
 
+        System.out.println("");
+        System.out.println("layerMap = " + layerMap);
+        System.out.println("");
+
         for (Edge edge : edges) {
             GraphNode start = edge.tail;
             GraphNode target = edge.head;
@@ -302,15 +312,12 @@ public class    Graph {
     }
 
 
-    public boolean addEdgeType(LinkedList<String> edgeType) {
-        if (!edgeTypes.contains(edgeType)) {
+    public void addEdgeType(String edgeType) {
+        if (!edgeTypes.contains(edgeType))
             edgeTypes.add(edgeType);
-            return true;}
-        if (VERBOSE) System.out.println("EdgeType " + edgeType + " already in list");
-        return false;
     }
 
-    public ArrayList<LinkedList<String>> getEdgeTypes() { return edgeTypes; }
+    public ArrayList<String> getEdgeTypes() { return edgeTypes; }
 
 
     @Override    public String toString() {

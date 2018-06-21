@@ -47,13 +47,12 @@ public class GraphMLParser {
                                 attributes = startElement.getAttributes();
                                 LinkedList<String> edgeType = null;
                                 while (attributes.hasNext()) {
-                                    edgeType = new LinkedList<>();
                                     Attribute attrib = attributes.next();
                                     String attributeName = attrib.getName().getLocalPart();
                                     String attributeValue = attrib.getValue();
                                     switch (attributeName) {
                                         case "id":
-                                            edgeType.add(attributeValue);
+                                            graph.addEdgeType(attributeValue);
 //                                            id = attributeValue;
                                             if (DEBUG) System.out.println("set id: " + attributeValue);
                                             break;
@@ -62,7 +61,7 @@ public class GraphMLParser {
                                         case "attr.name":
                                             break;
                                         case "attr.type":
-                                            edgeType.add(attributeValue);
+                                            graph.addEdgeType(attributeValue);
 //                                            ktype = attributeValue;
                                             if (DEBUG && !attributeValue.equalsIgnoreCase("double")) {
                                                 System.out.println("Warning: non-standard EdgeType added: " + attributeValue);
@@ -73,7 +72,6 @@ public class GraphMLParser {
                                             break;
                                     }
                                 }
-                                graph.addEdgeType(edgeType);
                                 break;
                             case "graph"://-----------------------------Graph--------------------------------------
                                 break;

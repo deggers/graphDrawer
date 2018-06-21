@@ -5,8 +5,8 @@ import structure.*;
 import java.util.*;
 
 public class CrossingMin {
-    private static boolean VERBOSE = true;
-    private static boolean DEBUG = true ;
+    private static boolean VERBOSE = false;
+    private static boolean DEBUG = false ;
     private static LinkedHashMap<Integer, LinkedList<GraphNode>> layerMap;
 
     public static Graph allPermutation(Graph graph, boolean bidirectional) {
@@ -40,10 +40,7 @@ public class CrossingMin {
             if (shuffleCrosses < bestCrossings) {
                 bestCrossings = shuffleCrosses;
                 graph.setCrossings("L" + indexFixed + "-L" + indexFree, bestCrossings );
-                System.out.println("layerMap = " + layerMap);
-                System.out.println("permutationOfFreeLayer = " + permutationOfFreeLayer);
                 layerMap.put(indexFree, permutationOfFreeLayer);
-                System.out.println("layerMap = " + layerMap);
                 if (VERBOSE) System.out.println("neuer Bestwert!: " + bestCrossings + " Kreuzungen");
                 if (bestCrossings == 0) break;
             }
