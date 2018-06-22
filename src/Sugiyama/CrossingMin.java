@@ -9,6 +9,56 @@ public class CrossingMin {
     private static boolean DEBUG = false ;
     private static LinkedHashMap<Integer, LinkedList<GraphNode>> layerMap;
 
+    public static void baryCenter_naive(Graph graph, boolean bidirectional, int sweeps) {
+        layerMap = graph.getLayerMap();
+        int numOfLayer = layerMap.keySet().size();
+
+        for (int i = 0; i < sweeps; i++) {
+            if (bidirectional) {
+                for (int layer = 1; layer <= numOfLayer - 1; layer++)
+                    processBaryCenter_naive(graph, layer, (layer + 1), "top-down");
+                for (int layer = numOfLayer; layer > 1; layer--)
+                    processBaryCenter_naive(graph, layer, (layer - 1),"down-top"); }
+            else for (int layer = 1; layer <= numOfLayer - 1; layer++)
+                processBaryCenter_naive(graph, layer, (layer + 1),"top-down");
+        }
+    }
+
+    private static void processBaryCenter_naive(Graph graph, int indexFixed, int indexFree, String direction) {
+        layerMap = graph.getLayerMap();
+        if (VERBOSE) System.out.println("fixedLayer = " + indexFixed);
+        if (VERBOSE) System.out.println("freeLayer = " + indexFree);
+        LinkedList<GraphNode> fixedLayer = layerMap.get(indexFixed);
+        LinkedList<GraphNode> freeLayer = layerMap.get(indexFree);
+        int shuffleCrosses = 0; // NNEED TO BE CHANGED!!V :)
+        int bestCrossings = Integer.MAX_VALUE;
+
+        // calculate the new ordering of the vertices
+
+        // got one fixed and one free
+        // for each free, get the degree of the freeNode
+        //      sumUp all indizes which their adjazent nodes have
+        //      degree multiplied by adjazentSumOfIndizes equals Bayes_x
+        // order vertices into layer in ascending order.. 1,2,3...
+        // calculate crossings - if better, save
+        // check if there are ambigous possiblites like 1, 2 ,2 ,3 ..
+        // if that the case, change each doubled number and check if crossings is lesser
+        // is crossings is equal, can i just my adjustedEdgeLength as critera?
+
+
+        // calculate how many Crossing we have
+
+        if (shuffleCrosses < bestCrossings) {
+                bestCrossings = shuffleCrosses;
+                if (direction.equals("top-down"))   graph.setCrossings("L" + indexFixed + "-L" + indexFree, bestCrossings );
+                else graph.setCrossings("L" + indexFree + "-L" + indexFixed, bestCrossings );
+                layerMap.put(indexFree, freeLayer);
+                if (VERBOSE) System.out.println("neuer Bestwert!: " + bestCrossings + " Kreuzungen");
+//                if (bestCrossings == 0)  break;
+        }
+    }
+
+
     public static void allPermutation(Graph graph, boolean bidirectional, int sweeps) {
         layerMap = graph.getLayerMap();
         int numOfLayer = layerMap.keySet().size();
@@ -16,15 +66,16 @@ public class CrossingMin {
         for (int i = 0; i < sweeps; i++) {
             if (bidirectional) {
                 for (int layer = 1; layer <= numOfLayer - 1; layer++)
-                    workOnLayers(graph, layer, (layer + 1), "top-down");
+                    processLayers(graph,"Permutation", layer, (layer + 1), "top-down");
                 for (int layer = numOfLayer; layer > 1; layer--)
-                    workOnLayers(graph, layer, (layer - 1),"down-top"); }
+                    processLayers(graph,"Permutation", layer, (layer - 1),"down-top"); }
             else for (int layer = 1; layer <= numOfLayer - 1; layer++)
-                workOnLayers(graph, layer, (layer + 1),"top-down");
+                processLayers(graph, "Permutation", layer, (layer + 1),"top-down");
         }
     }
 
-    private static void workOnLayers(Graph graph, int indexFixed, int indexFree, String direction) {
+
+    private static void processLayers(Graph graph, String algo, int indexFixed, int indexFree, String direction) {
         layerMap = graph.getLayerMap();
         if (VERBOSE) System.out.println("fixedLayer = " + indexFixed);
         if (VERBOSE) System.out.println("freeLayer = " + indexFree);
@@ -49,7 +100,6 @@ public class CrossingMin {
             }
         }
     }
-
     private static int BLCC_naive(Graph g, LinkedList<GraphNode> fixedLayer, LinkedList<GraphNode> freeLayer, String direction) {
         LinkedHashMap<GraphNode, LinkedList<Edge>> edgesIn = g.getEdgesInMap();
         LinkedHashMap<GraphNode, LinkedList<Edge>> edgesOut = g.getEdgesOutMap();

@@ -1,6 +1,5 @@
 package draw;
 
-import com.sun.java.accessibility.util.GUIInitializedListener;
 import controller.GUIController;
 import structure.*;
 import Sugiyama.*;
@@ -67,6 +66,7 @@ public class Sugiyama {
         System.out.println(GUIController.getInstance().getSelectedCrossingMinAlgo());
         switch (GUIController.getInstance().getSelectedCrossingMinAlgo()) {
             case "Permutation"  :   CrossingMin.allPermutation(partialGraph, bidirectional,sweeps); break;
+            case "BayesCenter_naive" : CrossingMin.baryCenter_naive(partialGraph, bidirectional,sweeps); break;
             default             :   System.out.println(" mhm, missin something here! Sugiyama"); break;
         }
         GUIController.getInstance().setCrossingLabel("Crossings: " + partialGraph.getCrossings().toString());

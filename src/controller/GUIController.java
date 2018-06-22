@@ -28,7 +28,7 @@ public class GUIController {
     private static final LinkedList<String> CYCLEREMOVAL = new LinkedList<>(Arrays.asList("Greedy_Eades'90","BergerShor'87","DFS_Florian"));
     private static final LinkedList<String> LAYERASSIGNER = new LinkedList<>(Arrays.asList("TopoSort", "Longest Path"));
     private static final LinkedList<String> HORIZONTALLAYOUT = new LinkedList<>(Arrays.asList("theOneAndOnly"));
-    private static final LinkedList<String> CROSSINGMINALGOS = new LinkedList<>(Arrays.asList("Permutation"));
+    private static final LinkedList<String> CROSSINGMINALGOS = new LinkedList<>(Arrays.asList("Permutation","BayesCenter_naive"));
 
     private PaneController              paneController              = null;
     private String                      fileName                    = null;

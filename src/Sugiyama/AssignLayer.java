@@ -79,6 +79,7 @@ public class AssignLayer {
             if (VERBOSE && level == g.getNodes().size()) System.out.println("\n#Nodes = #Layer\n");
         } sorted.put(level, copyG.getIsolatedNodes());
 
+        if (sorted.size() == 0) System.out.println("nothin in the layer ?!");
         g.insertLayer(sorted);
         g.reverseLayerOrder();
         g.addDummies();

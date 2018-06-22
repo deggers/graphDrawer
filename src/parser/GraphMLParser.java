@@ -178,6 +178,8 @@ public class GraphMLParser {
                                 if (VERBOSE) System.out.println("found node end");
                                 break;
                             case "edge":
+//                                System.out.println("edge.tail = " + edge.tail);
+//                                System.out.println("edge.head = " + edge.head);
                                 if (!edge.tail.equals(edge.head))  //keine Selbstkanten
                                     graph.addEdge(edge);
                                 else System.out.println("found self edge!");
@@ -195,7 +197,7 @@ public class GraphMLParser {
                 }
             }
             //Postprocessing der erhaltenen
-            if (!TESTINGGRAPHS) {
+            if (graph.getEdgeTypes().contains("package")) {
                 if (graph != null) {
                     StringBuilder sb;
                     LinkedHashMap<GraphNode, GraphNode> nodes = graph.getNodes();

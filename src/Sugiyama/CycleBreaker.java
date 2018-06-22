@@ -78,6 +78,7 @@ public class CycleBreaker {
         if (VERBOSE && edgesToBeReversed.isEmpty()) System.out.println("Nothin' to reverse");
         edgesToBeReversed.forEach(g::reverseEdge);
         edgesToBeReversed.clear();
+
     }
 
     private static void dfsRec(Graph g, GraphNode node) {
