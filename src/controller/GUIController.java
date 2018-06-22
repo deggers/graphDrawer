@@ -133,9 +133,8 @@ public class GUIController {
     @FXML    ChoiceBox choiceBox_5;     private boolean choiceBox_5_Set = false;
     @FXML    TextField params_1;
 
-
-
     @FXML   Label crossingLabel;
+    @FXML   Label graphInfo;
 
     // TODO implement the logic for .nh  --Dustyn
     private void loadedFile() {
@@ -278,5 +277,13 @@ public class GUIController {
 
     public void setCrossingLabel(String crossingLabel) {
         this.crossingLabel.setText(crossingLabel);
+    }
+
+    public Label getGraphInfo() {
+        return graphInfo;
+    }
+
+    public void setGraphInfo(String graphInfo) {
+        this.graphInfo.setText(graphInfo);
     }
 }

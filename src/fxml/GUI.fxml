@@ -89,6 +89,7 @@
 
        <HBox style="-fx-background-color: white;  -fx-border-color:grey; -fx-border-width: 0 1 0 1; -fx-border-style: solid;">
             <children>
+                <Label fx:id="graphInfo"> </Label>
                 <Label fx:id="crossingLabel" > </Label>
             </children>
        </HBox>

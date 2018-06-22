@@ -24,6 +24,7 @@ public class Sugiyama {
         System.out.println("Working on Graph with EdgeType: " + selectedEdgeType);
         if (VERBOSE) System.out.println("Partial: \n Nodes: " + partialGraph.getNodes().size() + ", Edges: " + partialGraph.getEdges().size());
 
+        GUIController.getInstance().setGraphInfo(String.format("Graph: %s Nodes, %s Edges || ", partialGraph.getNodes().size(), partialGraph.getEdges().size()));
 
 //        if (partialGraph!=null){
 //            if (partialGraph.edgeType == selectedEdgeType && partialGraph.graphname == GUIController.getInstance().getFileName()){
