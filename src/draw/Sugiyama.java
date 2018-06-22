@@ -20,7 +20,6 @@ public class Sugiyama {
         if (VERBOSE) System.out.println("Graph: \n Nodes: " + theGraph.getNodes().size() + ", Edges: " + theGraph.getEdges().size());
         String selectedEdgeType = Objects.requireNonNull(GUIController.getInstance()).getSelectedEdgeType();
         partialGraph = theGraph.copyWithRestrains(selectedEdgeType);
-        partialGraph.resetAllPorts();
         System.out.println("Working on Graph with EdgeType: " + selectedEdgeType);
         if (VERBOSE) System.out.println("Partial: \n Nodes: " + partialGraph.getNodes().size() + ", Edges: " + partialGraph.getEdges().size());
 
@@ -86,6 +85,9 @@ public class Sugiyama {
                 x++;
             }
         }
+
+
+        partialGraph.resetAllPorts();
         return partialGraph;
     }
 }
