@@ -9,18 +9,19 @@ public class CrossingMin {
     private static boolean DEBUG = false ;
     private static LinkedHashMap<Integer, LinkedList<GraphNode>> layerMap;
 
-    public static Graph allPermutation(Graph graph, boolean bidirectional) {
+    public static void allPermutation(Graph graph, boolean bidirectional, int sweeps) {
         layerMap = graph.getLayerMap();
         int numOfLayer = layerMap.keySet().size();
 
-        if (bidirectional) {
-            for (int layer = 1; layer <= numOfLayer - 1; layer++)
-                workOnLayers(graph, layer, (layer + 1), "top-down");
-            for (int layer = numOfLayer; layer > 1; layer--)
-                workOnLayers(graph, layer, (layer - 1),"down-top"); }
-        else for (int layer = 1; layer <= numOfLayer - 1; layer++)
+        for (int i = 0; i < sweeps; i++) {
+            if (bidirectional) {
+                for (int layer = 1; layer <= numOfLayer - 1; layer++)
+                    workOnLayers(graph, layer, (layer + 1), "top-down");
+                for (int layer = numOfLayer; layer > 1; layer--)
+                    workOnLayers(graph, layer, (layer - 1),"down-top"); }
+            else for (int layer = 1; layer <= numOfLayer - 1; layer++)
                 workOnLayers(graph, layer, (layer + 1),"top-down");
-        return graph;
+        }
     }
 
     private static void workOnLayers(Graph graph, int indexFixed, int indexFree, String direction) {
@@ -39,7 +40,9 @@ public class CrossingMin {
             if (VERBOSE && DEBUG) System.out.printf("for layer %d with order %s found %s crossings%n",indexFree,permutationOfFreeLayer,shuffleCrosses);
             if (shuffleCrosses < bestCrossings) {
                 bestCrossings = shuffleCrosses;
-                graph.setCrossings("L" + indexFixed + "-L" + indexFree, bestCrossings );
+//                System.out.println(graph.getCrossings());
+                if (direction.equals("top-down"))   graph.setCrossings("L" + indexFixed + "-L" + indexFree, bestCrossings );
+                else graph.setCrossings("L" + indexFree + "-L" + indexFixed, bestCrossings );
                 layerMap.put(indexFree, permutationOfFreeLayer);
                 if (VERBOSE) System.out.println("neuer Bestwert!: " + bestCrossings + " Kreuzungen");
                 if (bestCrossings == 0) break;

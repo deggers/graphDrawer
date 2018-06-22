@@ -5,7 +5,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<?import java.lang.*?>
 <VBox fx:controller="controller.GUIController" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" >
    <children>
       <HBox alignment="CENTER" prefHeight="36.0" prefWidth="600.0" style="-fx-background-color: white;  -fx-border-color:grey; -fx-border-width: 1; -fx-border-style: solid;">
@@ -18,26 +17,33 @@
             </Slider>
 -->
 
-             <ChoiceBox fx:id="choiceBox_1" onAction="#cb_choiceBox_1" prefWidth="110.0">
+             <ChoiceBox fx:id="choiceBox_1" onAction="#cb_1" prefWidth="110.0">
                  <HBox.margin>
                      <Insets left="10.0" right="10.0" />
                  </HBox.margin>
              </ChoiceBox>
 
-             <ChoiceBox fx:id="choiceBox_2" onAction="#cb_choiceBox_2" prefWidth="130.0">
+             <ChoiceBox fx:id="choiceBox_2" onAction="#cb_2" prefWidth="130.0">
                  <HBox.margin>
                      <Insets left="10.0" right="10.0" />
                  </HBox.margin>
              </ChoiceBox>
 
-             <ChoiceBox fx:id="choiceBox_3" onAction="#cb_choiceBox_3" prefWidth="130.0">
+             <ChoiceBox fx:id="choiceBox_3" onAction="#cb_3" prefWidth="100.0">
                  <HBox.margin>
                      <Insets left="10.0" right="10.0" />
                  </HBox.margin>
              </ChoiceBox>
 
+             <TextField fx:id="params_1" prefWidth="60.0" />
 
-             <ChoiceBox fx:id="choiceBox_4" onAction="#cb_choiceBox_4" prefWidth="130.0">
+             <ChoiceBox fx:id="choiceBox_4" onAction="#cb_4" prefWidth="110.0">
+                 <HBox.margin>
+                     <Insets left="10.0" right="10.0" />
+                 </HBox.margin>
+             </ChoiceBox>
+
+             <ChoiceBox fx:id="choiceBox_5" onAction="#cb_5" prefWidth="110.0">
                  <HBox.margin>
                      <Insets left="10.0" right="10.0" />
                  </HBox.margin>
@@ -80,5 +86,12 @@
             </Button>
          </children>
       </HBox>
+
+       <HBox style="-fx-background-color: white;  -fx-border-color:grey; -fx-border-width: 0 1 0 1; -fx-border-style: solid;">
+            <children>
+                <Label fx:id="crossingLabel" > </Label>
+            </children>
+       </HBox>
+
    </children>
 </VBox>

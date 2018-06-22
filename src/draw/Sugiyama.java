@@ -1,5 +1,6 @@
 package draw;
 
+import com.sun.java.accessibility.util.GUIInitializedListener;
 import controller.GUIController;
 import structure.*;
 import Sugiyama.*;
@@ -13,8 +14,8 @@ public class Sugiyama {
     private static Graph partialGraph = null;
 
     public static Graph processGraph(Graph theGraph) {
-        GUIController GUIinstance = GUIController.getInstance();
-
+        boolean bidirectional;
+        int sweeps;
 
         if (VERBOSE) System.out.println("Graph: \n Nodes: " + theGraph.getNodes().size() + ", Edges: " + theGraph.getEdges().size());
         String selectedEdgeType = Objects.requireNonNull(GUIController.getInstance()).getSelectedEdgeType();
@@ -22,8 +23,6 @@ public class Sugiyama {
         partialGraph.resetAllPorts();
         System.out.println("Working on Graph with EdgeType: " + selectedEdgeType);
         if (VERBOSE) System.out.println("Partial: \n Nodes: " + partialGraph.getNodes().size() + ", Edges: " + partialGraph.getEdges().size());
-
-        // make all buttons grey so you need, it's working...
 
 
 //        if (partialGraph!=null){
@@ -35,7 +34,6 @@ public class Sugiyama {
 
         if (VERBOSE) System.out.println("remove all cycles");
         String selectedCycleRemovalAlgo = GUIController.getInstance().getSelectedCycleRemovalAlgo();
-        System.out.println("selectedCycleRemovalAlgo = " + selectedCycleRemovalAlgo);
         if (selectedCycleRemovalAlgo == null) throw new RuntimeException ("no CycleRemovalAlgo selected!");
 
 
@@ -57,11 +55,23 @@ public class Sugiyama {
         }
 
 
-
-
         System.out.println("Crossing Minimization");
-        CrossingMin.allPermutation(partialGraph,true);
-        System.out.println("from x crossing to y crossing :)");
+        String  inputParams1    = GUIController.getInstance().getInputParams_1();
+        if (inputParams1.length() == 2) {
+            bidirectional = inputParams1.contains("B");
+            sweeps = Character.getNumericValue(inputParams1.charAt(1));
+        } else {
+            bidirectional = false;
+            sweeps = 1;
+        }
+        System.out.println(GUIController.getInstance().getSelectedCrossingMinAlgo());
+        switch (GUIController.getInstance().getSelectedCrossingMinAlgo()) {
+            case "Permutation"  :   CrossingMin.allPermutation(partialGraph, bidirectional,sweeps); break;
+            default             :   System.out.println(" mhm, missin something here! Sugiyama"); break;
+        }
+        GUIController.getInstance().setCrossingLabel("Crossings: " + partialGraph.getCrossings().toString());
+
+
 
 
         // simple algo to give nodes an coordinate to draw something :)
@@ -75,7 +85,6 @@ public class Sugiyama {
                 x++;
             }
         }
-
         return partialGraph;
     }
 }
