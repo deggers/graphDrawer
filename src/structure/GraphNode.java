@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 public class           GraphNode {
     private String label, nodeType;
     public int x, y;
+    public double x_Bary;
     private int layer = -1;
     private boolean isDummy = false;
     private LinkedHashMap<Double, Boolean> portMap = new LinkedHashMap<>();
@@ -30,6 +31,10 @@ public class           GraphNode {
 
     public void setNodeType(String nodeType) {
         this.nodeType = nodeType;
+    }
+
+    public double getX_Bary() {
+        return x_Bary;
     }
 
     public enum STATUS {done, unvisited, visited}
@@ -79,6 +84,8 @@ public class           GraphNode {
     public String getLabel()  {
         return this.label;
     }
+
+    public double compareTo(GraphNode o) { return Double.compare(x_Bary, o.x_Bary); }
 
     @Override
     public String toString() {

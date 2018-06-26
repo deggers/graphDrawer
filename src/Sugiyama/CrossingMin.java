@@ -19,13 +19,12 @@ public class CrossingMin {
                     processBaryCenter_naive(graph, layer, (layer + 1), "top-down");
                 for (int layer = numOfLayer; layer > 1; layer--)
                     processBaryCenter_naive(graph, layer, (layer - 1),"down-top"); }
-            else for (int layer = 1; layer <= numOfLayer - 1; layer++)
+            else for (int layer = 1; layer <= numOfLayer -1; layer++)
                 processBaryCenter_naive(graph, layer, (layer + 1),"top-down");
         }
     }
-
-    private static void processBaryCenter_naive(Graph graph, int indexFixed, int indexFree, String direction) {
-        layerMap = graph.getLayerMap();
+    private static void processBaryCenter_naive(Graph g, int indexFixed, int indexFree, String direction) {
+        layerMap = g.getLayerMap();
         if (VERBOSE) System.out.println("fixedLayer = " + indexFixed);
         if (VERBOSE) System.out.println("freeLayer = " + indexFree);
         LinkedList<GraphNode> fixedLayer = layerMap.get(indexFixed);
@@ -33,31 +32,24 @@ public class CrossingMin {
         int shuffleCrosses = 0; // NNEED TO BE CHANGED!!V :)
         int bestCrossings = Integer.MAX_VALUE;
 
-        // calculate the new ordering of the vertices
-
-        // got one fixed and one free
-        // for each free, get the degree of the freeNode
-        //      sumUp all indizes which their adjazent nodes have
-        //      degree multiplied by adjazentSumOfIndizes equals Bayes_x
-        // order vertices into layer in ascending order.. 1,2,3...
-        // calculate crossings - if better, save
-        // check if there are ambigous possiblites like 1, 2 ,2 ,3 ..
-        // if that the case, change each doubled number and check if crossings is lesser
-        // is crossings is equal, can i just my adjustedEdgeLength as critera?
-
-
-        // calculate how many Crossing we have
-
-        if (shuffleCrosses < bestCrossings) {
-                bestCrossings = shuffleCrosses;
-                if (direction.equals("top-down"))   graph.setCrossings("L" + indexFixed + "-L" + indexFree, bestCrossings );
-                else graph.setCrossings("L" + indexFree + "-L" + indexFixed, bestCrossings );
-                layerMap.put(indexFree, freeLayer);
-                if (VERBOSE) System.out.println("neuer Bestwert!: " + bestCrossings + " Kreuzungen");
-//                if (bestCrossings == 0)  break;
-        }
+        for (GraphNode freeNode : freeLayer) {
+            ArrayList<GraphNode> adjacentNodes = g.getAdjacentNodes(freeNode,indexFixed);
+            double inDegree = adjacentNodes.size();
+            double sumOfIndices = sumUpIndices(fixedLayer, adjacentNodes);
+            freeNode.x_Bary = ((1/inDegree) * sumOfIndices);}
+        freeLayer.sort(Comparator.comparing(GraphNode::getX_Bary));
+        // still open, check if ambigous position swap improve that situation
     }
-
+    private static double sumUpIndices(LinkedList<GraphNode> layer, ArrayList<GraphNode> adjacentNodes) {
+        double sum = 0.0;
+        for (GraphNode graphNode : layer) {
+            if (adjacentNodes.contains(graphNode)) {
+                double indexOf = layer.indexOf(graphNode) +1;
+                sum += indexOf;
+            }
+        }
+        return sum;
+    }
 
     public static void allPermutation(Graph graph, boolean bidirectional, int sweeps) {
         layerMap = graph.getLayerMap();
@@ -73,8 +65,6 @@ public class CrossingMin {
                 processLayers(graph, "Permutation", layer, (layer + 1),"top-down");
         }
     }
-
-
     private static void processLayers(Graph graph, String algo, int indexFixed, int indexFree, String direction) {
         layerMap = graph.getLayerMap();
         if (VERBOSE) System.out.println("fixedLayer = " + indexFixed);
@@ -87,10 +77,10 @@ public class CrossingMin {
         ListOfAllPermutation = graph.heapGenerate(freeLayer.size(), freeLayer, new ArrayList<>());
         if (VERBOSE) System.out.println("Checking " + ListOfAllPermutation.size() + " Permutations :)");
         for (LinkedList<GraphNode> permutationOfFreeLayer : ListOfAllPermutation) {
-            int shuffleCrosses = BLCC_naive(graph, fixedLayer, permutationOfFreeLayer, direction);
-            if (VERBOSE && DEBUG) System.out.printf("for layer %d with order %s found %s crossings%n",indexFree,permutationOfFreeLayer,shuffleCrosses);
-            if (shuffleCrosses < bestCrossings) {
-                bestCrossings = shuffleCrosses;
+            int newCrossings = BLCC_naive(graph, fixedLayer, permutationOfFreeLayer, direction);
+            if (VERBOSE && DEBUG) System.out.printf("for layer %d with order %s found %s crossings%n",indexFree,permutationOfFreeLayer,newCrossings);
+            if (newCrossings < bestCrossings) {
+                bestCrossings = newCrossings;
 //                System.out.println(graph.getCrossings());
                 if (direction.equals("top-down"))   graph.setCrossings("L" + indexFixed + "-L" + indexFree, bestCrossings );
                 else graph.setCrossings("L" + indexFree + "-L" + indexFixed, bestCrossings );

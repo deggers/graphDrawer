@@ -26,13 +26,40 @@ public class    Graph {
         for (Edge e : graph.edges) {
             GraphNode deepTail = new GraphNode(e.tail);
             GraphNode deepHead = new GraphNode(e.head);
+            // Process Tail
             if (!nodes.containsKey(deepTail)) nodes.put(deepTail,deepTail);
+            if (!layerMap.containsKey(deepTail.getLayer())) layerMap.put(deepTail.getLayer(), new LinkedList<>());
+            if (!layerMap.get(deepTail.getLayer()).contains(deepTail)) layerMap.get(deepTail.getLayer()).add(deepTail);
+            // Process Head
             if (!nodes.containsKey(deepHead)) nodes.put(deepHead,deepHead);
-
+            if (!layerMap.containsKey(deepHead.getLayer())) layerMap.put(deepHead.getLayer(), new LinkedList<>());
+            if (!layerMap.get(deepHead.getLayer()).contains(deepHead)) layerMap.get(deepHead.getLayer()).add(deepHead);
+            // Process new Edges
             Edge deepClonedEdge = new Edge(nodes.get(e.tail), nodes.get(e.head), e.getEdgeType(),e.isReversed());
             this.edges.add(deepClonedEdge);
             addToHashmap(deepClonedEdge);}
-        this.insertLayer(graph.layerMap);
+    }
+
+    public Graph(ArrayList<Edge> origGraphEdges) {
+        Graph graph = new Graph();
+        for (Edge e : origGraphEdges) {
+            GraphNode deepTail = new GraphNode(e.tail);
+            GraphNode deepHead = new GraphNode(e.head);
+            // Process Tail
+            if (!nodes.containsKey(deepTail)) nodes.put(deepTail,deepTail);
+            if (!layerMap.containsKey(deepTail.getLayer())) layerMap.put(deepTail.getLayer(), new LinkedList<>());
+            if (!layerMap.get(deepTail.getLayer()).contains(deepTail)) layerMap.get(deepTail.getLayer()).add(deepTail);
+
+            // Process Head
+            if (!nodes.containsKey(deepHead)) nodes.put(deepHead,deepHead);
+            if (!layerMap.containsKey(deepHead.getLayer())) layerMap.put(deepHead.getLayer(), new LinkedList<>());
+            if (!layerMap.get(deepHead.getLayer()).contains(deepHead)) layerMap.get(deepHead.getLayer()).add(deepHead);
+
+            // Process new Edges
+            Edge deepClonedEdge = new Edge(nodes.get(e.tail), nodes.get(e.head), e.getEdgeType(),e.isReversed());
+            this.edges.add(deepClonedEdge);
+            addToHashmap(deepClonedEdge);
+        }
     }
 
     private void addToHashmap(Edge e) {
@@ -259,6 +286,18 @@ public class    Graph {
         edgesToDelete.forEach(this::removeEdge);
         edgesNew.forEach(this::addEdge);
     }
+
+    public ArrayList<GraphNode> getAdjacentNodes(GraphNode node, int onLayer) {
+        LinkedHashMap<GraphNode, LinkedList<Edge>> edgesIn = this.getEdgesInMap();
+        LinkedHashMap<GraphNode, LinkedList<Edge>> edgesOut = this.getEdgesOutMap();
+
+        ArrayList<GraphNode> adjToNodeWithLayerRestriction = new ArrayList<>();
+        if (edgesOut.containsKey(node)) adjToNodeWithLayerRestriction.addAll(this.getChildren(node));
+        if (edgesIn.containsKey(node)) adjToNodeWithLayerRestriction.addAll(this.getParentsOf(node));
+        adjToNodeWithLayerRestriction.removeIf(particularNode -> particularNode.getLayer() != onLayer);
+        return adjToNodeWithLayerRestriction;
+    }
+
 
 
     // getter and Setter Area :)

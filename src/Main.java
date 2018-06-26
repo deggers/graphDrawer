@@ -48,6 +48,7 @@ public class Main extends Application {
         Parent root = guiController.getRoot();
         Scene scene = new Scene(root);
 
+
         stage.initStyle(StageStyle.UNDECORATED);
         stage.setScene(scene);
         stage.show();

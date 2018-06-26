@@ -66,19 +66,19 @@ public class Sugiyama {
         System.out.println(GUIController.getInstance().getSelectedCrossingMinAlgo());
         switch (GUIController.getInstance().getSelectedCrossingMinAlgo()) {
             case "Permutation"  :   CrossingMin.allPermutation(partialGraph, bidirectional,sweeps); break;
-            case "BayesCenter_naive" : CrossingMin.baryCenter_naive(partialGraph, bidirectional,sweeps); break;
+            case "BaryCenter_naive" : CrossingMin.baryCenter_naive(partialGraph, bidirectional,sweeps); break;
             default             :   System.out.println(" mhm, missin something here! Sugiyama"); break;
         }
         GUIController.getInstance().setCrossingLabel("Crossings: " + partialGraph.getCrossings().toString());
 
-
-
+        String HorizontalAlignment = GUIController.getInstance().getSelectedHorizontalAlgo();
+        partialGraph = AssignHorizontalPosition.processBK(partialGraph);
 
         // simple algo to give nodes an coordinate to draw something :)
         LinkedHashMap<Integer,LinkedList<GraphNode>> layerMap = partialGraph.getLayerMap();
         for (int layer : layerMap.keySet()) {
             int x = 1;
-//            System.out.println("layer = " + layerMap.get(layer));
+            System.out.println("layer = " + layerMap.get(layer));
             for (GraphNode node : layerMap.get(layer)) {
                 node.y = layer;
                 node.x = x;
