@@ -201,22 +201,24 @@ public class GraphMLParser {
                 if (graph != null) {
                     StringBuilder sb;
                     LinkedHashMap<GraphNode, GraphNode> nodes = graph.getNodes();
+                    LinkedHashMap<GraphNode, GraphNode> missing = new LinkedHashMap<>();
                     for (GraphNode mn : nodes.values()) { // add missing nodes for package hierarchy
                         try {
                             sb = new StringBuilder(mn.getLabel());
                             sb.delete(sb.lastIndexOf("."), sb.length());
                             GraphNode s = new GraphNode(sb.toString());
-                            if (!nodes.containsKey(s)) {
+                            if (!nodes.containsKey(s) && ! missing.containsKey(s)) {
                                 for (String par : makeListOfPackageParents(s.getLabel())) {
                                     GraphNode parNode = new GraphNode(par);
                                     parNode.setNodeType("package");
-                                    if (!nodes.containsKey(parNode)) nodes.put(parNode, parNode);
+                                    if (!nodes.containsKey(parNode) && !missing.containsKey(parNode)) missing.put(parNode, parNode);
                                 }
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
+                    nodes.putAll(missing); //copy all missing nodes to nodes Map
 
                     for (GraphNode parentalNode : nodes.values()) { //package parent von n.label suchen
                         try {
