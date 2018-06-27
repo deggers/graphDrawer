@@ -5,6 +5,9 @@ public class           Edge {
     private boolean reversed = false;
     private String edgeType;
 
+
+    public boolean markedType1Conflict = false;
+
     public boolean isReversed() {
         return reversed;}
 
@@ -47,6 +50,14 @@ public class           Edge {
 
     public void setEdgeType(String edgeType) {
         this.edgeType = edgeType;
+    }
+
+    public boolean isMarkedType1Conflict() {
+        return markedType1Conflict;
+    }
+
+    public void setMarkedType1Conflict(boolean markedType1Conflict) {
+        this.markedType1Conflict = markedType1Conflict;
     }
 
     @Override

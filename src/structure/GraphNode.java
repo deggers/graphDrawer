@@ -13,7 +13,6 @@ public class           GraphNode {
     public boolean isDummy() {
         return isDummy;
     }
-
     public void setDummy(boolean dummy) {
         isDummy = dummy;
     }

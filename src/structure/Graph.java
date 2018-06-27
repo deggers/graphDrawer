@@ -40,26 +40,14 @@ public class    Graph {
             addToHashmap(deepClonedEdge);}
     }
 
-    public Graph(ArrayList<Edge> origGraphEdges) {
+    public Graph(Graph origGraph, ArrayList<Edge> restrictedEdgeSet) {
         Graph graph = new Graph();
-        for (Edge e : origGraphEdges) {
-            GraphNode deepTail = new GraphNode(e.tail);
-            GraphNode deepHead = new GraphNode(e.head);
-            // Process Tail
-            if (!nodes.containsKey(deepTail)) nodes.put(deepTail,deepTail);
-            if (!layerMap.containsKey(deepTail.getLayer())) layerMap.put(deepTail.getLayer(), new LinkedList<>());
-            if (!layerMap.get(deepTail.getLayer()).contains(deepTail)) layerMap.get(deepTail.getLayer()).add(deepTail);
-
-            // Process Head
-            if (!nodes.containsKey(deepHead)) nodes.put(deepHead,deepHead);
-            if (!layerMap.containsKey(deepHead.getLayer())) layerMap.put(deepHead.getLayer(), new LinkedList<>());
-            if (!layerMap.get(deepHead.getLayer()).contains(deepHead)) layerMap.get(deepHead.getLayer()).add(deepHead);
-
-            // Process new Edges
-            Edge deepClonedEdge = new Edge(nodes.get(e.tail), nodes.get(e.head), e.getEdgeType(),e.isReversed());
-            this.edges.add(deepClonedEdge);
-            addToHashmap(deepClonedEdge);
+        for (Edge e : restrictedEdgeSet) {
+            this.edges.add(e);
+            addToHashmap(e);
         }
+        this.nodes = origGraph.getNodes();
+        this.layerMap = origGraph.getLayerMap();
     }
 
     private void addToHashmap(Edge e) {
@@ -285,6 +273,15 @@ public class    Graph {
 
         edgesToDelete.forEach(this::removeEdge);
         edgesNew.forEach(this::addEdge);
+    }
+
+    public Edge getEdgeBetween(GraphNode start, GraphNode target) {
+        for (Edge e : getEdges()) {
+            if ( (e.tail.equals(start) && e.head.equals(target)) || (e.tail.equals(target) && e.head.equals(start) ) ) {
+                return e;
+            }
+        }
+        return null;
     }
 
     public ArrayList<GraphNode> getAdjacentNodes(GraphNode node, int onLayer) {
