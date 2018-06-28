@@ -62,10 +62,10 @@ public class Connector extends Path {
         if (edge.isReversed()) startNode = edge.getTarget();
         if (edge.isReversed()) targetNode = edge.getStart();
         PaneController paneController = Objects.requireNonNull(PaneController.getInstance());
-        int startX = paneController.scaleGraphNode(startNode.x);
-        int startY = paneController.scaleGraphNode(startNode.y);
-        int targetX = paneController.scaleGraphNode(targetNode.x);
-        int targetY = paneController.scaleGraphNode(targetNode.y);
+        double startX = paneController.scaleGraphNode(startNode.x);
+        double startY = paneController.scaleGraphNode(startNode.y);
+        double targetX = paneController.scaleGraphNode(targetNode.x);
+        double targetY = paneController.scaleGraphNode(targetNode.y);
         double endX, endY;
         double radius = Objects.requireNonNull(GUIController.getInstance()).getNodeSize();
 
@@ -120,15 +120,15 @@ public class Connector extends Path {
         }
     }
 
-    private LinkedList<Double> getPointOnCircumference(int x, int y, double radius, double angle, boolean reversed) {
+    private LinkedList<Double> getPointOnCircumference(double x,double y, double radius, double angle, boolean reversed) {
         LinkedList<Double> coords = new LinkedList<>();
         angle = Math.abs(angle);
         if (!reversed) {
-            coords.add((double) x - radius * Math.sin(Math.toRadians(angle)));
-            coords.add((double) y - radius * Math.cos(Math.toRadians(angle)));
+            coords.add( x - radius * Math.sin(Math.toRadians(angle)));
+            coords.add( y - radius * Math.cos(Math.toRadians(angle)));
         } else {
-            coords.add((double) x + radius * Math.sin(Math.toRadians(angle)));
-            coords.add((double) y + radius * Math.cos(Math.toRadians(angle)));
+            coords.add( x + radius * Math.sin(Math.toRadians(angle)));
+            coords.add( y + radius * Math.cos(Math.toRadians(angle)));
         }
         return coords;
     }

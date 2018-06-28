@@ -29,7 +29,6 @@ public class CrossingMin {
         if (VERBOSE) System.out.println("freeLayer = " + indexFree);
         LinkedList<GraphNode> fixedLayer = layerMap.get(indexFixed);
         LinkedList<GraphNode> freeLayer = layerMap.get(indexFree);
-        int shuffleCrosses = 0; // NNEED TO BE CHANGED!!V :)
         int bestCrossings = Integer.MAX_VALUE;
 
         for (GraphNode freeNode : freeLayer) {

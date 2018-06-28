@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 
 public class           GraphNode {
     private String label, nodeType;
-    public int x, y;
+    public double x, y;
     public double x_Bary;
     private int layer = -1;
     private boolean isDummy = false;

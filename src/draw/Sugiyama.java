@@ -72,19 +72,13 @@ public class Sugiyama {
         GUIController.getInstance().setCrossingLabel("Crossings: " + partialGraph.getCrossings().toString());
 
         String HorizontalAlignment = GUIController.getInstance().getSelectedHorizontalAlgo();
-        partialGraph = AssignHorizontalPosition.processBK(partialGraph);
+        switch (GUIController.getInstance().getSelectedHorizontalAlgo()) {
+            case "BK"   : AssignHorizontalPosition.processBK(partialGraph); break;
+            case "Naive": AssignHorizontalPosition.processNaive(partialGraph); break;
+        }
 
         // simple algo to give nodes an coordinate to draw something :)
-        LinkedHashMap<Integer,LinkedList<GraphNode>> layerMap = partialGraph.getLayerMap();
-        for (int layer : layerMap.keySet()) {
-            int x = 1;
-            System.out.println("layer = " + layerMap.get(layer));
-            for (GraphNode node : layerMap.get(layer)) {
-                node.y = layer;
-                node.x = x;
-                x++;
-            }
-        }
+
 
 
         partialGraph.resetAllPorts();

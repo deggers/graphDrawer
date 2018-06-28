@@ -22,7 +22,7 @@ import java.util.Objects;
 //@formatter:off
 public class PaneController {
     // CONSTANTS
-    private static  final   int     OFFSET              = 20;
+    private static  final   int     OFFSET              = 5;
     private static final    int     ARROW_HEAD_SIZE     = 8;
 
 
@@ -66,6 +66,7 @@ public class PaneController {
     }
     private double  scaleCoordinate(double number) {
         return (number * 2 * getNodeSize()) + OFFSET;
+//        return number;
     }
 
     // SETTER & GETTER
@@ -99,13 +100,17 @@ public class PaneController {
     private Circle createGraphNode(GraphNode node, String type){
         Circle circle;
         circle = new Circle(scaleGraphNode(node.x), scaleGraphNode(node.y), getNodeSize());
+        circle.setStroke(Color.BLACK);
+        circle.setStrokeWidth(2);
+        circle.setFill(Color.TRANSPARENT);
         Tooltip tip = new Tooltip((node.getLabel() + ", " + node.getLayer()));
         Tooltip.install(circle,tip);
         if (node.isDummy()) circle.setFill(Color.TRANSPARENT);
         return circle;
     }
-    public int scaleGraphNode(int number){
-        return (number * 4 * getNodeSize()) + OFFSET;
+    public double scaleGraphNode(double number){
+        return (number * 3 * getNodeSize()) + OFFSET;
+//    return number;
     }
 
 

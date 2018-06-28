@@ -125,4 +125,17 @@ public class AssignHorizontalPosition {
         return null;
     }
 
+    public static void processNaive(Graph g) {
+        int layerdepth = g.getLayerMap().keySet().size();
+        for (int layer = 1; layer <= layerdepth; layer++){
+            int x = 1;
+            for (GraphNode node: g.getLayerMap().get(layer)){
+                node.x = x;
+                node.y = layer;
+                x++;
+            }
+        }
+
+    }
+
 }
