@@ -82,7 +82,7 @@ public class PaneController {
 
     // DRAWFUNCTIONS
 
-    void drawDAG(Graph graph) {
+    public void drawDAG(Graph graph) {
         drawDAGEdges(graph,8);
         drawDAGNodes(graph);
     }
@@ -106,6 +106,7 @@ public class PaneController {
         Tooltip tip = new Tooltip((node.getLabel() + ", " + node.getLayer()));
         Tooltip.install(circle,tip);
         if (node.isDummy()) circle.setFill(Color.TRANSPARENT);
+        if (node.isDummy()) circle.setStroke(Color.TRANSPARENT);
         return circle;
     }
     public double scaleGraphNode(double number){
