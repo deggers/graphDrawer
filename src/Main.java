@@ -1,4 +1,7 @@
 import java.io.File;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 
 import Sugiyama.AssignHorizontalPosition;
 import Sugiyama.AssignLayer;
@@ -18,65 +21,54 @@ import structure.GraphNode;
 
 //@formatter:off
 public class Main extends Application {
-
-
-
     private static File file = new File("C:\\Users\\dusty\\Desktop\\Zeckzer\\Vorlesung\\Baeume_1\\Baeume\\Data\\Software-Engineering\\test.graphml");
 
     public static void main(String[] args) {
 
-        Graph myGraph =  new Graph();
-        GraphNode node1 = new GraphNode("1",false);
-        GraphNode d1 = new GraphNode("D1",true);
-        GraphNode d2 = new GraphNode("D2",true);
-        GraphNode d3 = new GraphNode("D3",true);
-        GraphNode d4 = new GraphNode("D4",true);
-        GraphNode node2 = new GraphNode("2",false);
-
-        Edge e1 = new Edge(node1,d1);
-        Edge e2 = new Edge(d1,d2);
-        Edge e3 = new Edge(d2,node2);
-
-        Edge e4 = new Edge(node1,d3);
-        Edge e5 = new Edge(d3,d4);
-        Edge e6 = new Edge(d4,node2);
-
-        myGraph.addEdge(e1);
-        myGraph.addEdge(e2);
-        myGraph.addEdge(e3);
-        myGraph.addEdge(e4);
-        myGraph.addEdge(e5);
-        myGraph.addEdge(e6);
-
-        CycleBreaker.GreedyCycleRemoval(myGraph);
-        AssignLayer.topologicalPath(myGraph);
-        CrossingMin.baryCenter_naive(myGraph,true,3);
-        AssignHorizontalPosition.processNaive(myGraph);
-
-        System.out.println("myGraph = " + myGraph.getNodes());
-        System.out.println("myGraph = " + myGraph.getEdges());
-
-        PaneController.getInstance().drawDAG(myGraph);
-
-//        ParseController.INSTANCE.initParsing(file);
-//        Graph theWholeGraph = ParseController.INSTANCE.getGraph();
-//        Graph partialGraph = theWholeGraph.copyWithRestrains("Graph1");
-//        System.out.println("partialGraph = " + partialGraph);
+//        Graph myGraph =  new Graph();
+//        GraphNode node1 = new GraphNode("1",false);
+//        GraphNode node2 = new GraphNode("2",false);
+//        GraphNode node3 = new GraphNode("3",false);
+//        GraphNode node4 = new GraphNode("4",false);
+//        GraphNode node5 = new GraphNode("5",false);
+//        GraphNode node6 = new GraphNode("6",false);
+//        GraphNode node7 = new GraphNode("7",false);
 //
-//        System.out.println("Beginn with Sugiyama.CycleBreaker\n");
-//        CycleBreaker.GreedyCycleRemoval(partialGraph);
+//        GraphNode d1 = new GraphNode("D1",true);
+//        GraphNode d2 = new GraphNode("D2",true);
+//        GraphNode d3 = new GraphNode("D3",true);
+//        GraphNode d4 = new GraphNode("D4",true);
+//        GraphNode d5 = new GraphNode("D5",true);
+//        GraphNode d6 = new GraphNode("D6",true);
+//        GraphNode d7 = new GraphNode("D7",true);
 //
-//        System.out.println("Beginn with LayerAssignment\n");
-//        AssignLayer.topologicalPath(partialGraph);
+//        Edge e1 = new Edge(node1,node5);    myGraph.addEdge(e1);
+//        Edge e2 = new Edge(node1,node6);    myGraph.addEdge(e2);
+//        Edge e7 = new Edge(node4,d4);       myGraph.addEdge(e7);
+//        Edge e4 = new Edge(d1,d5);          myGraph.addEdge(e4);
+//        Edge e5 = new Edge(d2,d6);          myGraph.addEdge(e5);
+//        Edge e3 = new Edge(node1,node7);    myGraph.addEdge(e3);
+//        Edge e6 = new Edge(d3,node7);       myGraph.addEdge(e6);
+//        Edge e8 = new Edge(node4,d7);       myGraph.addEdge(e8);
 //
+//        LinkedHashMap<Integer,LinkedList<GraphNode>> myModifiedLayerMap = new LinkedHashMap<>();
+//        LinkedList<GraphNode> layer1 = new LinkedList<>(Arrays.asList(node1,node2,d1,d2,d3,node4));
+//        LinkedList<GraphNode> layer2 = new LinkedList<>(Arrays.asList(node5,node6,d4,d5,d6,node7,d7));
+//        myModifiedLayerMap.put(1,layer1);
+//        myModifiedLayerMap.put(2,layer2);
 //
-//        System.out.println("Beginn with Sugiyama.CrossingMin\n");
-//        CrossingMin.allPermutation(partialGraph,true);
-//        System.out.println("Crossings = " + partialGraph.getCrossings());
-//        System.out.println(partialGraph.getLayerMap());
-//        System.out.println("partialGraph.getEdges() = " + partialGraph.getEdges());
+//        AssignLayer.topologicalPath(myGraph);
+//        myGraph.setLayerMap(myModifiedLayerMap);
+//        AssignHorizontalPosition.processBK(myGraph);
+//        System.out.println("Going to give u all the conflict edges :-)");
+//        for (Edge e: myGraph.getEdges())
+//            if (e.isMarkedType1Conflict()) System.out.println("e = " + e);
+//        System.out.println("that have been them all..\n");
 
-            launch(args);
+//        PaneController.getInstance().drawDAG(myGraph);
+
+        launch(args);
+
 
     }
 

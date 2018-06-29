@@ -40,11 +40,11 @@ public class AssignHorizontalPosition {
         if (direction.contains("S")){  // top-to-bottom
             for (int intLayer = 1; intLayer < numberOfLayer ; intLayer++) {
                 MarkTypeOneConflicts(graph, intLayer, intLayer+1);
-                LinkedList<GraphNode> nodesOnLayer = graph.getLayerMap().get(intLayer);
-                for (GraphNode nodeOnLayer : nodesOnLayer) {
-                    ArrayList<GraphNode> neighbours = graph.getAdjacentNodes(nodeOnLayer, intLayer + 1);
-                    blockEdges.add(new Edge(nodeOnLayer, getMedianNeighbour(neighbours, direction)));
-                }
+//                LinkedList<GraphNode> nodesOnLayer = graph.getLayerMap().get(intLayer);
+//                for (GraphNode nodeOnLayer : nodesOnLayer) {
+//                    ArrayList<GraphNode> neighbours = graph.getAdjacentNodes(nodeOnLayer, intLayer + 1);
+//                    blockEdges.add(new Edge(nodeOnLayer, getMedianNeighbour(neighbours, direction)));
+//                }
             }
         } else if (direction.contains("N")) {// bottom-to-top
             for (int intLayer = numberOfLayer; intLayer > 1; intLayer--) {
@@ -59,32 +59,46 @@ public class AssignHorizontalPosition {
         return new Graph(graph, blockEdges);
     }
 
-    private static void MarkTypeOneConflicts(Graph graph, int layer1, int layer2) {
-        int k0 = 0, k1 = 0, l = 0;
-        LinkedList<GraphNode> nodesOnLayer1 = graph.getLayerMap().get(layer1);
-        LinkedList<GraphNode> nodesOnLayer2 = graph.getLayerMap().get(layer2);
-        for (GraphNode nodeOnLayer : nodesOnLayer2) {
-            if (nodeOnLayer.isDummy() || nodesOnLayer2.indexOf(nodeOnLayer) == nodesOnLayer2.size()-1){
-                ArrayList<GraphNode> neighbours = graph.getAdjacentNodes(nodeOnLayer, layer1);
-                if (neighbours.size()==1 && neighbours.get(0).isDummy()){
-                    //Kante ist inneres Segment
-                    k1 = nodesOnLayer1.size()-1;
-                    if (nodeOnLayer.isDummy()){
-                        k1 = nodesOnLayer1.indexOf(neighbours.get(0)); //position des oberen nachbarn im inneren segment
-                    }
-                    while (l <= nodesOnLayer2.indexOf(nodeOnLayer)){
-                        GraphNode bottomNodeForConflictFinding = nodesOnLayer2.get(l);
-                        for (GraphNode upperneighbor : graph.getAdjacentNodes(bottomNodeForConflictFinding, layer1)) {
-                            if (nodesOnLayer1.indexOf(upperneighbor) < k0 || nodesOnLayer1.indexOf(upperneighbor) > k1){
-                                graph.getEdgeBetween(upperneighbor, bottomNodeForConflictFinding).setMarkedType1Conflict(true);
-                            }
-                        }
+    private static void MarkTypeOneConflicts(Graph graph, int layer1_int, int layer2_int) {
+        LinkedList<GraphNode> layer_1 = graph.getLayerMap().get(layer1_int);
+        LinkedList<GraphNode> layer_2 = graph.getLayerMap().get(layer2_int);
+        int k0 = 0, k1 = 0, l = 0;                                                                           // Zeile 2
+        for (GraphNode L_1 : layer_2) {                                                                      // Zeile 3
+            if (isLastNode(layer_2, L_1) || incidentToInnerSegment(graph, L_1, layer1_int) ){                // Zeile 4
+                k1 = layer_1.size()-1;                                                                       // Zeile 5
+                if (incidentToInnerSegment(graph,L_1,layer1_int))                                            // Zeile 6
+                        k1 = layer_1.indexOf(getUpperNodeFromInnerSegment(graph,L_1,layer1_int));            // Zeile 7
+                while (l <= layer_2.indexOf(L_1)){                                                           // Zeile 8
+                        GraphNode bottomNode = layer_2.get(l);
+                        for (GraphNode upperneighbor : graph.getAdjacentNodes(bottomNode, layer1_int))       // Zeile 9
+                            if (layer_1.indexOf(upperneighbor) < k0 || layer_1.indexOf(upperneighbor) > k1)  // Zeile 10
+                                graph.getEdgeBetween(upperneighbor, bottomNode).setMarkedType1Conflict(true);
                         l++;
                     }
                     k0 = k1;
-                }
             }
         }
+    }
+    private static boolean isLastNode(LinkedList<GraphNode> nodesLayer, GraphNode node){
+        return node == nodesLayer.getLast();
+    }
+
+
+    private static boolean incidentToInnerSegment(Graph g, GraphNode u, int layer_int){
+        ArrayList<GraphNode> neighbors = g.getAdjacentNodes(u, layer_int);
+        for (GraphNode node : neighbors)
+            if (node.isDummy()) return true;
+        return false;
+    }
+
+    private static GraphNode getUpperNodeFromInnerSegment(Graph g, GraphNode u, int layer_int){
+        ArrayList<GraphNode> neighbors = g.getAdjacentNodes(u, layer_int);
+        for (GraphNode node : neighbors)
+            if (node.isDummy()) {
+                Edge e =  g.getEdgeBetween(u,node);
+                return e.tail.equals(u) ? e.head : e.tail;
+            }
+        return null;
     }
 
     private static Graph Compaction(Graph graph, String direction) {

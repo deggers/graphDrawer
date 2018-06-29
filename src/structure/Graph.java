@@ -137,7 +137,7 @@ public class    Graph {
         this.layerMap.clear();
         LinkedHashMap<Integer,LinkedList<GraphNode>> ownLayerMap = new LinkedHashMap<>();
         for (Map.Entry<Integer,LinkedList<GraphNode>> entry : otherLayerMap.entrySet()){
-            Integer layer = entry.getKey();
+            int layer = entry.getKey();
             ownLayerMap.put(layer, new LinkedList<>());
             for (GraphNode copyNode : entry.getValue()){
                 GraphNode myNode = nodes.get(copyNode);
@@ -147,6 +147,11 @@ public class    Graph {
         }
         this.layerMap = ownLayerMap;
     }
+
+    public void setLayerMap(LinkedHashMap<Integer, LinkedList<GraphNode>> myLayerMap) {
+        this.layerMap = myLayerMap;
+    }
+
     public void reverseLayerOrder(){
         // no good idea how to reverse - so naive approach.. --dustyn
         LinkedHashMap<Integer, LinkedList<GraphNode>> sortedReversed = new LinkedHashMap<>();

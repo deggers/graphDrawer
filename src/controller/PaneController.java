@@ -106,7 +106,7 @@ public class PaneController {
         Tooltip tip = new Tooltip((node.getLabel() + ", " + node.getLayer()));
         Tooltip.install(circle,tip);
         if (node.isDummy()) circle.setFill(Color.TRANSPARENT);
-        if (node.isDummy()) circle.setStroke(Color.TRANSPARENT);
+        if (node.isDummy()) circle.setStroke(Color.GRAY);
         return circle;
     }
     public double scaleGraphNode(double number){

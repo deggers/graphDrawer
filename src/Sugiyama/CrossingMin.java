@@ -8,6 +8,9 @@ public class CrossingMin {
     private static boolean VERBOSE = false;
     private static boolean DEBUG = false ;
     private static LinkedHashMap<Integer, LinkedList<GraphNode>> layerMap;
+    private static int iterations = 0;
+    private static int minCrossings = 10000;
+    private static int graphDepth = 1;
 
     public static void baryCenter_naive(Graph graph, boolean bidirectional, int sweeps) {
         layerMap = graph.getLayerMap();
@@ -130,4 +133,127 @@ public class CrossingMin {
         return crossings;
     }
 
+
+    public static void baryCenterViola(Graph graph) {
+        BarycenterMatrix m0;
+        BarycenterMatrix mStar, mTemp;                                   // mStar equals M*, solution matrix
+
+        for (GraphNode n : graph.getNodes().values()) {
+            if (n.getLayer() > graphDepth) {
+                graphDepth = n.getLayer();
+            }
+        }
+
+        for (int layers = 1; layers < graphDepth; layers++) {             // layers start at 1, < graphDepth, because matrix always level i and i+1
+            if (VERBOSE && DEBUG) System.out.println("starting down for layer: " + layers);
+            minCrossings = Integer.MAX_VALUE;
+            m0 = new BarycenterMatrix(graph, layers, "down");
+            mStar = m0.copy();
+            mTemp = m0.copy();
+            minCrossings = m0.getCrossings();
+            if (VERBOSE && DEBUG) System.out.println("layers = " + layers + ", min cross = " + minCrossings);
+            if (minCrossings != 0) {
+                iterations = 0;
+                phase1(m0,mStar,mTemp);
+            }
+
+            // hier auch noch die layer map ändern
+            graph.getLayerMap().put(layers, mStar.getRows());
+
+            for (GraphNode gn : graph.getNodes().values()) {
+                for (GraphNode g : mStar.getRows()) {
+                    if (gn.equals(g) && gn.y == mStar.getColumns().get(0).y) {
+                        gn.x = g.x;
+                        gn.y = layers;
+                    }
+                }
+            }
+            if (VERBOSE && DEBUG) System.out.println("new min cross = " + minCrossings);
+        }
+
+        for (int layers = graphDepth; layers > 1; layers--) {
+            if (VERBOSE && DEBUG) System.out.println("starting up for layer: " + layers);
+            minCrossings = Integer.MAX_VALUE;
+            m0 = new BarycenterMatrix(graph, layers, "up");
+            mStar = m0.copy();
+            mTemp = m0.copy();
+            minCrossings = m0.getCrossings();
+            if (VERBOSE && DEBUG) System.out.println("layers = " + layers + ", min cross = " + minCrossings);
+            if (minCrossings != 0) {
+                iterations = 0;
+                phase1(m0, mStar, mTemp);
+            }
+            for (GraphNode gn : graph.getNodes().values()) {
+                for (GraphNode g : mStar.getRows()) {
+                    if (gn.equals(g) && gn.y == mStar.getColumns().get(0).y) {
+                        gn.x = g.x;
+                    }
+                }
+            }
+            graph.getLayerMap().put(layers, mStar.getRows());
+
+            if (VERBOSE && DEBUG) System.out.println("new min cross = " + minCrossings);
+
+        }            //
+
+/*        for(Map.Entry<Integer, LinkedList<GraphNode>> entry : graph.getLayerMap().entrySet()) {
+        System.out.println(" on layer: " + entry.getKey());
+        for (GraphNode graphNode : entry.getValue()) {
+            System.out.println(graphNode.getLabel() + ": " + graphNode.x);
+        }
+    }*/
+        // stattdessen die layer map ändern, also die reihenfolge der knoten
+        // graph.getLayerMap().put
+    }
+
+    private static void phase1(BarycenterMatrix m0, BarycenterMatrix mStar, BarycenterMatrix mTemp) {
+        if (iterations < 1000) {
+            iterations++;         //System.out.println("iterations1 = " + iterations1);
+            mTemp.orderByRow();
+            if (mTemp.getCrossings() < minCrossings) {    // Step 3
+                mStar = mTemp.copy();
+                minCrossings = mTemp.getCrossings();
+                if (VERBOSE && DEBUG) System.out.println("changed minCrossings to = " + minCrossings);
+                if (VERBOSE && DEBUG) System.out.println("mTemp col= " + mTemp.getColumns()+ " "+ mTemp.getColumns());
+                if (VERBOSE && DEBUG) System.out.println("mTemp row = " + mTemp.getRows());
+
+            }
+
+            mTemp.orderByColumn();
+            if (mTemp.getCrossings() < minCrossings) {     // Step 5
+                mStar = mTemp.copy();
+                minCrossings = mTemp.getCrossings();
+                if (VERBOSE && DEBUG) System.out.println("changed minCrossings to = " + minCrossings);
+            }
+
+            if (m0.equals(mTemp)) { // anzahl iterations sinnvolle größe wählen als abbruchkriterim
+                // auf periodisches auftreten prüfen-- klappt noch nicht???? !!!
+                phase2(m0,mStar,mTemp);
+            } else {
+                phase1(m0, mStar, mTemp);
+            }
+        }
+    }
+
+    private static void phase2(BarycenterMatrix m0, BarycenterMatrix mStar, BarycenterMatrix mTemp) {
+        mTemp.reverseRows();
+
+        if (!mTemp.columnsAreIncreasing()) {           // Step 8:
+            phase1(m0,mStar,mTemp);
+        }
+
+        mTemp.reverseColumns();
+        if (!mTemp.rowsAreIncreasing()) {                // Step 10
+            phase1(m0,mStar,mTemp);
+        }
+    }
 }
+
+/*  PHASE 1:
+Step 1: M*= m0, K* = K(m0)
+Step 2: M1= bR(m0)  = reorder rows as initial operation
+STep 3: if K(M1) < K* then M*= M1 and K*= K(M1)
+Step 4: M2= bC(M1)   = reorder columns
+Step 5: If K(M2) <K* then M*= M2 and K*= K(M2)
+step 6: if m0 and M2 equal OR # of iterations in Phase 1 attains an initially given number, Phase 1 STOPPED, goto 7, else goto Step 2
+ */

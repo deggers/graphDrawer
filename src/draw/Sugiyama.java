@@ -4,8 +4,6 @@ import controller.GUIController;
 import structure.*;
 import Sugiyama.*;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.Objects;
 
 public class Sugiyama {
@@ -67,6 +65,7 @@ public class Sugiyama {
         switch (GUIController.getInstance().getSelectedCrossingMinAlgo()) {
             case "Permutation"  :   CrossingMin.allPermutation(partialGraph, bidirectional,sweeps); break;
             case "BaryCenter_naive" : CrossingMin.baryCenter_naive(partialGraph, bidirectional,sweeps); break;
+            case "Bary_Viola" : CrossingMin.baryCenterViola(partialGraph); break;
             default             :   System.out.println(" mhm, missin something here! Sugiyama"); break;
         }
         GUIController.getInstance().setCrossingLabel("Crossings: " + partialGraph.getCrossings().toString());
@@ -75,6 +74,7 @@ public class Sugiyama {
         switch (GUIController.getInstance().getSelectedHorizontalAlgo()) {
             case "BK"   : AssignHorizontalPosition.processBK(partialGraph); break;
             case "Naive": AssignHorizontalPosition.processNaive(partialGraph); break;
+            case "None" : break;
         }
 
         // simple algo to give nodes an coordinate to draw something :)
