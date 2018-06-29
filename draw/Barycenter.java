@@ -9,10 +9,8 @@ import java.util.*;
 public class Barycenter {
     private BarycenterMatrix m0;
     private BarycenterMatrix mStar, mTemp;                                   // mStar equals M*, solution matrix
-    private int iterations1 = 0;
-    private int iterations2 = 0;
+    private int iterations = 0;
     private int minCrossings = 10000;
-
 
     public static void barycenterAlgo(Graph graph) {
         Barycenter b = new Barycenter(graph);
@@ -26,29 +24,54 @@ public class Barycenter {
             }
         }
         for (int layers = 1; layers < graphDepth; layers++) {             // layers start at 1, < graphDepth, because matrix always level i and i+1
-            //System.out.println("starting down for layer: "+ layers);
+            System.out.println("starting down for layer: " + layers);
             minCrossings = Integer.MAX_VALUE;
             m0 = new BarycenterMatrix(graph, layers, "down");
             mStar = m0.copy();
             mTemp = m0.copy();
             minCrossings = m0.getCrossings();
-            //System.out.println("minCrossings in beginning = " + minCrossings);
-            iterations1 = 0;
-            phase1();
-        }            //System.out.println("down finished");
+            System.out.println("layers = " + layers + ", min cross = " + minCrossings);
+            if (minCrossings != 0) {
+                iterations = 0;
+                phase1();
+            }
+            // hier auch noch die layer map ändern
+          graph.getLayerMap().put(layers, mStar.getRows());
+
+            for (GraphNode gn : graph.getNodes()) {
+                for (GraphNode g : mStar.getRows()) {
+                    if (gn.equals(g) && gn.y == mStar.getColumns().get(0).y) {
+                        gn.x = g.x;
+                    }
+                }
+            }
+            System.out.println("new min cross = " + minCrossings);
+        }
 
         for (int layers = graphDepth; layers > 1; layers--) {
-            //System.out.println("starting up for layer: "+ layers);
+            System.out.println("starting up for layer: " + layers);
             minCrossings = Integer.MAX_VALUE;
             m0 = new BarycenterMatrix(graph, layers, "up");
             mStar = m0.copy();
             mTemp = m0.copy();
             minCrossings = m0.getCrossings();
-            //System.out.println("minCrossings in beginning = " + minCrossings);
-            iterations1 = 0;
-            phase1();
+            System.out.println("layers = " + layers + ", min cross = " + minCrossings);
+            if (minCrossings != 0) {
+                iterations = 0;
+                phase1();
+            }
+            for (GraphNode gn : graph.getNodes()) {
+                for (GraphNode g : mStar.getRows()) {
+                    if (gn.equals(g) && gn.y == mStar.getColumns().get(0).y) {
+                        gn.x = g.x;
+                    }
+                }
+            }
+            graph.getLayerMap().put(layers, mStar.getRows());
 
-        }            //System.out.println("up finished");
+            System.out.println("new min cross = " + minCrossings);
+
+        }            //
 
 /*        for(Map.Entry<Integer, LinkedList<GraphNode>> entry : graph.getLayerMap().entrySet()) {
             System.out.println(" on layer: " + entry.getKey());
@@ -57,65 +80,50 @@ public class Barycenter {
             }
         }*/
         // stattdessen die layer map ändern, also die reihenfolge der knoten
-         for (GraphNode gn : graph.getNodes()) {
-            for (GraphNode g : mStar.getRows()) {
-                if (gn.equals(g)) {
-                    gn.x = g.x;
-                }
-            }
-        }
-        
-       // graph.getLayerMap().put
+        // graph.getLayerMap().put
     }
 
     private void phase1() {
-        iterations1++;
-        //System.out.println("iterations1 = " + iterations1);
-        mTemp.orderByRow();
-        //System.out.println("mTemp crossings = " + mTemp.getCrossings() + " min cross = "+ minCrossings);
-        if (mTemp.getCrossings() < minCrossings) {    // Step 3
-            mStar = mTemp.copy();
-            minCrossings = mTemp.getCrossings();
-            //System.out.println("new minCrossings = " + minCrossings);
-        }
+        if (iterations < 1000) {
+            iterations++;         //System.out.println("iterations1 = " + iterations1);
+            mTemp.orderByRow();
+            if (mTemp.getCrossings() < minCrossings) {    // Step 3
+                mStar = mTemp.copy();
+                minCrossings = mTemp.getCrossings();
+                System.out.println("changed minCrossings to = " + minCrossings);
+                System.out.println("mTemp col= " + mTemp.getColumns()+ " "+ mTemp.getColumns());
+                System.out.println("mTemp row = " + mTemp.getRows());
 
-        mTemp.orderByColumn();
+            }
 
-        if (mTemp.getCrossings() < minCrossings) {     // Step 5
-            mStar = mTemp.copy();
-            minCrossings = mTemp.getCrossings();
-        }
+            mTemp.orderByColumn();
+            if (mTemp.getCrossings() < minCrossings) {     // Step 5
+                mStar = mTemp.copy();
+                minCrossings = mTemp.getCrossings();
+                System.out.println("changed minCrossings to = " + minCrossings);
+            }
 
-        if (m0.equals(mTemp) || iterations1 > 100) { // anzahl iterations sinnvolle größe wählen als abbruchkriterim
-            iterations2 = 0;
-            phase2();
-        } else {
-            phase1();
+            if (m0.equals(mTemp)) { // anzahl iterations sinnvolle größe wählen als abbruchkriterim
+                // auf periodisches auftreten prüfen-- klappt noch nicht???? !!!
+                phase2();
+            } else {
+                phase1();
+            }
         }
     }
 
     private void phase2() {
-        iterations2++;
-        //System.out.println("iterations2 = " + iterations2);
         mTemp.reverseRows();
 
         if (!mTemp.columnsAreIncreasing()) {           // Step 8:
-            step11();                                      // go to step 2 with m0= M3
-        } else {
-            mTemp.reverseColumns();
-
-            if (!mTemp.rowsAreIncreasing()) {                // Step 10
-                step11();                                       // go to step 2 with m0= M4
-            }
+            phase1();
         }
-    }
 
-    private void step11() {
-        if (iterations2 < 100) {
+        mTemp.reverseColumns();
+        if (!mTemp.rowsAreIncreasing()) {                // Step 10
             phase1();
         }
     }
-
 }
 
 /*  PHASE 1:

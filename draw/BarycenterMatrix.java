@@ -8,8 +8,8 @@ import java.util.*;
 
 public class BarycenterMatrix {
     private Map<GraphNode, LinkedList<GraphNode>> nodesAreConnected = new HashMap<>();
-    private List<GraphNode> rows = new ArrayList<>();
-    private List<GraphNode> columns = new ArrayList<>();
+    private LinkedList<GraphNode> rows = new LinkedList<>();
+    private LinkedList<GraphNode> columns = new LinkedList<>();
     private int[][] matrix;
     private List<Double> rowBary = new ArrayList<>();
     private List<Double> columnBary = new ArrayList<>();
@@ -100,11 +100,9 @@ public class BarycenterMatrix {
                     for (int j = 0; j < columns.size(); j++) {
                         if (nodesAreConnected.get(rows.get(i)).contains((columns.get(j)))
                                 || nodesAreConnected.get(columns.get(j)).contains((rows.get(i)))) {
-                            matrix[i][j] = 1;
-                            //System.out.println("set 1");
+                            matrix[i][j] = 1;              //System.out.println("set 1");
                         } else {
-                            matrix[i][j] = 0;
-                            //System.out.println("set 0");
+                            matrix[i][j] = 0;              //System.out.println("set 0");
                         }
                     }
                 }
@@ -137,8 +135,27 @@ public class BarycenterMatrix {
             }
             tempBary = tempBary / (double) sumcount;
             columnBary.add(tempBary);
-            //System.out.println(" col no: " + l + " colbary = " + tempBary);
         }
+        String matrixent = "";
+        for (int row = 0; row < rows.size(); row++) {
+            matrixent += "\n";
+            for (int col = 0; col < columns.size(); col++) {
+                matrixent += matrix[row][col];
+                matrixent += "\t";
+            }
+        }
+        System.out.println("matrixent = \n" + matrixent);
+
+        String barys = "";
+        for (Double aDouble : rowBary) {
+            barys += aDouble;
+            barys += " ";
+        }
+        for (Double aDouble : columnBary) {
+            barys += aDouble;
+            barys += " ";
+        }
+        System.out.println("barys = " + barys);
     }
 
 
@@ -160,20 +177,20 @@ public class BarycenterMatrix {
 
     public void orderByRow() {              // order bary ascending, for nodes only change x coord
         if (rowBary.size() > 1) {
-            boolean change = true;
-            while (change) {
-                change = false;
+           // boolean change = true;
+            for(int iter=0; iter<100; iter++){
+               // change = false;
                 for (int i = 1; i < rowBary.size(); i++) {
                     int prev = i - 1;
 
                     if (Double.compare(rowBary.get(i), rowBary.get(prev)) < 0) {
-                        Collections.swap(rowBary, i, prev);
+                       Collections.swap(rowBary, i, prev);
                         //System.out.println("rows.get(i).x =" + rows.get(i) + " gets x coor= " + prev);
-                        rows.get(i).x = prev;
+                       // rows.get(i).x = prev;
                         //System.out.println("rows.get(prev).x =" + rows.get(prev) + " gets x coor= " + i);
-                        rows.get(prev).x = i;
+                       // rows.get(prev).x = i;
                         Collections.swap(rows, i, prev);
-                        change = true;
+                       // change = true;
                         //System.out.println("swapped");
                     }
                 }
@@ -184,9 +201,9 @@ public class BarycenterMatrix {
 
     public void orderByColumn() {
         if (columnBary.size() > 1) {
-            boolean change = true;
-            while (change) {
-                change = false;
+           /* boolean change = true;
+            while (change)*/ for(int iter=0; iter<100; iter++) {
+                //change = false;
                 for (int i = 1; i < columns.size(); i++) {
                     int prev = i - 1;
                     //System.out.println("colb = " + columnBary.get(i)+ " colb prev   "+ columnBary.get(prev));
@@ -194,11 +211,11 @@ public class BarycenterMatrix {
                     if (Double.compare(columnBary.get(i), columnBary.get(prev)) < 0) {
                         Collections.swap(columnBary, i, prev);
                         // System.out.println("rcol.get(i).x =" + columns.get(i) + " gets x coor= " + prev);
-                        columns.get(i).x = prev;
+                       // columns.get(i).x = prev;
                         //System.out.println("cols.get(prev).x =" + columns.get(prev) + " gets x coor= " + i);
-                        columns.get(prev).x = i;
+                        //columns.get(prev).x = i;
                         Collections.swap(columns, i, prev);
-                        change = true;
+                      //  change = true;
                         //System.out.println("swapped");
                     }
                 }
@@ -215,9 +232,9 @@ public class BarycenterMatrix {
             for (int i = 1; i < rowBary.size(); i++) {
                 int prev = i - 1;
                 if (Double.compare(rowBary.get(i), rowBary.get(prev)) == 0) {
-                    Collections.swap(rowBary, i, prev);
-                    rows.get(i).x = prev;
-                    rows.get(prev).x = i;
+                  Collections.swap(rowBary, i, prev);
+                  /*  rows.get(i).x = prev;
+                    rows.get(prev).x = i;*/
                     Collections.swap(rows, i, prev);
                 }
             }
@@ -231,8 +248,8 @@ public class BarycenterMatrix {
                 int prev = i - 1;
                 if (Double.compare(columnBary.get(i), columnBary.get(prev)) == 0) {
                     Collections.swap(columnBary, i, prev);
-                    columns.get(i).x = prev;
-                    columns.get(prev).x = i;
+                    /*columns.get(i).x = prev;
+                    columns.get(prev).x = i;*/
                     Collections.swap(columns, i, prev);
                 }
             }
@@ -261,14 +278,21 @@ public class BarycenterMatrix {
         return true;
     }
 
+
     public BarycenterMatrix copy() {
         BarycenterMatrix other = new BarycenterMatrix();
-        other.columns = new ArrayList<>(this.columns);
-        other.rows = new ArrayList<>(this.rows);
+        other.columns = new LinkedList<>(this.columns);
+        other.rows = new LinkedList<>(this.rows);
         other.nodesAreConnected = new HashMap<>(this.nodesAreConnected);
         other.upDown = this.upDown;
+        other.rowBary = new ArrayList<>(this.rowBary);
+        other.columnBary = new ArrayList<>(this.columnBary);
         other.matrix = new int[rows.size()][columns.size()];
-        other.calcMatrixAndBarys(other.upDown);
+        for (int row = 0; row < rows.size(); row++) {
+            for (int col = 0; col < columns.size(); col++) {
+                other.matrix[row][col] = matrix[row][col];
+            }
+        }
         return other;
     }
 
@@ -280,8 +304,8 @@ public class BarycenterMatrix {
 
         BarycenterMatrix mat = (BarycenterMatrix) obj;
 
-        if (rows.size() != ((BarycenterMatrix) obj).rows.size()
-                || columns.size() != ((BarycenterMatrix) obj).columns.size()) {
+        if (rows.size() != mat.rows.size()
+                || columns.size() != mat.columns.size()) {
             return false;
         }
 
@@ -299,11 +323,11 @@ public class BarycenterMatrix {
         return true;
     }
 
-    public List<GraphNode> getRows() {
+    public LinkedList<GraphNode> getRows() {
         return rows;
     }
 
-    public List<GraphNode> getColumns() {
+    public LinkedList<GraphNode> getColumns() {
         return columns;
     }
     /*    public List<Double> getRowBarys() {
