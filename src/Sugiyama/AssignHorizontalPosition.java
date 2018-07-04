@@ -4,10 +4,7 @@ import structure.Edge;
 import structure.Graph;
 import structure.GraphNode;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.*;
 
 //@formatter:off
 
@@ -70,6 +67,8 @@ public class AssignHorizontalPosition {
         LinkedHashMap<Integer,LinkedList<GraphNode>> layerMap   = graph.getLayerMap();
         LinkedHashMap<GraphNode,GraphNode> rootMap              = new LinkedHashMap<>();
         LinkedHashMap<GraphNode,GraphNode> alignMap             = new LinkedHashMap<>();
+        Map<GraphNode, Runnable> commands = new HashMap<>();
+
         System.out.println("direction = " + direction);
         for(GraphNode node: graph.getNodes().values())rootMap.put(node,node);                               // Zeile 1
         for(GraphNode node: graph.getNodes().values())alignMap.put(node,node);                              // Zeile 2
@@ -147,11 +146,15 @@ public class AssignHorizontalPosition {
                                     int pos_neighbor_m = layerAbove.indexOf((neighbor_m));
                                     boolean isMarked = graph.getEdgeBetween(neighbor_m, vk_i).isMarkedType1Conflict();
                                         if (!isMarked && r < pos_neighbor_m){     // ATTENTION, ">" ||"<"        // Zeile 15
+
+                                            // Populate commands map
+
                                             System.out.println("neighbor_m = " + neighbor_m);
                                             System.out.println("update it because not marked and r < pos_neighbor_m && without block");
-                                            alignMap.put(vk_i,neighbor_m);
+                                            alignMap.put(neighbor_m,vk_i);
                                             rootMap.put(vk_i,rootMap.get(neighbor_m));
-                                            alignMap.put(neighbor_m,rootMap.get(vk_i));
+//                                            commands.put(vk_i, () -> System.out.print(rootMap.get(neighbor_m)));
+                                            alignMap.put(vk_i,rootMap.get(vk_i));
                                             System.out.println("rootMap = " + rootMap);
                                             System.out.println("alignMap = " + alignMap);
                                             r = pos_neighbor_m;                                                  // Zeile 20
@@ -185,6 +188,13 @@ public class AssignHorizontalPosition {
         System.out.println("rootMap = " + rootMap);
         System.out.println("");
         System.out.println("alignMap = " + alignMap);
+
+//        System.out.println("");
+//        for (GraphNode node: rootMap.values()){
+//            System.out.println("node = " + node);
+//            commands.get(node);
+//        }
+
         graph.setRootBlock(direction,rootMap);
         graph.setAlignBlock(direction,rootMap);
     }
