@@ -79,7 +79,9 @@ public class Sugiyama {
 
         // simple algo to give nodes an coordinate to draw something :)
 
-
+        System.out.println("theGraph.getRootBlock() = " + theGraph.getRootBlock());
+        System.out.println("");
+        System.out.println("theGraph = " + theGraph.getAlignBlock());
 
         partialGraph.resetAllPorts();
         return partialGraph;

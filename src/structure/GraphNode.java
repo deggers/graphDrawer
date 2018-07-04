@@ -64,6 +64,11 @@ public class           GraphNode {
         this(label,isDummy);
         this.isDummy = isDummy;}
 
+    public GraphNode(String label, boolean isDummy, int layer) {
+        this(label,isDummy);
+        this.layer = layer;
+    }
+
     public STATUS getDfsStatus() {
         return this.status;
     }

@@ -12,6 +12,10 @@ public class    Graph {
     private LinkedHashMap<GraphNode, LinkedList<Edge>> edgesOut = new LinkedHashMap<>();
     private LinkedHashMap<Integer, LinkedList<GraphNode>> layerMap = new LinkedHashMap<>();
 
+    // BK stuff
+    private LinkedHashMap<String, LinkedHashMap<GraphNode, GraphNode>> alignBlock = new LinkedHashMap<>();
+    private LinkedHashMap<String, LinkedHashMap<GraphNode, GraphNode>> rootBlock  = new LinkedHashMap<>();
+
     public Graph() {
         this.crossings = new LinkedHashMap<>();
         this.edges = new LinkedHashSet<>();
@@ -242,10 +246,6 @@ public class    Graph {
         LinkedList<Edge> edgesToDelete = new LinkedList<>();
         LinkedList<Edge> edgesNew = new LinkedList<>();
 
-        System.out.println("");
-        System.out.println("layerMap = " + layerMap);
-        System.out.println("");
-
         for (Edge edge : edges) {
             GraphNode start = edge.tail;
             GraphNode target = edge.head;
@@ -385,4 +385,19 @@ public class    Graph {
         relevantEdges.forEach(returnGraph::addEdge);
         return returnGraph;
     }
+
+    public LinkedHashMap<String, LinkedHashMap<GraphNode, GraphNode>> getAlignBlock() {
+        return alignBlock;
+    }
+    public void setAlignBlock(String direction, LinkedHashMap<GraphNode,GraphNode> alignBlock) {
+        this.alignBlock.put(direction, alignBlock);
+    }
+
+    public void setRootBlock(String direction, LinkedHashMap<GraphNode,GraphNode> rootBlock) {
+        this.rootBlock.put(direction, rootBlock);
+    }
+    public LinkedHashMap<String, LinkedHashMap<GraphNode, GraphNode>> getRootBlock() {
+        return rootBlock;
+    }
+
 }
