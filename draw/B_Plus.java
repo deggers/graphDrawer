@@ -1,15 +1,14 @@
 package draw;
 
-import model.TreeNode;
-import model.Tree;
+import structure.*;
 
 public class B_Plus {
-    
+
     private static int leaveCoordCounter;
     private static int lowestlevel;
     private static final double levelSeparation = 2;
     private static final double nodeSeparation = 2;
-    
+
     public static Tree processTree(Tree tree) {
         try {
             TreeNode root = tree.getRoot();
@@ -20,7 +19,7 @@ public class B_Plus {
             setX(root);
             //scale()?
             return tree;
-           }
+        }
         catch (Exception e) {
             System.out.println("Error while running naive B_Plus drawing algorithm");
             e.printStackTrace();
@@ -57,5 +56,5 @@ public class B_Plus {
             root.x = (root.getChild(0).x + root.getChild(-1).x)/2.0;
         }
     }
-    
+
 }

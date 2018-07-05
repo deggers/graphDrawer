@@ -1,7 +1,6 @@
 package draw;
 
-import draw.exception.NonBinaryTreeException;
-import model.*;
+import structure.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,14 +13,13 @@ public class Reinhold {
     public static Tree processTree(Tree tree) {
         if (!tree.isBinary()) {
             System.out.println("Tree is not binary, running RT not possible!");
-            throw new NonBinaryTreeException("Running RT Algo not possible");
         }
         try {
             Reinhold r = new Reinhold();
             TreeNode root = tree.getRoot();
             r.layout(root, tree.getTreeDepth());
             return tree;
-           }
+        }
         catch (Exception e) {
             System.out.println("Error while running RT Algorithm");
             e.printStackTrace();
@@ -173,7 +171,7 @@ public class Reinhold {
                     rr.addr.hasThread = true;
                     rr.addr.offset = abs(rr.off + root.offset - loffsum);
                     if (((loffsum - root.offset) < rr.off)
-                        || ((loffsum - root.offset) == rr.off)) {
+                            || ((loffsum - root.offset) == rr.off)) {
                         rr.addr.leftChild = left;
                     } else {
                         rr.addr.rightChild = left;
@@ -183,7 +181,7 @@ public class Reinhold {
                     ll.addr.hasThread = true;
                     ll.addr.offset = abs(ll.off - root.offset - roffsum);
                     if (((roffsum + root.offset) > ll.off)
-                         || ((roffsum + root.offset) == ll.off)){
+                            || ((roffsum + root.offset) == ll.off)){
                         ll.addr.rightChild = right;
                     } else {
                         ll.addr.leftChild = right;
@@ -234,7 +232,7 @@ public class Reinhold {
     }
 
     // was wenn baum nur aus einem knoten besteht oder aus root und einem knoten? der ist dann links
-        private TreeNode getRR(TreeNode node, int depth){
+    private TreeNode getRR(TreeNode node, int depth){
         if(node == null){
             return null;
         }

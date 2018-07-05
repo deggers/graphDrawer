@@ -1,7 +1,6 @@
-// just wanted to test :sunrise: :-D
 package controller;
 
-import draw.*;
+import draw.Sugiyama;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -10,117 +9,35 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import model.GraphMLGraph;
-import model.Tree;
+import structure.Graph;
 
+import javax.xml.bind.annotation.XmlAnyAttribute;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.stream.Collectors;
 
 public class GUIController {
-
-    private static final String PARSE_WHOLE_GRAPH = "WHOLE GRAPH";
-
-    private boolean choiceBoxEdgeTypeIsSet = false;
-    private boolean choiceBoxRootIsSet = false;
-    private File    fileHandle         = null;
-
-    public void setChoiceBoxAlgorithmIsSet(boolean choiceBoxAlgorithmIsSet) {
-        this.choiceBoxAlgorithmIsSet = choiceBoxAlgorithmIsSet;
-    }
-
-    private boolean choiceBoxAlgorithmIsSet = false;
-
-    public void initialize() {
-        nodeSizeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            setNodeSize(newValue.doubleValue());
-        });
-        choiceBoxEdgeType.setDisable(true); // disable at beginning
-        choiceBoxRoot.setDisable(true); // disable at beginning
-        choiceBoxAlgorithm.setDisable((true)); // disable at beginning :)
-    } // setup observer for nodeSizeSlider
-
     //@formatter:off
-    @FXML    private    VBox            vBox;
-    @FXML    Button                     exitBtn;
-    @FXML    ToggleButton               fullscreenToggle;
-    @FXML    Slider                     nodeSizeSlider;
-    @FXML    ChoiceBox                  choiceBoxAlgorithm;
-    @FXML    Button                     loadFile;
-    @FXML    Button                     nextFile;
-    @FXML    Label                      fileNameLabel;
-    @FXML    ChoiceBox                  choiceBoxEdgeType;
-    @FXML    ChoiceBox                  choiceBoxRoot;
+    private static final LinkedList<String> CYCLEREMOVAL = new LinkedList<>(Arrays.asList("Greedy_Eades'90","BergerShor'87","DFS_Florian"));
+    private static final LinkedList<String> LAYERASSIGNER = new LinkedList<>(Arrays.asList("TopoSort", "Longest Path"));
+    private static final LinkedList<String> CROSSINGMINALGOS = new LinkedList<>(Arrays.asList("Bary_Viola","Permutation","BaryCenter_naive"));
+    private static final LinkedList<String> HORIZONTALLAYOUT = new LinkedList<>(Arrays.asList("Naive","BK","None"));
 
-
-    @FXML    private void               closeButtonAction() {
-        Stage stage = (Stage) exitBtn.getScene().getWindow();
-        stage.close();
-    }
-    @FXML    private void               toggleFullscreen()  {
-        Stage stage = (Stage) exitBtn.getScene().getWindow();
-        if (stage.isFullScreen()) {
-            stage.setFullScreen(false);
-        } else {
-            stage.setFullScreen(true);
-        }
-        drawInit();
-    }
-    @FXML    private void               setNextFileAsTree() {
-        if (filesInFolder != null) { // we selected a file so we have the folder from here on
-            if (filesIter == null || !filesIter.hasNext()) {
-                List<File> files = filesInFolder;
-                this.filesIter = files.listIterator();
-            }
-            ParseController.getInstance().setFile(filesIter.next());
-            File file = ParseController.getInstance().getFile();
-            if (ParseController.getInstance().initializeParsing(file)) {
-                this.fileName = file.getName();
-                drawInit();
-            } else {
-                System.out.println("was not able to ParseController.getInstance().initializeParsing(file)");
-            }
-        }
-
-    }
-    @FXML    private void               loadFileOnAction() {
-        FileChooser fileChooser = new FileChooser();
-
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Newick files (*.nh)", "*.nh"),
-                new FileChooser.ExtensionFilter("GraphML files (*.graphml)", "*.graphml")
-        );
-
-        File file = fileChooser.showOpenDialog(null);
-        this.fileHandle = file;
-
-        if (file != null) {
-            this.fileName = file.getName();
-            filesInFolder = getFilesFromFolder(file);
-            if (ParseController.getInstance().initializeParsing(file)) {
-                drawInit();
-            } else {
-                System.out.println("was not able to ParseController.getInstance().initializeParsing(file)");
-            }
-        }
-    }
-    @FXML    private void               choiceBoxAlgorithmOnAction() {
-        this.selectedAlgorithm = String.valueOf(choiceBoxAlgorithm.getSelectionModel().getSelectedItem());
-        drawInit();
-    }
 
     private PaneController              paneController              = null;
-    private String                      selectedAlgorithm           = null;
     private String                      fileName                    = null;
     private ListIterator<File>          filesIter                   = null;
     private List<File>                  filesInFolder               = null;
 
+    private String                      selectedLayerAssigner       = null;
+    private String                      selectedCrossingMinAlgo     = null;
 
     public static   GUIController       getInstance() {
         FXMLLoader loader = new FXMLLoader();
@@ -144,22 +61,11 @@ public class GUIController {
     private static  GUIController       guiInstance                 = null;
 
 
-    private double                      nodeSize                    = 8;
-    private int                         spaceBetweenRadii           = 0;
-    private String                      selectedRoot                = null;
-    private String                      selectedEdgeType            = null;
-
     public  void                        init()      {
         paneController = PaneController.getInstance();// set ScrollPane
         vBox.getChildren().add(paneController.getScrollPane());
     }
-    void                                cleanPane()   {
-        if (paneController != null) paneController.cleanPane();
-    }
-    private void                        setFileLabel() {
-        fileNameLabel.setText(this.fileName);
-    }
-    public List<File>                  getFilesFromFolder(File file) {
+    public List<File>                   getFilesFromFolder(File file) {
         try {
             return Files.walk(Paths.get(file.getParent()))
                     .filter(Files::isRegularFile)
@@ -171,165 +77,214 @@ public class GUIController {
         }
         return null;
     }
+    private int                         nodeSize                    = 22;
+    private int                         spaceBetweenRadii           = 0;
+    private String                      selectedRoot                = null;
+    private String                      selectedEdgeType            = null;
+    private String                      selectedCycleRemovalAlgo    = null;
+    private String                      selectedHorizontalAlgo      = null;
+    private String                      inputParams_1               = null;
+    private File                        fileHandle                  = null;
+    private ParseController             parseInstance                   = ParseController.INSTANCE;
+    
+    @FXML    private    VBox            vBox;
+    @FXML    Button                     exitBtn;
+    @FXML    ToggleButton               fullscreenToggle;
+    @FXML    Button                     loadFile;
 
-    public void cb_EdgeTypeOnAction(ActionEvent event) {
-        this.selectedEdgeType = String.valueOf(choiceBoxEdgeType.getSelectionModel().getSelectedItem());
-
-        if (selectedEdgeType != null) {
-            this.selectedRoot = null;
-            choiceBoxRoot.getItems().clear();
-            choiceBoxRoot.setDisable(false);
-
-            GraphMLGraph theGraph = ParseController.getInstance().getGraph();
-            if (theGraph != null) {
-                List<String> rootList = ParseController.getInstance().getGraph().getPossibleRootLabels(selectedEdgeType);
-                choiceBoxRoot.getItems().setAll(rootList);
-                choiceBoxRoot.getItems().add(0,PARSE_WHOLE_GRAPH);
-            }
-            drawInit();
-        }
+    @FXML    private void               closeButtonAction() {
+        Stage stage = (Stage) exitBtn.getScene().getWindow();
+        stage.close();
     }
-    public void cb_SelectRootOnAction(ActionEvent event) {
-        this.selectedRoot     = String.valueOf(choiceBoxRoot.getSelectionModel().getSelectedItem());
-        GraphMLGraph    theGraph        = ParseController.getInstance().getGraph();
-        ParseController parseController = ParseController.getInstance();
-
-        boolean willBeTree = (selectedRoot != null) && (theGraph != null) && !selectedRoot.equals(PARSE_WHOLE_GRAPH);
-        boolean isWholeGraph = (selectedRoot != null) && (theGraph != null) && selectedRoot.equals(PARSE_WHOLE_GRAPH);
-
-        if (willBeTree) {
-            Tree extractedTreeFromNode = theGraph.extractSubtreeFromProtoNode(theGraph.labelToProtoNode(selectedRoot), selectedEdgeType);
-            parseController.setTree(extractedTreeFromNode);
+    @FXML    private void               toggleFullscreen()  {
+        Stage stage = (Stage) exitBtn.getScene().getWindow();
+        if (stage.isFullScreen()) {
+            stage.setFullScreen(false);
+        } else {
+            stage.setFullScreen(true);
         }
-        else if (isWholeGraph) {
-             parseController.setGraph(theGraph);
-             parseController.setTree(null);
-        }
-        cleanPane();
-        drawInit();
+        loadedFile();
     }
+    @FXML    private void               loadFileOnAction() {
+        FileChooser fileChooser = new FileChooser();
 
-    private void processAlgo() {
-        cleanPane();
-        nodeSizeSlider.setDisable(false);
-        ParseController parseInstance = ParseController.getInstance();
-        switch (selectedAlgorithm) {  // what about a tree.resizeToScreen() ?
-            case "Walker":
-                Tree treeWalker = WalkerImprovedDraw.processTreeNodes(parseInstance.getTree());
-                paneController.drawTreeStructure(treeWalker);
-                break;
-            case "Radial":
-                Tree radialTree = RadialTree.processTree(parseInstance.getTree());
-//                nodeSizeSlider.setDisable(true);
-                paneController.drawRadialTreeStructure(radialTree);
-                break;
-            case "RT":
-                Tree reinholdTree = Reinhold.processTree(parseInstance.getTree());
-                paneController.drawTreeStructure(reinholdTree);
-                break;
-            case "BPlus":
-                Tree BPlusTree = B_Plus.processTree(parseInstance.getTree());
-                paneController.drawTreeOrthogonally(BPlusTree);
-                break;
-            case "Random":
-                if (parseInstance.getGraph() != null) {
-                    try {
-                        GraphMLGraph randomGraph = NaiveDraw.processGraph(parseInstance.getGraph());
-//                    paneController.drawGraph(randomGraph);
-                    }
-                    catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else if (parseInstance.getTree() != null) {
-                    Tree randomTree = NaiveDraw.processTree(parseInstance.getTree());
-                }
-                break;
-            default:
-                throw new IllegalArgumentException("The algo: " + selectedAlgorithm + " is not yet implemented");
-        }
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Newick files (*.nh)", "*.nh"),
+                new FileChooser.ExtensionFilter("GraphML files (*.graphml)", "*.graphml")
+        );
 
-    }
+        File file = fileChooser.showOpenDialog(null);
+        this.fileHandle = file;
 
-    //@formatter:on
-
-    private void drawInit() {
-        setFileLabel();
-        Tree theTree = ParseController.getInstance().getTree();
-        GraphMLGraph theGraph = ParseController.getInstance().getGraph();
-        boolean treeOrGraph = (theTree != null || theGraph != null);
-
-        setupChoiceBoxAlgorithms(theTree, theGraph, treeOrGraph);
-        setupChoiceBoxEdgeType(theGraph);
-
-        if (treeOrGraph && selectedAlgorithm != null && !selectedAlgorithm.equals("null")) {
-            if (theGraph == null) {
-                choiceBoxEdgeType.setDisable(true);
-                choiceBoxRoot.setDisable(true);
-                choiceBoxEdgeType.getItems().clear();
-                choiceBoxRoot.getItems().clear();
-                processAlgo();
+        if (file != null) {
+            this.fileName = file.getName();
+            filesInFolder = getFilesFromFolder(file);
+            if (parseInstance.initParsing(file)) {
+                loadedFile();
             } else {
-                if (selectedEdgeType != null) processAlgo();
+                System.out.println("was not able to ParseController.getInstance().initializeParsing(file)");
             }
         }
     }
 
-    private void setupChoiceBoxAlgorithms(Tree theTree, GraphMLGraph theGraph, boolean treeOrGraph) {
-        List<String> allAlgos = Arrays.asList("BPlus", "RT", "Walker", "Radial", "Random");
-        List<String> reducedAlgos = Arrays.asList("BPlus", "Walker", "Radial", "Random");
-        List<String> graphMLAlgos = Arrays.asList("Random");
+    @FXML    ChoiceBox choiceBox_1;     private boolean choiceBox_1_Set = false;
+    @FXML    ChoiceBox choiceBox_2;     private boolean choiceBox_2_Set = false;
+    @FXML    ChoiceBox choiceBox_3;     private boolean choiceBox_3_Set = false;
+    @FXML    ChoiceBox choiceBox_4;     private boolean choiceBox_4_Set = false;
+    @FXML    ChoiceBox choiceBox_5;     private boolean choiceBox_5_Set = false;
+    @FXML    TextField params_1;
 
-        if (treeOrGraph && !choiceBoxAlgorithmIsSet) {
-            choiceBoxAlgorithmIsSet = true;
-            choiceBoxAlgorithm.setDisable(false);
-            choiceBoxAlgorithm.getItems().clear();
-            choiceBoxAlgorithm.getItems().setAll(theTree != null ? theTree.isBinary() ? allAlgos : reducedAlgos : graphMLAlgos);
+    @FXML   Label crossingLabel;
+    @FXML   Label graphInfo;
+
+    // TODO implement the logic for .nh  --Dustyn
+    private void loadedFile() {
+        if (fileName.contains(".graphml")) {
+            Graph theGraph = ParseController.INSTANCE.getGraph();
+            setup_cb_1(theGraph);
+            setup_cb_2(theGraph);
+            setup_cb_3(theGraph);
+            setup_cb_4(theGraph);
+            setup_cb_5(theGraph);
+        }
+        else if (fileName.contains(".nh")) {
+            System.out.println("Sorry, .nh needs to be implemented :) Greetings from GUIController");
+        }
+        else System.out.println("Sorry, this format cannot be handled");
+    }
+
+    private void setup_cb_1(Graph theGraph) {
+        if (theGraph != null && !choiceBox_1_Set) {
+            choiceBox_1.getItems().setAll(theGraph.getEdgeTypes());
+            choiceBox_1_Set = true;}}
+    private void setup_cb_2(Graph theGraph) {
+        if (theGraph != null && !choiceBox_2_Set) {
+            choiceBox_2.getItems().setAll(CYCLEREMOVAL);
+            choiceBox_2_Set = true;}}
+    private void setup_cb_3(Graph theGraph) {
+        if (theGraph != null && !choiceBox_3_Set) {
+            choiceBox_3.getItems().setAll(LAYERASSIGNER);
+            choiceBox_3_Set = true;}}
+    private void setup_cb_4(Graph theGraph) {
+        if (theGraph != null && !choiceBox_4_Set) {
+            choiceBox_4.getItems().setAll(CROSSINGMINALGOS);
+            choiceBox_4_Set = true;}}
+    private void setup_cb_5(Graph theGraph) {
+        if (theGraph != null && !choiceBox_5_Set) {
+            choiceBox_5.getItems().setAll(HORIZONTALLAYOUT);
+            choiceBox_5_Set = true;}}
+
+    public void cb_1(ActionEvent event) {
+        this.selectedEdgeType = String.valueOf(choiceBox_1.getSelectionModel().getSelectedItem());
+    }
+    public void cb_2(ActionEvent event) {
+        this.selectedCycleRemovalAlgo = String.valueOf(choiceBox_2.getSelectionModel().getSelectedItem());
+    }
+    public void cb_3(ActionEvent event) {
+        this.selectedLayerAssigner = String.valueOf(choiceBox_3.getSelectionModel().getSelectedItem());
+    }
+    public void cb_4(ActionEvent event) {
+        this.selectedCrossingMinAlgo = String.valueOf(choiceBox_4.getSelectionModel().getSelectedItem());
+    }
+    public void cb_5(ActionEvent event) {
+        this.selectedHorizontalAlgo = String.valueOf(choiceBox_5.getSelectionModel().getSelectedItem());
+
+    }
+
+    public void drawOnAction(ActionEvent event)  {
+        // TODO: needs to handle logic for everything else than sugiyama :)
+        if (parseInstance.getGraph() != null) {
+            this.inputParams_1 = params_1.getText();
+            paneController.cleanPane();
+            Graph naiveDraw = Sugiyama.processGraph(parseInstance.getGraph());
+            paneController.drawDAG(naiveDraw);
         }
     }
-    private void setupChoiceBoxEdgeType(GraphMLGraph theGraph) {
-        if (theGraph != null && !choiceBoxEdgeTypeIsSet) {
-            choiceBoxEdgeType.setDisable(false);
-            choiceBoxEdgeType.getItems().setAll(theGraph.getEdgeTypes());
-            choiceBoxEdgeTypeIsSet = true;
-        }
-    }
 
+//    private String                      selectedAlgorithm           = null;
+//    private void processAlgo() {
+//        switch (selectedAlgorithm) {
+//            case "Walker":
+//                Tree treeWalker = WalkerImproved.processTreeNodes(parseInstance.getTree());
+//                paneController.drawTreeStructure(treeWalker);
+//                break;
+//            case "Radial":
+//                Tree radialTree = RadialTree.processTree(parseInstance.getTree());
+//                paneController.drawRadialTreeStructure(radialTree);
+//                break;
+//            case "RT":
+//                Tree reinholdTree = Reinhold.processTree(parseInstance.getTree());
+//                paneController.drawTreeStructure(reinholdTree);
+//                break;
+//            case "BPlus":
+//                Tree BPlusTree = B_Plus.processTree(parseInstance.getTree());
+//                paneController.drawTreeOrthogonally(BPlusTree);
+//                break;
+//            case "Sugiyama":
+//                if (parseInstance.getGraph() != null) {
+//                    Graph naiveDraw = Sugiyama.processGraph(parseInstance.getGraph());
+//                    paneController.drawDAG(naiveDraw);
+//                }
+//                break;
+//            default:
+//                throw new IllegalArgumentException("The algo: " + selectedAlgorithm + " is not yet implemented");
+//        }
+//    }
+
+//    void setChoiceBoxAlgorithm(String algo) {
+//        this.selectedAlgorithm = algo;
+//    }
+
+
+//    public void cb_2(ActionEvent event) {
+//        this.selected = String.valueOf(choiceBoxTwo.getSelectionModel().getSelectedItem());
+//    }
 
     // SETTER & GETTER AREA
     public Parent getRoot() {
         return this.vBox;
     }
-
-    private void setNodeSize(double nodeSize) {
-        this.nodeSize = nodeSize;
-        drawInit();
-    }
-
-    double getNodeSize() {
+    public int getNodeSize() {
         return this.nodeSize;
     }
-
     private void setPane(VBox vBox) {
         this.vBox = vBox;
     }
-
-    void setChoiceBoxAlgorithm(String algo) {
-        this.selectedAlgorithm = algo;
-    }
-
     public void setFilesInFolder(List<File> filesInFolder) {
         this.filesInFolder = filesInFolder;
     }
-
     public File getFileHandle() {
         return fileHandle;
     }
-
-    public String getSelectedAlgo() {
-        return selectedAlgorithm;
-    }
-
     public String getSelectedEdgeType() {
         return selectedEdgeType;
+    }
+    public String getSelectedCycleRemovalAlgo() {
+        return this.selectedCycleRemovalAlgo;
+    }
+    public String getSelectedLayerAssigner() {
+        return this.selectedLayerAssigner;
+    }
+    public String getSelectedHorizontalAlgo() {
+        return this.selectedHorizontalAlgo;
+    }
+    public String getSelectedCrossingMinAlgo() { return this.selectedCrossingMinAlgo;}
+    public String getInputParams_1(){
+        return this.inputParams_1;}
+
+    public Label getCrossingLabel() {
+        return crossingLabel;
+    }
+
+    public void setCrossingLabel(String crossingLabel) {
+        this.crossingLabel.setText(crossingLabel);
+    }
+
+    public Label getGraphInfo() {
+        return graphInfo;
+    }
+
+    public void setGraphInfo(String graphInfo) {
+        this.graphInfo.setText(graphInfo);
     }
 }
