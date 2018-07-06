@@ -1,4 +1,6 @@
-package structure;
+package src.structure;
+
+import structure.GraphNode;
 
 public class           Edge {
     public GraphNode tail, head;

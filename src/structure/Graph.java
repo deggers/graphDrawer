@@ -1,12 +1,15 @@
-package structure;
+package src.structure;
+
+import structure.GraphNode;
 
 import java.util.*;
 
-public class    Graph {
+
+public class Graph {
     private static boolean VERBOSE = true;
     private LinkedHashMap<String, Integer> crossings = new LinkedHashMap<>();
     private LinkedHashSet<Edge> edges = new LinkedHashSet<>();
-    private LinkedHashMap<GraphNode,GraphNode> nodes = new LinkedHashMap<>();
+    private LinkedHashMap<GraphNode, GraphNode> nodes = new LinkedHashMap<>();
     private ArrayList<String> edgeTypes = new ArrayList<>();
     private LinkedHashMap<GraphNode, LinkedList<Edge>> edgesIn = new LinkedHashMap<>();
     private LinkedHashMap<GraphNode, LinkedList<Edge>> edgesOut = new LinkedHashMap<>();

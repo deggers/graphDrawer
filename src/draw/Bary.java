@@ -1,12 +1,12 @@
-package draw;
+package src.draw;
 
-import model.Edge;
-import model.Graph;
-import model.GraphNode;
+import src.structure.Edge;
+import src.structure.Graph;
+import structure.GraphNode;
 
 import java.util.*;
 
-class Bary {
+public class Bary {
     private BaryHelperGraph g0 = new BaryHelperGraph(), gTemp;
     private Map<GraphNode, LinkedList<GraphNode>> nodesAreConnected = new HashMap<>();
     private int count = 0;

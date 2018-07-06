@@ -1,23 +1,19 @@
-import java.io.File;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-
 import Sugiyama.AssignHorizontalPosition;
-import Sugiyama.AssignLayer;
-import Sugiyama.CrossingMin;
-import Sugiyama.CycleBreaker;
 import controller.GUIController;
-import controller.PaneController;
-import controller.ParseController;
 import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import structure.Edge;
-import structure.Graph;
+import src.draw.Bary;
+import src.structure.Edge;
+import src.structure.Graph;
 import structure.GraphNode;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 
 //@formatter:off
 public class Main extends Application {
@@ -139,8 +135,10 @@ public class Main extends Application {
         myModifiedLayerMap.put(5,layer5);
         myGraph.setLayerMap(myModifiedLayerMap);
 
+        // crossing min
+        Bary.barycenterAlgo(myGraph);
 
-        AssignHorizontalPosition.processBK(myGraph);
+        AssignHorizontalPosition.processBK((myGraph);
         if (VERBOSE) {
         System.out.println("Going to give u all the conflict edges :-)");
         for (Edge e: myGraph.getEdges())
