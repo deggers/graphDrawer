@@ -6,7 +6,7 @@ import model.GraphNode;
 
 import java.util.*;
 
-public class Bary {
+class Bary {
     private BaryHelperGraph g0 = new BaryHelperGraph(), gTemp;
     private Map<GraphNode, LinkedList<GraphNode>> nodesAreConnected = new HashMap<>();
     private int count = 0;
@@ -15,14 +15,12 @@ public class Bary {
         Bary b = new Bary(graph);
     }
 
-    public Bary(Graph graph) {
+    private Bary(Graph graph) {
         nodesConnected(graph);
         g0.setLayerMap(graph.getLayerMap());
 
         List<Integer> keys = new ArrayList<>();
-        for (Integer integer : graph.getLayerMap().keySet()) {
-            keys.add(integer);
-        }
+        keys.addAll(graph.getLayerMap().keySet());
         // key is level, value is bary matrix
         for (int i = 1; i < keys.size(); i++) {                                 // alle außer für letzten
             g0.setBaryMat(i, new BaryMatrix(i));
@@ -32,22 +30,16 @@ public class Bary {
 
         SugiyamaPhase1Sweep(1, g0.getLayerMap().size(), 1);         //layer beginnen bei 1
 
+        int graphDepth=gTemp.getLayerMap().size();
+        for (int level = 1; level < graphDepth; level++) {    // zb lm size 6, geht von 1-5
+            graph.getLayerMap().put(level, gTemp.getBaryMatOnLevel(level).rows);
+        }
+        graph.getLayerMap().put(graphDepth, gTemp.getBaryMatOnLevel(graphDepth-1).columns);
 
-        for (Integer integer : gTemp.getLayerMap().keySet()) {
-            graph.getLayerMap().put(integer, gTemp.getLayerMap().get(integer));
+        for (Integer integer : graph.getLayerMap().keySet()) {
             for (int i = 0; i < graph.getLayerMap().get(integer).size(); i++) {
                 graph.getLayerMap().get(integer).get(i).x = i;
             }
-
-            /*for (int i = 1; i < gTemp.getLayerMap().size(); i++) {
-                System.out.println("i = " + i);
-                for (Double aDouble : gTemp.getBaryMatOnLevel(i).rowBary) {
-                    System.out.println("rowbary = " + aDouble);
-                }
-                for (Double aDouble : gTemp.getBaryMatOnLevel(i).columnBary) {
-                    System.out.println("colbary = " + aDouble);
-                }
-            }*/
         }
         System.out.println("number of crossings total = " + gTemp.getCrossingsTotal());
     }
@@ -95,10 +87,9 @@ public class Bary {
     }
 
     private void nodesConnected(Graph graph) {
-        for (Iterator<Edge> iterator = graph.getEdges().iterator(); iterator.hasNext(); ) {
-            Edge edge = iterator.next();
-            GraphNode u = (GraphNode) edge.getStart();
-            GraphNode v = (GraphNode) edge.getTarget();
+        for (Edge edge : graph.getEdges()) {
+            GraphNode u = edge.getStart();
+            GraphNode v = edge.getTarget();
             if (nodesAreConnected.get(u) != null) {
                 LinkedList<GraphNode> temp = (nodesAreConnected.get(u));
                 temp.add(v);
@@ -129,18 +120,14 @@ public class Bary {
         private List<Double> columnBary = new ArrayList<>();
         private int matCrossings;
 
-        public BaryMatrix(int level) {
-            for (GraphNode g : g0.getLayerMap().get(level)) {
-                rows.add(g);
-            }
-            for (GraphNode g : g0.getLayerMap().get(level + 1)) {
-                columns.add(g);
-            }
+        BaryMatrix(int level) {
+            rows.addAll(g0.getLayerMap().get(level));
+            columns.addAll(g0.getLayerMap().get(level + 1));
             matrix = new int[rows.size()][columns.size()];
             calcMatBaryAndCross();
         }
 
-        public void calcMatBaryAndCross() {
+        void calcMatBaryAndCross() {
             for (int i = 0; i < rows.size(); i++) { // calc mat
                 for (int j = 0; j < columns.size(); j++) {
                     if (nodesAreConnected.get(rows.get(i)).contains((columns.get(j)))
@@ -192,45 +179,44 @@ public class Bary {
             matCrossings = crossings;
         }
 
-        public int getMatCrossings() {
+        int getMatCrossings() {
             return this.matCrossings;
         }
 
-        public boolean orderByColumn(Integer level) {
+        boolean orderByColumn(Integer level) {
             boolean hasChanged = true;      //  hier wird er immer wieder rein springen ? rekursiv aufrufen oder bool mitgeben?
             boolean neededOrdering = false;
             if (columnBary.size() > 1) {
                 while (hasChanged) {
                     hasChanged = false;
                     for (int i = 1; i < columnBary.size(); i++) {   // level für graph1 von 1 bis < 6
+                    /*    if(improvementCols(level,i)){
+                        }*/
                         int prev = i - 1;
                         if (Double.compare(columnBary.get(i), columnBary.get(prev)) < 0) {
                             Collections.swap(columnBary, prev, i);
                             Collections.swap(columns, prev, i); //zugriff auf 0 und 1
                             hasChanged = true;
                             neededOrdering = true;
+                            calcMatBaryAndCross();
+                            gTemp.setBaryMat(level, this);
+                            gTemp.setLayerInMap(level + 1, columns);
+
+                            if (level < gTemp.getLayerMap().size() - 1) {  // es gibt level 1-6 in layermap
+                                // wenn auf 1-4 dann muss in nächster mat rows gesetzt werden
+                                // wenn schon in 5 dann gibt es keine mat mehr , da 5&6 in mat(5)
+                                gTemp.getBaryMatOnLevel(level + 1).rows = this.columns;
+                                gTemp.getBaryMatOnLevel(level + 1).calcMatBaryAndCross();
+                            }
+                            gTemp.calcCrossingsTotal();
                         }
                     }
-                }
-                if (neededOrdering) {   // irgendwelche neuberechnungen vergessen?
-                    calcMatBaryAndCross();
-                    gTemp.setBaryMat(level, this);
-                    gTemp.setLayerInMap(level + 1, columns);
-
-                    if (level < gTemp.getLayerMap().size() - 1) {  // es gibt level 1-6 in layermap
-                        // wenn auf 1-4 dann muss in nächster mat rows gesetzt werden
-                        // wenn schon in 5 dann gibt es keine mat mehr , da 5&6 in mat(5)
-                        gTemp.getBaryMatOnLevel(level + 1).rows = this.columns;
-                        gTemp.getBaryMatOnLevel(level + 1).calcMatBaryAndCross();
-                    }
-                    gTemp.calcCrossingsTotal();
                 }
             }
             return neededOrdering;
         }
 
         public boolean orderByRow(Integer level) {
-            int crossBefore = gTemp.getCrossingsTotal();
             boolean hasChanged = true;
             boolean neededOrdering = false;
             if (rowBary.size() > 1) {
@@ -241,62 +227,27 @@ public class Bary {
                         if (improvementRows(level, i)) {
                         }
                         if (Double.compare(rowBary.get(i), rowBary.get(prev)) < 0) {
-                            Collections.swap(rowBary, i, prev);
-                            Collections.swap(rows, i, prev);
+                            Collections.swap(rowBary, prev, i);
+                            Collections.swap(rows, prev, i);
                             hasChanged = true;
                             neededOrdering = true;
+                            calcMatBaryAndCross();
+                            gTemp.setBaryMat(level, this);
+                            gTemp.setLayerInMap(level, rows);
+                            if (level > 1) {
+                                gTemp.getBaryMatOnLevel(level - 1).columns = this.rows;
+                                gTemp.getBaryMatOnLevel(level - 1).calcMatBaryAndCross();
+                            }
+                            gTemp.calcCrossingsTotal();
                         }
                     }
                 }
-                if (neededOrdering) {
-                    calcMatBaryAndCross();
-                    gTemp.setBaryMat(level, this);
-                    gTemp.setLayerInMap(level, rows);
-                    if (level > 1) {
-                        gTemp.getBaryMatOnLevel(level - 1).columns = this.rows;
-                        gTemp.getBaryMatOnLevel(level - 1).calcMatBaryAndCross();
-                    }
-                    gTemp.calcCrossingsTotal();
-
-                    if (!(gTemp.getCrossingsTotal() < crossBefore)) {
-                        // alles rückgängig machen
-                        // wie??? neue funktion mit hilfsgraphen? weil sonst sind i und prev unbek
-
-
-                        neededOrdering = false;
-                    }
-                }
             }
-
-            // vielleicht einfach schauen ob es besser wird und wenn nicht alles rückgängig machen?
-
-
             return neededOrdering;
         }
 
 
-        /*public boolean orderRowImproves(int i, int level) {
-            boolean changed = false;
-            BaryHelperGraph gHelp = gTemp.copy();
-            if (Double.compare(gHelp.getBaryMatOnLevel(i).rowBary.get(i), gHelp.getBaryMatOnLevel(i).rowBary.get(i - 1)) < 0) {
-                Collections.swap(gHelp.getBaryMatOnLevel(i).rowBary, i, i - 1);
-                Collections.swap(gHelp.getBaryMatOnLevel(i).rows, i, i - 1);
-                changed = true;
-            }
-            if (changed) {
-                gHelp.getBaryMatOnLevel(i).calcMatBaryAndCross();
-                gHelp.setBaryMat(level, gHelp.getBaryMatOnLevel(i));
-                gHelp.setLayerInMap(level, gHelp.getBaryMatOnLevel(i).rows);
-                if (level > 1) {
-                    gHelp.getBaryMatOnLevel(level - 1).columns = gHelp.getBaryMatOnLevel(i).rows;
-                    gHelp.getBaryMatOnLevel(level - 1).calcMatBaryAndCross();
-                }
-                gHelp.calcCrossingsTotal();
-            }
-            return (gHelp.getCrossingsTotal() < gTemp.getCrossingsTotal());
-        }*/
-
-        public void reverseRows(int level, BaryHelperGraph gTemp) {
+        void reverseRows(int level, BaryHelperGraph gTemp) {
             if (rows.size() > 1) {
                 for (int i = 1; i < rowBary.size(); i++) {
                     int prev = i - 1;
@@ -318,7 +269,7 @@ public class Bary {
             }
         }
 
-        public boolean improvementRows(int level, int i) {
+        boolean improvementRows(int level, int i) {
             BaryHelperGraph gHelp = gTemp.copy();
             BaryMatrix mHelp = gHelp.getBaryMatOnLevel(level);
 
@@ -335,6 +286,25 @@ public class Bary {
             }
             gHelp.calcCrossingsTotal();
             return (gHelp.getCrossingsTotal() < gTemp.getCrossingsTotal());
+        }
+
+        boolean improvementCols(int level, int i) {
+            BaryHelperGraph gHelper = gTemp.copy();
+            BaryMatrix mHelp = gHelper.getBaryMatOnLevel(level);
+
+            if (Double.compare(mHelp.columnBary.get(i), mHelp.columnBary.get(i - 1)) == 0) {
+                Collections.swap(mHelp.columnBary, i, i - 1);
+                Collections.swap(mHelp.columns, i, i - 1);
+            }
+            mHelp.calcMatBaryAndCross();
+            gHelper.setBaryMat(level, mHelp);
+            gHelper.setLayerInMap(level, mHelp.columns);
+            if (level < gHelper.getLayerMap().size() - 1) {
+                gHelper.getBaryMatOnLevel(level + 1).rows = mHelp.columns;
+                gHelper.getBaryMatOnLevel(level + 1).calcMatBaryAndCross();
+            }
+            gHelper.calcCrossingsTotal();
+            return (gHelper.getCrossingsTotal() < gTemp.getCrossingsTotal());
         }
 
 
