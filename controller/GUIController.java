@@ -108,8 +108,8 @@ public class GUIController {
         FileChooser fileChooser = new FileChooser();
 
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Newick files (*.nh)", "*.nh"),
-                new FileChooser.ExtensionFilter("GraphML files (*.graphml)", "*.graphml")
+                new FileChooser.ExtensionFilter("GraphML files (*.graphml)", "*.graphml"),
+                new FileChooser.ExtensionFilter("Newick files (*.nh)", "*.nh")
         );
 
         File file = fileChooser.showOpenDialog(null);
