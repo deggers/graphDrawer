@@ -1,16 +1,18 @@
 package structure;
 
-import Sugiyama.CrossingMin;
-import structure.GraphNode;
+import Sugiyama.Bary.BaryMatrix;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
-class BaryHelperGraph {
+public class BaryHelperGraph {
     private int crossingsTotal = 0;
     private LinkedHashMap<Integer, LinkedList<GraphNode>> layerMap; // key layer, entry nodes in corr order
     private Map<Integer, BaryMatrix> baryMat=new HashMap<>();  // position in array= level of rows
 
-    void calcCrossingsTotal() {
+    public void calcCrossingsTotal() {
         for (int i = 1; i <= baryMat.size(); i++) {
             if(i==1){
                 crossingsTotal=0;
@@ -19,30 +21,30 @@ class BaryHelperGraph {
         }
     }
 
-    void setBaryMat(Integer i, BaryMatrix baryMat) {
+    public void setBaryMat(Integer i, BaryMatrix baryMat) {
         this.baryMat.put(i, baryMat);
     }
-    BaryMatrix getBaryMatOnLevel(Integer level){
+    public BaryMatrix getBaryMatOnLevel(Integer level){
         return this.baryMat.get(level);
     }
 
-    void setLayerMap(LinkedHashMap<Integer, LinkedList<GraphNode>> layerMap){
+    public void setLayerMap(LinkedHashMap<Integer, LinkedList<GraphNode>> layerMap){
         this.layerMap= layerMap;
     }
 
-    void setLayerInMap(Integer i, LinkedList<GraphNode> list){
+    public void setLayerInMap(Integer i, LinkedList<GraphNode> list){
         this.layerMap.put(i,list );
     }
 
-    LinkedHashMap<Integer, LinkedList<GraphNode>> getLayerMap() {
+    public LinkedHashMap<Integer, LinkedList<GraphNode>> getLayerMap() {
         return layerMap;
     }
 
-    int getCrossingsTotal(){
+    public int getCrossingsTotal(){
         return this.crossingsTotal;
     }
 
-    BaryHelperGraph copy(){
+    public BaryHelperGraph copy(){
         BaryHelperGraph other = new BaryHelperGraph();
         other.layerMap = new LinkedHashMap<>(this.layerMap);
         other.baryMat= new HashMap<>(this.baryMat);

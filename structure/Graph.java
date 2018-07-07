@@ -1,7 +1,5 @@
 package  structure;
 
-import structure.GraphNode;
-
 import java.util.*;
 
 
@@ -354,6 +352,7 @@ public class Graph {
     public void                                            setCrossings(String layer, int crossings) {
         this.crossings.put(layer, crossings);
     }
+
 
     public void resetAllPorts(){
         this.nodes.values().forEach(GraphNode::resetPortMap);

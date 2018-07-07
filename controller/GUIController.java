@@ -11,7 +11,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import structure.Graph;
 
-import javax.xml.bind.annotation.XmlAnyAttribute;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
