@@ -1,8 +1,6 @@
-package src.draw;
+package draw;
 
-import src.structure.Edge;
-import src.structure.Graph;
-import structure.GraphNode;
+import structure.*;
 
 import java.util.*;
 

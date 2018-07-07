@@ -1,5 +1,4 @@
-package src.structure;
-
+package structure;
 import structure.GraphNode;
 
 public class           Edge {

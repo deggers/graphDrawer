@@ -2,6 +2,7 @@ package Sugiyama;
 
 import structure.*;
 
+
 import java.util.*;
 
 public class CrossingMin {
@@ -109,144 +110,144 @@ public class CrossingMin {
             if (edgesIn.containsKey(fixedNode)) adjacentToFixedNodes.addAll(g.getParentsOf(fixedNode));
             adjacentToFixedNodes.removeIf(node -> node.getLayer() != freeLayerInt);
             if (VERBOSE && DEBUG) System.out.println("adjacentNodes = " + adjacentToFixedNodes);
-                for (GraphNode adjToFixedNode : adjacentToFixedNodes) {
-                    if (VERBOSE && DEBUG) System.out.println("looking left for all nodes from " + adjToFixedNode);
-                    for (int k = 0; k <= freeLayer.indexOf(adjToFixedNode)-1; k++) {
-                        GraphNode checkNode = freeLayer.get(k);
-                        if (VERBOSE && DEBUG) System.out.println("checkNode = " + checkNode);
-                        LinkedList<GraphNode> adjToCheckNode = new LinkedList<>();
-                        if (edgesOut.containsKey(checkNode)) adjToCheckNode.addAll(g.getChildren(checkNode));
-                        if (edgesIn.containsKey(checkNode)) adjToCheckNode.addAll(g.getParentsOf(checkNode));
-                        adjToCheckNode.removeIf(node -> node.getLayer() != fixedLayerInt);
-                        if (VERBOSE && DEBUG) System.out.println("adjToCheckNode = " + adjToCheckNode);
-                            for (GraphNode particularNode : adjToCheckNode){
-                                if (VERBOSE && DEBUG) System.out.println("particularNode = " + particularNode);
-                                int indexParticularNode = fixedLayer.indexOf(particularNode);
-                                int indexFixedNode = fixedLayer.indexOf(fixedNode);
-                                if (indexParticularNode > indexFixedNode) {
-                                    crossings++;
-                                }
-                            }
+            for (GraphNode adjToFixedNode : adjacentToFixedNodes) {
+                if (VERBOSE && DEBUG) System.out.println("looking left for all nodes from " + adjToFixedNode);
+                for (int k = 0; k <= freeLayer.indexOf(adjToFixedNode) - 1; k++) {
+                    GraphNode checkNode = freeLayer.get(k);
+                    if (VERBOSE && DEBUG) System.out.println("checkNode = " + checkNode);
+                    LinkedList<GraphNode> adjToCheckNode = new LinkedList<>();
+                    if (edgesOut.containsKey(checkNode)) adjToCheckNode.addAll(g.getChildren(checkNode));
+                    if (edgesIn.containsKey(checkNode)) adjToCheckNode.addAll(g.getParentsOf(checkNode));
+                    adjToCheckNode.removeIf(node -> node.getLayer() != fixedLayerInt);
+                    if (VERBOSE && DEBUG) System.out.println("adjToCheckNode = " + adjToCheckNode);
+                    for (GraphNode particularNode : adjToCheckNode) {
+                        if (VERBOSE && DEBUG) System.out.println("particularNode = " + particularNode);
+                        int indexParticularNode = fixedLayer.indexOf(particularNode);
+                        int indexFixedNode = fixedLayer.indexOf(fixedNode);
+                        if (indexParticularNode > indexFixedNode) {
+                            crossings++;
+                        }
                     }
                 }
+            }
         }
         return crossings;
     }
 
 
-    public static void baryCenterViola(Graph graph) {
-        BarycenterMatrix m0;
-        BarycenterMatrix mStar, mTemp;                                   // mStar equals M*, solution matrix
-
-        for (GraphNode n : graph.getNodes().values()) {
-            if (n.getLayer() > graphDepth) {
-                graphDepth = n.getLayer();
-            }
-        }
-
-        for (int layers = 1; layers < graphDepth; layers++) {             // layers start at 1, < graphDepth, because matrix always level i and i+1
-            if (VERBOSE && DEBUG) System.out.println("starting down for layer: " + layers);
-            minCrossings = Integer.MAX_VALUE;
-            m0 = new BarycenterMatrix(graph, layers, "down");
-            mStar = m0.copy();
-            mTemp = m0.copy();
-            minCrossings = m0.getCrossings();
-            if (VERBOSE && DEBUG) System.out.println("layers = " + layers + ", min cross = " + minCrossings);
-            if (minCrossings != 0) {
-                iterations = 0;
-                phase1(m0,mStar,mTemp);
-            }
-
-            // hier auch noch die layer map ändern
-            graph.getLayerMap().put(layers, mStar.getRows());
-
-            for (GraphNode gn : graph.getNodes().values()) {
-                for (GraphNode g : mStar.getRows()) {
-                    if (gn.equals(g) && gn.y == mStar.getColumns().get(0).y) {
-                        gn.x = g.x;
-                        gn.y = layers;
-                    }
-                }
-            }
-            if (VERBOSE && DEBUG) System.out.println("new min cross = " + minCrossings);
-        }
-
-        for (int layers = graphDepth; layers > 1; layers--) {
-            if (VERBOSE && DEBUG) System.out.println("starting up for layer: " + layers);
-            minCrossings = Integer.MAX_VALUE;
-            m0 = new BarycenterMatrix(graph, layers, "up");
-            mStar = m0.copy();
-            mTemp = m0.copy();
-            minCrossings = m0.getCrossings();
-            if (VERBOSE && DEBUG) System.out.println("layers = " + layers + ", min cross = " + minCrossings);
-            if (minCrossings != 0) {
-                iterations = 0;
-                phase1(m0, mStar, mTemp);
-            }
-            for (GraphNode gn : graph.getNodes().values()) {
-                for (GraphNode g : mStar.getRows()) {
-                    if (gn.equals(g) && gn.y == mStar.getColumns().get(0).y) {
-                        gn.x = g.x;
-                    }
-                }
-            }
-            graph.getLayerMap().put(layers, mStar.getRows());
-
-            if (VERBOSE && DEBUG) System.out.println("new min cross = " + minCrossings);
-
-        }            //
-
-/*        for(Map.Entry<Integer, LinkedList<GraphNode>> entry : graph.getLayerMap().entrySet()) {
-        System.out.println(" on layer: " + entry.getKey());
-        for (GraphNode graphNode : entry.getValue()) {
-            System.out.println(graphNode.getLabel() + ": " + graphNode.x);
-        }
-    }*/
-        // stattdessen die layer map ändern, also die reihenfolge der knoten
-        // graph.getLayerMap().put
-    }
-
-    private static void phase1(BarycenterMatrix m0, BarycenterMatrix mStar, BarycenterMatrix mTemp) {
-        if (iterations < 1000) {
-            iterations++;         //System.out.println("iterations1 = " + iterations1);
-            mTemp.orderByRow();
-            if (mTemp.getCrossings() < minCrossings) {    // Step 3
-                mStar = mTemp.copy();
-                minCrossings = mTemp.getCrossings();
-                if (VERBOSE && DEBUG) System.out.println("changed minCrossings to = " + minCrossings);
-                if (VERBOSE && DEBUG) System.out.println("mTemp col= " + mTemp.getColumns()+ " "+ mTemp.getColumns());
-                if (VERBOSE && DEBUG) System.out.println("mTemp row = " + mTemp.getRows());
-
-            }
-
-            mTemp.orderByColumn();
-            if (mTemp.getCrossings() < minCrossings) {     // Step 5
-                mStar = mTemp.copy();
-                minCrossings = mTemp.getCrossings();
-                if (VERBOSE && DEBUG) System.out.println("changed minCrossings to = " + minCrossings);
-            }
-
-            if (m0.equals(mTemp)) { // anzahl iterations sinnvolle größe wählen als abbruchkriterim
-                // auf periodisches auftreten prüfen-- klappt noch nicht???? !!!
-                phase2(m0,mStar,mTemp);
-            } else {
-                phase1(m0, mStar, mTemp);
-            }
-        }
-    }
-
-    private static void phase2(BarycenterMatrix m0, BarycenterMatrix mStar, BarycenterMatrix mTemp) {
-        mTemp.reverseRows();
-
-        if (!mTemp.columnsAreIncreasing()) {           // Step 8:
-            phase1(m0,mStar,mTemp);
-        }
-
-        mTemp.reverseColumns();
-        if (!mTemp.rowsAreIncreasing()) {                // Step 10
-            phase1(m0,mStar,mTemp);
-        }
-    }
+//    public static void baryCenterViola(Graph graph) {
+//        BarycenterMatrix m0;
+//        BarycenterMatrix mStar, mTemp;                                   // mStar equals M*, solution matrix
+//
+//        for (GraphNode n : graph.getNodes().values()) {
+//            if (n.getLayer() > graphDepth) {
+//                graphDepth = n.getLayer();
+//            }
+//        }
+//
+//        for (int layers = 1; layers < graphDepth; layers++) {             // layers start at 1, < graphDepth, because matrix always level i and i+1
+//            if (VERBOSE && DEBUG) System.out.println("starting down for layer: " + layers);
+//            minCrossings = Integer.MAX_VALUE;
+//            m0 = new BarycenterMatrix(graph, layers, "down");
+//            mStar = m0.copy();
+//            mTemp = m0.copy();
+//            minCrossings = m0.getCrossings();
+//            if (VERBOSE && DEBUG) System.out.println("layers = " + layers + ", min cross = " + minCrossings);
+//            if (minCrossings != 0) {
+//                iterations = 0;
+//                phase1(m0,mStar,mTemp);
+//            }
+//
+//            // hier auch noch die layer map ändern
+//            graph.getLayerMap().put(layers, mStar.getRows());
+//
+//            for (GraphNode gn : graph.getNodes().values()) {
+//                for (GraphNode g : mStar.getRows()) {
+//                    if (gn.equals(g) && gn.y == mStar.getColumns().get(0).y) {
+//                        gn.x = g.x;
+//                        gn.y = layers;
+//                    }
+//                }
+//            }
+//            if (VERBOSE && DEBUG) System.out.println("new min cross = " + minCrossings);
+//        }
+//
+//        for (int layers = graphDepth; layers > 1; layers--) {
+//            if (VERBOSE && DEBUG) System.out.println("starting up for layer: " + layers);
+//            minCrossings = Integer.MAX_VALUE;
+//            m0 = new BarycenterMatrix(graph, layers, "up");
+//            mStar = m0.copy();
+//            mTemp = m0.copy();
+//            minCrossings = m0.getCrossings();
+//            if (VERBOSE && DEBUG) System.out.println("layers = " + layers + ", min cross = " + minCrossings);
+//            if (minCrossings != 0) {
+//                iterations = 0;
+//                phase1(m0, mStar, mTemp);
+//            }
+//            for (GraphNode gn : graph.getNodes().values()) {
+//                for (GraphNode g : mStar.getRows()) {
+//                    if (gn.equals(g) && gn.y == mStar.getColumns().get(0).y) {
+//                        gn.x = g.x;
+//                    }
+//                }
+//            }
+//            graph.getLayerMap().put(layers, mStar.getRows());
+//
+//            if (VERBOSE && DEBUG) System.out.println("new min cross = " + minCrossings);
+//
+//        }            //
+//
+///*        for(Map.Entry<Integer, LinkedList<GraphNode>> entry : graph.getLayerMap().entrySet()) {
+//        System.out.println(" on layer: " + entry.getKey());
+//        for (GraphNode graphNode : entry.getValue()) {
+//            System.out.println(graphNode.getLabel() + ": " + graphNode.x);
+//        }
+//    }*/
+//        // stattdessen die layer map ändern, also die reihenfolge der knoten
+//        // graph.getLayerMap().put
+//    }
+//
+//    private static void phase1(BarycenterMatrix m0, BarycenterMatrix mStar, BarycenterMatrix mTemp) {
+//        if (iterations < 1000) {
+//            iterations++;         //System.out.println("iterations1 = " + iterations1);
+//            mTemp.orderByRow();
+//            if (mTemp.getCrossings() < minCrossings) {    // Step 3
+//                mStar = mTemp.copy();
+//                minCrossings = mTemp.getCrossings();
+//                if (VERBOSE && DEBUG) System.out.println("changed minCrossings to = " + minCrossings);
+//                if (VERBOSE && DEBUG) System.out.println("mTemp col= " + mTemp.getColumns()+ " "+ mTemp.getColumns());
+//                if (VERBOSE && DEBUG) System.out.println("mTemp row = " + mTemp.getRows());
+//
+//            }
+//
+//            mTemp.orderByColumn();
+//            if (mTemp.getCrossings() < minCrossings) {     // Step 5
+//                mStar = mTemp.copy();
+//                minCrossings = mTemp.getCrossings();
+//                if (VERBOSE && DEBUG) System.out.println("changed minCrossings to = " + minCrossings);
+//            }
+//
+//            if (m0.equals(mTemp)) { // anzahl iterations sinnvolle größe wählen als abbruchkriterim
+//                // auf periodisches auftreten prüfen-- klappt noch nicht???? !!!
+//                phase2(m0,mStar,mTemp);
+//            } else {
+//                phase1(m0, mStar, mTemp);
+//            }
+//        }
+//    }
+//
+//    private static void phase2(BarycenterMatrix m0, BarycenterMatrix mStar, BarycenterMatrix mTemp) {
+//        mTemp.reverseRows();
+//
+//        if (!mTemp.columnsAreIncreasing()) {           // Step 8:
+//            phase1(m0,mStar,mTemp);
+//        }
+//
+//        mTemp.reverseColumns();
+//        if (!mTemp.rowsAreIncreasing()) {                // Step 10
+//            phase1(m0,mStar,mTemp);
+//        }
+//    }
 }
 
 /*  PHASE 1:

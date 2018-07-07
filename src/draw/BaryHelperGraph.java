@@ -1,6 +1,6 @@
-package src.draw;
+package draw;
 
-import src.draw.Bary.BaryMatrix;
+import draw.Bary.BaryMatrix;
 import structure.GraphNode;
 
 import java.util.*;

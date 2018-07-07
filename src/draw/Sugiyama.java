@@ -65,7 +65,7 @@ public class Sugiyama {
         switch (GUIController.getInstance().getSelectedCrossingMinAlgo()) {
             case "Permutation"  :   CrossingMin.allPermutation(partialGraph, bidirectional,sweeps); break;
             case "BaryCenter_naive" : CrossingMin.baryCenter_naive(partialGraph, bidirectional,sweeps); break;
-            case "Bary_Viola" : CrossingMin.baryCenterViola(partialGraph); break;
+//            case "Bary_Viola" : CrossingMin.baryCenterViola(partialGraph); break;
             default             :   System.out.println(" mhm, missin something here! Sugiyama"); break;
         }
         GUIController.getInstance().setCrossingLabel("Crossings: " + partialGraph.getCrossings().toString());
