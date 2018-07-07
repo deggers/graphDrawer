@@ -141,12 +141,8 @@ public class Main extends Application {
 
 
         AssignHorizontalPosition.processBK(myGraph);
-        if (VERBOSE) {
-        System.out.println("Going to give u all the conflict edges :-)");
-        for (Edge e: myGraph.getEdges())
-            if (e.isMarkedType1Conflict()) System.out.println("e = " + e);
-        System.out.println("that have been them all..\n");
-        }
+//        System.out.println("AlignBlock =" + myGraph.getAlignBlock());
+//        System.out.println("RootBlock  =" + myGraph.getRootBlock());
 
 //        System.out.println("myGraph = " + myGraph.getAlignBlock());
 //        System.out.println("my = " + myGraph.getRootBlock());

@@ -11,6 +11,7 @@ import java.util.*;
 // aka Brandes Köpf
 public class AssignHorizontalPosition {
     private static boolean VERBOSE = false;
+    private static boolean DEBUG = false;
 
     public static Graph processBK(Graph inputGraph) {
         // step 1 -> verticalAlignment(direction)
@@ -20,9 +21,9 @@ public class AssignHorizontalPosition {
         upward and downward alignment with leftmost and rightmost conflict resolution. */
 
         MarkTypeOneConflicts(inputGraph);
-        verticalAlignment(inputGraph,"NW");
+//        verticalAlignment(inputGraph,"NW");
 //        verticalAlignment(inputGraph,"NE");
-//        verticalAlignment(inputGraph,"SW");
+        verticalAlignment(inputGraph,"SW");
 //        verticalAlignment(inputGraph,"SE");
 
         // step 2 -> Compaction(direction)
@@ -67,66 +68,59 @@ public class AssignHorizontalPosition {
         LinkedHashMap<Integer,LinkedList<GraphNode>> layerMap   = graph.getLayerMap();
         LinkedHashMap<GraphNode,GraphNode> rootMap              = new LinkedHashMap<>();
         LinkedHashMap<GraphNode,GraphNode> alignMap             = new LinkedHashMap<>();
-        Map<GraphNode, Runnable> commands = new HashMap<>();
 
-        System.out.println("direction = " + direction);
-        for(GraphNode node: graph.getNodes().values())rootMap.put(node,node);                               // Zeile 1
-        for(GraphNode node: graph.getNodes().values())alignMap.put(node,node);                              // Zeile 2
+        for(GraphNode node: graph.getNodes().values() )  alignMap.put(node,node);                              // Zeile 2
 
         int graphDepth  = graph.getLayerMap().keySet().size();
+        if (VERBOSE) System.out.println(direction);
         if (direction.contains("S")) {
-            System.out.println("south");
 // TRAVERSING LAYERS FROM TOP TO BOTTOM-v-v-v-v-v-v-v-v-v-v-v-v-TOP TO BOTTOM-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-
+            if (VERBOSE) System.out.println("TOP to BOTTOM");
             for (int layer = 1; layer < graphDepth; layer++){                                                 // Zeile 3
                 int layerSize   = layerMap.get(layer).size();
                 int r           = direction.contains("W") ? -1 : Integer.MAX_VALUE;                         // Zeile 5,6
                 LinkedList<GraphNode>   layerList = layerMap.get(layer);
-                System.out.println("layerSize = " + layerSize);
-                System.out.println(r);
-                System.out.println("layerList = " + layerList);
 //>>>>>>>>>>>>>>>--------------------------------------FOR LEFT TO RIGHT-------------------------------------->>>>>>>>>>
                 if (direction.contains("W")){ for (int k = 0; k < layerSize; k++){                            // Zeile 7
-                        System.out.println("");
-                        System.out.println("west");
                         GraphNode               vk_i        = layerList.get(k);
-                        System.out.println("vk_i = " + vk_i);
+                        if (VERBOSE && DEBUG) System.out.println("\nvk_i = " + vk_i);
                         ArrayList<GraphNode>    neighbors   = getNeighbors(graph, vk_i, "predecessor");          // Zeile  9
-                        System.out.println("neighbors = " + neighbors);
                         LinkedList<GraphNode> layerAbove = graph.getLayerMap().get(layer + 1);
                         if (neighbors != null) {
                             for (GraphNode neighbor_m : getUpperAndLowerMedian(neighbors,  false)) {
                                 if (alignMap.get(vk_i) == vk_i){                                             // Zeile 14
-                                    System.out.println("neighbor_m = " + neighbor_m);
                                     boolean isMarked = graph.getEdgeBetween(neighbor_m, vk_i).isMarkedType1Conflict();
                                     if (!isMarked && r < layerAbove.indexOf(neighbor_m)){     // ATTENTION, ">" ||"<"        // Zeile 15
-                                        alignMap.put(neighbor_m, vk_i);                                      // Zeile 17
-                                        rootMap.put(vk_i,rootMap.get(neighbor_m));                           // Zeile 18
-                                        alignMap.put(vk_i, rootMap.get(vk_i));                               // Zeile 19
-                                        r = layerAbove.indexOf(neighbor_m);                                                  // Zeile 20
+                                        if (VERBOSE && DEBUG) System.out.println("took neighbor_m = " + neighbor_m);
+                                        alignMap.put(vk_i, neighbor_m);
+                                        r = layerAbove.indexOf(neighbor_m);
                                     }
-                                }}}}} else {
+                                }}}}
+                } else { // ---------------------------FOR RIGHT TO LEFT--------------------------------------<<<<<<<<<<
 //<<<<<<<<<<<<<<<<<<-----------------------------------FOR RIGHT TO LEFT--------------------------------------<<<<<<<<<<
-                    for (int k = layerSize - 1; k > 0; k--){                                                      // Zeile 8
+                    for (int k = layerSize - 1; k >= 0; k--){                                                      // Zeile 8
                         GraphNode            vk_i       = layerList.get(k);
+                        if (VERBOSE & DEBUG) System.out.println("\nvk_i = " + vk_i);
                         ArrayList<GraphNode> neighbors  = getNeighbors(graph, vk_i,"predecessor");
                         LinkedList<GraphNode> layerAbove = graph.getLayerMap().get(layer + 1);
-                        if (neighbors != null)
+                        System.out.println("neighbors = " + neighbors);
+                        if (neighbors != null) {
                             for (GraphNode neighbor_m : getUpperAndLowerMedian(neighbors, true))
-                            if (alignMap.get(vk_i) == vk_i){                                             // Zeile 14
+                                if (alignMap.get(vk_i) == vk_i){                                             // Zeile 14
                                     boolean isMarked = graph.getEdgeBetween(neighbor_m, vk_i).isMarkedType1Conflict();
-                                        if (!isMarked && r > layerAbove.indexOf(neighbor_m)){ // ATTENTION, ">" ||"<"        // Zeile 15
-                                        alignMap.put(neighbor_m, vk_i);                                      // Zeile 17
-                                        rootMap.put(vk_i,rootMap.get(neighbor_m));                           // Zeile 18
-                                        alignMap.put(vk_i, rootMap.get(vk_i));                               // Zeile 19
-                                        r = layerAbove.indexOf(neighbor_m);                                                  // Zeile 20
+                                    if (!isMarked && r > layerAbove.indexOf(neighbor_m)){ // ATTENTION, ">" ||"<"        // Zeile 15
+                                    if (VERBOSE && DEBUG) System.out.println("took neighbor_m = " + neighbor_m);
+                                        alignMap.put(vk_i,neighbor_m);
+                                        r = layerAbove.indexOf(neighbor_m);// Zeile 20
                                     }
-                                }
+                            }
+                        }
                     }
                 }
             } // END-FOR-LOOP TOP-TO-BOTTOM -----------------------------------------------------------------------------
         } else {
-            System.out.println("North");
 // TRAVERSING LAYERS FROM BOTTOM TO TOP------------------BOTTOM TO TOP--------------------------------------------------
+            if (VERBOSE) System.out.println("BOTTOM to TOP");
             for (int layer = graphDepth; layer > 0; layer-- ){                                             // Zeile 4
                 int layerSize   = layerMap.get(layer).size();
                 int r           = direction.contains("W") ? -1 : Integer.MAX_VALUE;                         // Zeile 5,6
@@ -134,38 +128,26 @@ public class AssignHorizontalPosition {
 //>>>>>>>>>>>>>>>--------------------------------------FOR LEFT TO RIGHT-------------------------------------->>>>>>>>>>
                 if (direction.contains("W")){ for (int k = 0; k < layerSize; k++){                            // Zeile 7
                         GraphNode               vk_i        = layerList.get(k);
-                        System.out.println("");
-                        System.out.println("vk_i = " + vk_i);
+                        if (VERBOSE && DEBUG) System.out.println("\nvk_i = " + vk_i);
                         ArrayList<GraphNode>    neighbors   = getNeighbors(graph, vk_i, "successors");          // Zeile  9
                         LinkedList<GraphNode> layerAbove = graph.getLayerMap().get(layer - 1);
-                        System.out.println("layerAbove = " + layerAbove);
-                        System.out.println("neighbors = " + neighbors);
                         if (neighbors != null)
                             for (GraphNode neighbor_m : getUpperAndLowerMedian(neighbors, false)){
                                 if (alignMap.get(vk_i).equals(vk_i)){                                             // Zeile 14
                                     int pos_neighbor_m = layerAbove.indexOf((neighbor_m));
                                     boolean isMarked = graph.getEdgeBetween(neighbor_m, vk_i).isMarkedType1Conflict();
                                         if (!isMarked && r < pos_neighbor_m){     // ATTENTION, ">" ||"<"        // Zeile 15
-
-                                            // Populate commands map
-
-                                            System.out.println("neighbor_m = " + neighbor_m);
-                                            System.out.println("update it because not marked and r < pos_neighbor_m && without block");
-                                            alignMap.put(neighbor_m,vk_i);
-                                            rootMap.put(vk_i,rootMap.get(neighbor_m));
-//                                            commands.put(vk_i, () -> System.out.print(rootMap.get(neighbor_m)));
-                                            alignMap.put(vk_i,rootMap.get(vk_i));
-                                            System.out.println("rootMap = " + rootMap);
-                                            System.out.println("alignMap = " + alignMap);
+                                            if (VERBOSE && DEBUG) System.out.println("took neighbor_m = " + neighbor_m);
+                                            alignMap.put(vk_i, neighbor_m);
                                             r = pos_neighbor_m;                                                  // Zeile 20
                                         }
                                 }
-
                             }}
                 } else {
 //<<<<<<<<<<<<<<<<<<-----------------------------------FOR RIGHT TO LEFT--------------------------------------<<<<<<<<<<
-                    for (int k = layerSize - 1; k > 0; k--){                                                      // Zeile 8
+                    for (int k = layerSize - 1; k >= 0; k--){                                                      // Zeile 8
                         GraphNode            vk_i       = layerList.get(k);
+                        if (VERBOSE && DEBUG) System.out.println("\nvk_i = " + vk_i);
                         ArrayList<GraphNode> neighbors  = getNeighbors(graph, vk_i,"successors");
                         LinkedList<GraphNode> layerAbove = graph.getLayerMap().get(layer - 1);
                         if (neighbors != null)
@@ -174,9 +156,8 @@ public class AssignHorizontalPosition {
                                     int pos_neighbor_m = layerAbove.indexOf((neighbor_m));
                                         boolean isMarked = graph.getEdgeBetween(neighbor_m, vk_i).isMarkedType1Conflict();
                                             if (!isMarked && r > pos_neighbor_m){ // ATTENTION, ">" ||"<"        // Zeile 15
-                                            alignMap.put(neighbor_m, vk_i);                                      // Zeile 17
-                                            rootMap.put(vk_i,rootMap.get(neighbor_m));                           // Zeile 18
-                                            alignMap.put(vk_i, rootMap.get(vk_i));                               // Zeile 19
+                                            if (VERBOSE && DEBUG) System.out.println("took neighbor_m = " + neighbor_m);
+                                            alignMap.put(vk_i, neighbor_m);                                      // Zeile 17
                                             r = pos_neighbor_m;                                                  // Zeile 20
                                         }
                                     }
@@ -184,20 +165,56 @@ public class AssignHorizontalPosition {
                 }
             }
         }
-        System.out.println(""); System.out.println("");
-        System.out.println("rootMap = " + rootMap);
-        System.out.println("");
-        System.out.println("alignMap = " + alignMap);
 
-//        System.out.println("");
-//        for (GraphNode node: rootMap.values()){
-//            System.out.println("node = " + node);
-//            commands.get(node);
-//        }
+        if (direction.contains("N")) {
+            ArrayList<GraphNode> realRoots = new ArrayList<>();
+            for(GraphNode key: alignMap.keySet())
+                if (key.equals(alignMap.get(key)))  realRoots.add(alignMap.get(key));
+            for (GraphNode node : alignMap.keySet()){
+                if (!realRoots.contains(alignMap.get(node)))
+                    rootMap.put(node,findRoot(node,alignMap));
+                else rootMap.put(node,alignMap.get(node));
+            }
+        } else {
+            ArrayList<GraphNode> done = new ArrayList<>();
+            ArrayList<GraphNode> addRoot = new ArrayList<>();
+            for (GraphNode key : alignMap.keySet()){
+                if (!done.contains(key)){
+                    done.add(key);
+                    GraphNode possibleRoot = key;
+                    if (key.equals(alignMap.get(key)))
+                        rootMap.put(possibleRoot,possibleRoot);
+                    else {
+                        while (!key.equals(alignMap.get(key))){
+                            key = nextNode(key,alignMap);
+                            done.add(key);
+                            addRoot.add(key);
+                        }
+                        for (GraphNode doneKey : addRoot)
+                            rootMap.put(doneKey,possibleRoot);
+                        addRoot.clear();
+                    }
+                }
+            }
+        }
 
         graph.setRootBlock(direction,rootMap);
-        graph.setAlignBlock(direction,rootMap);
+        graph.setAlignBlock(direction,alignMap);
     }
+
+    private static GraphNode nextNode(GraphNode key, LinkedHashMap<GraphNode,GraphNode> alignMap){
+        return alignMap.get(key);
+    }
+
+    private static GraphNode findRoot(GraphNode key, LinkedHashMap<GraphNode,GraphNode> alignMap) {
+        GraphNode value = alignMap.get(key);
+        while (!value.equals(key)){
+            key = findRoot(alignMap.get(key),alignMap);
+            value = alignMap.get(key);
+        }
+        return key;
+    }
+
     private static boolean  isLastNode(LinkedList<GraphNode> nodesLayer, GraphNode node){
         return node == nodesLayer.getLast();
     }
