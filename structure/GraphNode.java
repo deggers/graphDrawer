@@ -2,7 +2,7 @@ package structure;
 
 import java.util.LinkedHashMap;
 
-public class           GraphNode {
+public class GraphNode {
     private String label, nodeType;
     public double x, y;
     public double x_Bary;
