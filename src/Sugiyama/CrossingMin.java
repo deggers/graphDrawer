@@ -135,126 +135,316 @@ public class CrossingMin {
     }
 
 
-//    public static void baryCenterViola(Graph graph) {
-//        BarycenterMatrix m0;
-//        BarycenterMatrix mStar, mTemp;                                   // mStar equals M*, solution matrix
-//
-//        for (GraphNode n : graph.getNodes().values()) {
-//            if (n.getLayer() > graphDepth) {
-//                graphDepth = n.getLayer();
-//            }
-//        }
-//
-//        for (int layers = 1; layers < graphDepth; layers++) {             // layers start at 1, < graphDepth, because matrix always level i and i+1
-//            if (VERBOSE && DEBUG) System.out.println("starting down for layer: " + layers);
-//            minCrossings = Integer.MAX_VALUE;
-//            m0 = new BarycenterMatrix(graph, layers, "down");
-//            mStar = m0.copy();
-//            mTemp = m0.copy();
-//            minCrossings = m0.getCrossings();
-//            if (VERBOSE && DEBUG) System.out.println("layers = " + layers + ", min cross = " + minCrossings);
-//            if (minCrossings != 0) {
-//                iterations = 0;
-//                phase1(m0,mStar,mTemp);
-//            }
-//
-//            // hier auch noch die layer map ändern
-//            graph.getLayerMap().put(layers, mStar.getRows());
-//
-//            for (GraphNode gn : graph.getNodes().values()) {
-//                for (GraphNode g : mStar.getRows()) {
-//                    if (gn.equals(g) && gn.y == mStar.getColumns().get(0).y) {
-//                        gn.x = g.x;
-//                        gn.y = layers;
-//                    }
-//                }
-//            }
-//            if (VERBOSE && DEBUG) System.out.println("new min cross = " + minCrossings);
-//        }
-//
-//        for (int layers = graphDepth; layers > 1; layers--) {
-//            if (VERBOSE && DEBUG) System.out.println("starting up for layer: " + layers);
-//            minCrossings = Integer.MAX_VALUE;
-//            m0 = new BarycenterMatrix(graph, layers, "up");
-//            mStar = m0.copy();
-//            mTemp = m0.copy();
-//            minCrossings = m0.getCrossings();
-//            if (VERBOSE && DEBUG) System.out.println("layers = " + layers + ", min cross = " + minCrossings);
-//            if (minCrossings != 0) {
-//                iterations = 0;
-//                phase1(m0, mStar, mTemp);
-//            }
-//            for (GraphNode gn : graph.getNodes().values()) {
-//                for (GraphNode g : mStar.getRows()) {
-//                    if (gn.equals(g) && gn.y == mStar.getColumns().get(0).y) {
-//                        gn.x = g.x;
-//                    }
-//                }
-//            }
-//            graph.getLayerMap().put(layers, mStar.getRows());
-//
-//            if (VERBOSE && DEBUG) System.out.println("new min cross = " + minCrossings);
-//
-//        }            //
-//
-///*        for(Map.Entry<Integer, LinkedList<GraphNode>> entry : graph.getLayerMap().entrySet()) {
-//        System.out.println(" on layer: " + entry.getKey());
-//        for (GraphNode graphNode : entry.getValue()) {
-//            System.out.println(graphNode.getLabel() + ": " + graphNode.x);
-//        }
-//    }*/
-//        // stattdessen die layer map ändern, also die reihenfolge der knoten
-//        // graph.getLayerMap().put
-//    }
-//
-//    private static void phase1(BarycenterMatrix m0, BarycenterMatrix mStar, BarycenterMatrix mTemp) {
-//        if (iterations < 1000) {
-//            iterations++;         //System.out.println("iterations1 = " + iterations1);
-//            mTemp.orderByRow();
-//            if (mTemp.getCrossings() < minCrossings) {    // Step 3
-//                mStar = mTemp.copy();
-//                minCrossings = mTemp.getCrossings();
-//                if (VERBOSE && DEBUG) System.out.println("changed minCrossings to = " + minCrossings);
-//                if (VERBOSE && DEBUG) System.out.println("mTemp col= " + mTemp.getColumns()+ " "+ mTemp.getColumns());
-//                if (VERBOSE && DEBUG) System.out.println("mTemp row = " + mTemp.getRows());
-//
-//            }
-//
-//            mTemp.orderByColumn();
-//            if (mTemp.getCrossings() < minCrossings) {     // Step 5
-//                mStar = mTemp.copy();
-//                minCrossings = mTemp.getCrossings();
-//                if (VERBOSE && DEBUG) System.out.println("changed minCrossings to = " + minCrossings);
-//            }
-//
-//            if (m0.equals(mTemp)) { // anzahl iterations sinnvolle größe wählen als abbruchkriterim
-//                // auf periodisches auftreten prüfen-- klappt noch nicht???? !!!
-//                phase2(m0,mStar,mTemp);
-//            } else {
-//                phase1(m0, mStar, mTemp);
-//            }
-//        }
-//    }
-//
-//    private static void phase2(BarycenterMatrix m0, BarycenterMatrix mStar, BarycenterMatrix mTemp) {
-//        mTemp.reverseRows();
-//
-//        if (!mTemp.columnsAreIncreasing()) {           // Step 8:
-//            phase1(m0,mStar,mTemp);
-//        }
-//
-//        mTemp.reverseColumns();
-//        if (!mTemp.rowsAreIncreasing()) {                // Step 10
-//            phase1(m0,mStar,mTemp);
-//        }
-//    }
-}
+/*
+class Bary {
+    private BaryHelperGraph g0 = new BaryHelperGraph(), gTemp;
+    private Map<GraphNode, LinkedList<GraphNode>> nodesAreConnected = new HashMap<>();
+    private int count = 0;
 
-/*  PHASE 1:
-Step 1: M*= m0, K* = K(m0)
-Step 2: M1= bR(m0)  = reorder rows as initial operation
-STep 3: if K(M1) < K* then M*= M1 and K*= K(M1)
-Step 4: M2= bC(M1)   = reorder columns
-Step 5: If K(M2) <K* then M*= M2 and K*= K(M2)
-step 6: if m0 and M2 equal OR # of iterations in Phase 1 attains an initially given number, Phase 1 STOPPED, goto 7, else goto Step 2
- */
+    public static void barycenterAlgo(Graph graph) {
+        Bary b = new Bary(graph);
+    }
+
+    private Bary(Graph graph) {
+        nodesConnected(graph);
+        g0.setLayerMap(graph.getLayerMap());
+
+        List<Integer> keys = new ArrayList<>();
+        keys.addAll(graph.getLayerMap().keySet());
+        // key is level, value is bary matrix
+        for (int i = 1; i < keys.size(); i++) {                                 // alle außer für letzten
+            g0.setBaryMat(i, new BaryMatrix(i));
+        }
+        g0.calcCrossingsTotal();
+        gTemp = g0.copy();
+
+        SugiyamaPhase1Sweep(1, g0.getLayerMap().size(), 1);         //layer beginnen bei 1
+
+        int graphDepth=gTemp.getLayerMap().size();
+        for (int level = 1; level < graphDepth; level++) {    // zb lm size 6, geht von 1-5
+            graph.getLayerMap().put(level, gTemp.getBaryMatOnLevel(level).rows);
+        }
+        graph.getLayerMap().put(graphDepth, gTemp.getBaryMatOnLevel(graphDepth-1).columns);
+
+        for (Integer integer : graph.getLayerMap().keySet()) {
+            for (int i = 0; i < graph.getLayerMap().get(integer).size(); i++) {
+                graph.getLayerMap().get(integer).get(i).x = i;
+            }
+        }
+        System.out.println("number of crossings total = " + gTemp.getCrossingsTotal());
+    }
+
+
+    // Down col : 1 bis n-1, Up row: n-1 bis 1
+    private void SugiyamaPhase1Sweep(int start, int end, int step) {
+        boolean stillProcessing = false;
+        count++;
+
+        for (int i = start; i != end; i += step) {
+            if (i < gTemp.getLayerMap().size()) {
+                if (gTemp.getBaryMatOnLevel(i).orderByRow(i)) {
+                    stillProcessing = true;
+                }
+            }
+        }
+        for (int i = start; i != end; i += step) {                          // von 1 bis 6 bzw bis 5
+            if (i < gTemp.getLayerMap().size()) {                            //layermap  1-6   barymat 1-5 = 1&2 2&3 3&4 4&5 5&6
+                if (gTemp.getBaryMatOnLevel(i).orderByColumn(i)) {
+                    stillProcessing = true;
+                }
+            }
+        }
+        if (stillProcessing & count < 101) {
+            SugiyamaPhase1Sweep(end, start, step * -1); // wenn von 1up kommend --> 1 down
+        }
+      */
+/*  else{
+            SugiyamaPhase2Sweep(start, end, step);
+        }*//*
+
+    }
+
+
+    private void SugiyamaPhase2Sweep(int start, int end, int step) {
+
+        for (int i = start; i != end; i += step) {
+            if (i < gTemp.getLayerMap().size()) {
+                gTemp.getBaryMatOnLevel(i).reverseRows(i, gTemp);
+            }
+        }
+
+        if (count < 100) {
+            SugiyamaPhase1Sweep(end, start, step * -1);
+        }
+    }
+
+    private void nodesConnected(Graph graph) {
+        for (Edge edge : graph.getEdges()) {
+            GraphNode u = edge.getStart();
+            GraphNode v = edge.getTarget();
+            if (nodesAreConnected.get(u) != null) {
+                LinkedList<GraphNode> temp = (nodesAreConnected.get(u));
+                temp.add(v);
+                nodesAreConnected.put(u, temp);
+            } else {
+                LinkedList<GraphNode> n = new LinkedList<>();
+                n.add(v);
+                nodesAreConnected.put(u, n);
+            }
+            if (nodesAreConnected.get(v) != null) {
+                LinkedList<GraphNode> temp = (nodesAreConnected.get(v));
+                temp.add(u);
+                nodesAreConnected.put(v, temp);
+            } else {
+                LinkedList<GraphNode> n = new LinkedList<>();
+                n.add(u);
+                nodesAreConnected.put(v, n);
+            }
+        }
+    }
+
+
+    class BaryMatrix {
+        private LinkedList<GraphNode> rows = new LinkedList<>();
+        private LinkedList<GraphNode> columns = new LinkedList<>();
+        private int[][] matrix;
+        private List<Double> rowBary = new ArrayList<>();
+        private List<Double> columnBary = new ArrayList<>();
+        private int matCrossings;
+
+        BaryMatrix(int level) {
+            rows.addAll(g0.getLayerMap().get(level));
+            columns.addAll(g0.getLayerMap().get(level + 1));
+            matrix = new int[rows.size()][columns.size()];
+            calcMatBaryAndCross();
+        }
+
+        void calcMatBaryAndCross() {
+            for (int i = 0; i < rows.size(); i++) { // calc mat
+                for (int j = 0; j < columns.size(); j++) {
+                    if (nodesAreConnected.get(rows.get(i)).contains((columns.get(j)))
+                            || nodesAreConnected.get(columns.get(j)).contains((rows.get(i)))) {
+                        matrix[i][j] = 1;
+                    } else {
+                        matrix[i][j] = 0;
+                    }
+                }
+            }
+            rowBary.clear();
+            columnBary.clear();
+            for (int k = 0; k < rows.size(); k++) {     // calcRowBarycenter
+                int sumcount = 0;
+                double tempBary = 0;
+                for (int l = 0; l < columns.size(); l++) {
+                    int temp = matrix[k][l];
+                    if (temp != 0) {
+                        tempBary += (((l + 1.0) * matrix[k][l]));
+                        sumcount++;
+                    }
+                }
+                tempBary = tempBary / (double) sumcount;
+                rowBary.add(tempBary);
+            }
+            for (int l = 0; l < columns.size(); l++) {      // calcColumnBary
+                int sumcount = 0;
+                double tempBary = 0;
+                for (int k = 0; k < rows.size(); k++) {
+                    int temp = matrix[k][l];
+                    if (temp != 0) {
+                        tempBary += (((k + 1.0) * matrix[k][l]));
+                        sumcount++;
+                    }
+                }
+                tempBary = tempBary / (double) sumcount;
+                columnBary.add(tempBary);
+            }
+            int crossings = 0;
+            for (int j = 0; j < rows.size() - 1; j++) { // von 1 bis p-1
+                for (int k = j + 1; k < rows.size(); k++) { // von j+1 bis p
+                    for (int a = 0; a < columns.size() - 1; a++) { // von 1 bis q-1
+                        for (int b = a + 1; b < columns.size(); b++) { // von a+1 bis q
+                            crossings += matrix[j][b] * matrix[k][a];
+                        }
+                    }
+                }
+            }
+            matCrossings = crossings;
+        }
+
+        int getMatCrossings() {
+            return this.matCrossings;
+        }
+
+        boolean orderByColumn(Integer level) {
+            boolean hasChanged = true;      //  hier wird er immer wieder rein springen ? rekursiv aufrufen oder bool mitgeben?
+            boolean neededOrdering = false;
+            if (columnBary.size() > 1) {
+                while (hasChanged) {
+                    hasChanged = false;
+                    for (int i = 1; i < columnBary.size(); i++) {   // level für graph1 von 1 bis < 6
+                    */
+/*    if(improvementCols(level,i)){
+                        }*//*
+
+                        int prev = i - 1;
+                        if (Double.compare(columnBary.get(i), columnBary.get(prev)) < 0) {
+                            Collections.swap(columnBary, prev, i);
+                            Collections.swap(columns, prev, i); //zugriff auf 0 und 1
+                            hasChanged = true;
+                            neededOrdering = true;
+                            calcMatBaryAndCross();
+                            gTemp.setBaryMat(level, this);
+                            gTemp.setLayerInMap(level + 1, columns);
+
+                            if (level < gTemp.getLayerMap().size() - 1) {  // es gibt level 1-6 in layermap
+                                // wenn auf 1-4 dann muss in nächster mat rows gesetzt werden
+                                // wenn schon in 5 dann gibt es keine mat mehr , da 5&6 in mat(5)
+                                gTemp.getBaryMatOnLevel(level + 1).rows = this.columns;
+                                gTemp.getBaryMatOnLevel(level + 1).calcMatBaryAndCross();
+                            }
+                            gTemp.calcCrossingsTotal();
+                        }
+                    }
+                }
+            }
+            return neededOrdering;
+        }
+
+        public boolean orderByRow(Integer level) {
+            boolean hasChanged = true;
+            boolean neededOrdering = false;
+            if (rowBary.size() > 1) {
+                while (hasChanged) {
+                    hasChanged = false;
+                    for (int i = 1; i < rowBary.size(); i++) {
+                        int prev = i - 1;
+                        if (improvementRows(level, i)) {
+                        }
+                        if (Double.compare(rowBary.get(i), rowBary.get(prev)) < 0) {
+                            Collections.swap(rowBary, prev, i);
+                            Collections.swap(rows, prev, i);
+                            hasChanged = true;
+                            neededOrdering = true;
+                            calcMatBaryAndCross();
+                            gTemp.setBaryMat(level, this);
+                            gTemp.setLayerInMap(level, rows);
+                            if (level > 1) {
+                                gTemp.getBaryMatOnLevel(level - 1).columns = this.rows;
+                                gTemp.getBaryMatOnLevel(level - 1).calcMatBaryAndCross();
+                            }
+                            gTemp.calcCrossingsTotal();
+                        }
+                    }
+                }
+            }
+            return neededOrdering;
+        }
+
+
+        void reverseRows(int level, BaryHelperGraph gTemp) {
+            if (rows.size() > 1) {
+                for (int i = 1; i < rowBary.size(); i++) {
+                    int prev = i - 1;
+                    if (improvementRows(level, i)) {
+                        if (Double.compare(rowBary.get(i), rowBary.get(prev)) == 0) {
+                            Collections.swap(rowBary, i, prev);
+                            Collections.swap(rows, i, prev);
+                        }
+                        calcMatBaryAndCross();
+                        gTemp.setBaryMat(level, this);
+                        gTemp.setLayerInMap(level, rows);
+                        if (level > 1) {
+                            gTemp.getBaryMatOnLevel(level - 1).columns = this.rows;
+                            gTemp.getBaryMatOnLevel(level - 1).calcMatBaryAndCross();
+                        }
+                        gTemp.calcCrossingsTotal();
+                    }
+                }
+            }
+        }
+
+        boolean improvementRows(int level, int i) {
+            BaryHelperGraph gHelp = gTemp.copy();
+            BaryMatrix mHelp = gHelp.getBaryMatOnLevel(level);
+
+            if (Double.compare(mHelp.rowBary.get(i), mHelp.rowBary.get(i - 1)) == 0) {
+                Collections.swap(mHelp.rowBary, i, i - 1);
+                Collections.swap(mHelp.rows, i, i - 1);
+            }
+            mHelp.calcMatBaryAndCross();
+            gHelp.setBaryMat(level, mHelp);
+            gHelp.setLayerInMap(level, mHelp.rows);
+            if (level > 1) {
+                gHelp.getBaryMatOnLevel(level - 1).columns = mHelp.rows;
+                gHelp.getBaryMatOnLevel(level - 1).calcMatBaryAndCross();
+            }
+            gHelp.calcCrossingsTotal();
+            return (gHelp.getCrossingsTotal() < gTemp.getCrossingsTotal());
+        }
+
+        boolean improvementCols(int level, int i) {
+            BaryHelperGraph gHelper = gTemp.copy();
+            BaryMatrix mHelp = gHelper.getBaryMatOnLevel(level);
+
+            if (Double.compare(mHelp.columnBary.get(i), mHelp.columnBary.get(i - 1)) == 0) {
+                Collections.swap(mHelp.columnBary, i, i - 1);
+                Collections.swap(mHelp.columns, i, i - 1);
+            }
+            mHelp.calcMatBaryAndCross();
+            gHelper.setBaryMat(level, mHelp);
+            gHelper.setLayerInMap(level, mHelp.columns);
+            if (level < gHelper.getLayerMap().size() - 1) {
+                gHelper.getBaryMatOnLevel(level + 1).rows = mHelp.columns;
+                gHelper.getBaryMatOnLevel(level + 1).calcMatBaryAndCross();
+            }
+            gHelper.calcCrossingsTotal();
+            return (gHelper.getCrossingsTotal() < gTemp.getCrossingsTotal());
+        }
+
+
+        public void reverseColumns() {
+
+        }
+    }
+}
+*/
