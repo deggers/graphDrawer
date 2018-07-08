@@ -5,6 +5,7 @@ import structure.Graph;
 import structure.GraphNode;
 
 import java.util.*;
+import sun.nio.cs.ext.GB18030;
 
 //@formatter:off
 
@@ -12,6 +13,7 @@ import java.util.*;
 public class AssignHorizontalPosition {
     private static boolean VERBOSE = false;
     private static boolean DEBUG = false;
+    private static int MinimumSeparation = 2;
 
     public static Graph processBK(Graph inputGraph) {
         // step 1 -> verticalAlignment(direction)
@@ -247,9 +249,174 @@ public class AssignHorizontalPosition {
         return null;
     }
     private static Graph        Compaction(Graph graph, String direction) {
-
+        int graphDepth  = graph.getLayerMap().keySet().size();
+        LinkedHashMap<Integer,LinkedList<GraphNode>> layerMap   = graph.getLayerMap();
+        LinkedHashMap<GraphNode, GraphNode> Align = graph.getAlignBlock().get(direction);
+        LinkedHashMap<GraphNode, GraphNode> Root = graph.getRootBlock().get(direction);
+        //initialize -----------------------------------------------------------
+        HashMap<GraphNode, GraphNode> Sink = new HashMap<>();
+        HashMap<GraphNode, Integer> Shift = new HashMap<>();
+        for (GraphNode v : graph.getNodes().values()) {
+            Sink.put(v, v);
+            if (direction.contains("W")) {
+                Shift.put(v, Integer.MAX_VALUE); 
+            } else {
+                Shift.put(v, Integer.MIN_VALUE); 
+            }
+            v.x=-1; //-1 stands for undefined
+        }
+        //Holder for better readability
+        BKHolder holder = new BKHolder(direction, Align, Root, Sink, Shift, layerMap);
+        //root coordinated relative to sink ------------------------------------
+        if (direction.contains("S")){ //top-down
+            for (int layer = 1; layer < graphDepth; layer++){
+                int layerSize   = layerMap.get(layer).size();
+                LinkedList<GraphNode>   layerList = layerMap.get(layer);
+                if (direction.contains("W")) { //links->rechts
+                    for (int k = 0; k < layerSize; k++) {
+                        GraphNode v = layerList.get(k);
+                        if (Root.get(v).equals(v)){
+                            placeBlock(v, holder);
+                        }
+                    }
+                } else { //rechts->links
+                    for (int k = layerSize - 1; k >= 0; k--){
+                        GraphNode v = layerList.get(k);
+                        if (Root.get(v).equals(v)){
+                            placeBlock(v, holder);
+                        }
+                    }
+                }
+            }
+        } else { //bottom-up
+            for (int layer = graphDepth-1; layer >= 0; layer--){ //mögliches problem, Layer 0->depth-1?
+                int layerSize   = layerMap.get(layer).size();
+                LinkedList<GraphNode>   layerList = layerMap.get(layer);
+                if (direction.contains("W")) { //links->rechts
+                    for (int k = 0; k < layerSize; k++) {
+                        GraphNode v = layerList.get(k);
+                        if (Root.get(v).equals(v)){
+                            placeBlock(v, holder);
+                        }
+                    }
+                } else { //rechts->links
+                    for (int k = layerSize - 1; k >= 0; k--){
+                        GraphNode v = layerList.get(k);
+                        if (Root.get(v).equals(v)){
+                            placeBlock(v, holder);
+                        }
+                    }
+                }
+        }
+        //absolute coordinates -------------------------------------------------
+        if (direction.contains("S")){ //top-down
+            for (int layer = 1; layer < graphDepth; layer++){
+                int layerSize   = layerMap.get(layer).size();
+                LinkedList<GraphNode>   layerList = layerMap.get(layer);
+                if (direction.contains("W")) { //links->rechts
+                    for (int k = 0; k < layerSize; k++) {
+                        GraphNode v = layerList.get(k);
+                        v.x = Root.get(v).x;
+                        if (v.equals(Root.get(v)) && Shift.get(Sink.get(v))<Integer.MAX_VALUE){ //nach Erratum von Brandes
+                            v.x = v.x + Shift.get(Sink.get(v));
+                        }
+                    }
+                } else { //rechts->links
+                    for (int k = layerSize - 1; k >= 0; k--){
+                        GraphNode v = layerList.get(k);
+                        v.x = Root.get(v).x;
+                        if (v.equals(Root.get(v)) && Shift.get(Sink.get(v))>Integer.MIN_VALUE){ 
+                            v.x = v.x + Shift.get(Sink.get(v));
+                        }
+                    }
+                }
+            }
+        } else { //bottom-up
+            for (int layer = graphDepth-1; layer >= 0; layer--){ //mögliches problem, Layer 0->depth-1?
+                int layerSize   = layerMap.get(layer).size();
+                LinkedList<GraphNode>   layerList = layerMap.get(layer);
+                if (direction.contains("W")) { //links->rechts
+                    for (int k = 0; k < layerSize; k++) {
+                        GraphNode v = layerList.get(k);
+                        v.x = Root.get(v).x;
+                        if (v.equals(Root.get(v)) && Shift.get(Sink.get(v))<Integer.MAX_VALUE){ //nach Erratum von Brandes
+                            v.x = v.x + Shift.get(Sink.get(v));
+                        }
+                    }
+                } else { //rechts->links
+                    for (int k = layerSize - 1; k >= 0; k--){
+                        GraphNode v = layerList.get(k);
+                        v.x = Root.get(v).x;
+                        if (v.equals(Root.get(v)) && Shift.get(Sink.get(v))>Integer.MIN_VALUE){ 
+                            v.x = v.x + Shift.get(Sink.get(v));
+                        }
+                    }
+                }
+        }
         return graph;
     }
+    
+    private static class BKHolder {
+        final LinkedHashMap<GraphNode, GraphNode> Align;
+        final LinkedHashMap<GraphNode, GraphNode> Root;
+        final HashMap<GraphNode, GraphNode> Sink;
+        final HashMap<GraphNode, Integer> Shift;
+        final LinkedHashMap<Integer,LinkedList<GraphNode>> layerMap;
+        final String direction;
+        
+        private BKHolder (String direction, LinkedHashMap<GraphNode, GraphNode> Align,LinkedHashMap<GraphNode, GraphNode> Root, HashMap<GraphNode, GraphNode> Sink, HashMap<GraphNode, Integer> Shift, LinkedHashMap<Integer,LinkedList<GraphNode>> layerMap){
+            this.Align = Align;
+            this.Root = Root;
+            this.Sink = Sink;
+            this.Shift = Shift;
+            this.layerMap = layerMap;
+            this.direction = direction;
+        }
+    }
+    
+    private static void         placeBlock(GraphNode v, BKHolder holder){
+        if (v.x==-1){ //undefined
+            v.x=0;
+            GraphNode w = v;
+            do {
+                boolean test;
+                if (holder.direction.contains("W")) { //links->rechts
+                    test = holder.layerMap.get(w.getLayer()).getFirst()!=w; //hope this works
+                } else {
+                    test = holder.layerMap.get(w.getLayer()).getLast()!=w;
+                }
+                if(test){
+                    GraphNode u;
+                    if (holder.direction.contains("W")) { //links->rechts
+                        int pos = holder.layerMap.get(w.getLayer()).indexOf(w);
+                        u = holder.Root.get(holder.layerMap.get(w.getLayer()).get(pos-1)); //Vorgänger -> auf layer
+                    } else {
+                        int pos = holder.layerMap.get(w.getLayer()).indexOf(w);
+                        u = holder.Root.get(holder.layerMap.get(w.getLayer()).get(pos+1)); //Nachfolger -> auf layer
+                    }
+                    placeBlock(u, holder);
+                    if (holder.Sink.get(v).equals(v)) {
+                        holder.Sink.put(v, holder.Sink.get(u));
+                    }
+                    if (holder.Sink.get(v).equals(holder.Sink.get(u))) {
+                        if (holder.direction.contains("W")) {
+                            v.x=Integer.max((int)v.x, (int)u.x+MinimumSeparation);
+                        } else {
+                            v.x=Integer.min((int)v.x, (int)u.x-MinimumSeparation);
+                        }
+                    } else{ //aufpassen mit cast double->int
+                        if (holder.direction.contains("W")) {
+                            holder.Shift.put(holder.Sink.get(u),Integer.min(holder.Shift.get(holder.Sink.get(u)), (int)v.x-(int)u.x-MinimumSeparation));
+                        } else {
+                            holder.Shift.put(holder.Sink.get(u),Integer.max(holder.Shift.get(holder.Sink.get(u)), (int)v.x+(int)u.x+MinimumSeparation));
+                        }                     
+                    }                    
+                }
+                w = holder.Align.get(w);
+            } while(!w.equals(v));
+        }
+    }
+    
     private static void         Balancing(Graph graphNW, Graph graphNE, Graph graphSW, Graph graphSE) {
         // Balance for all Graphs
     }
