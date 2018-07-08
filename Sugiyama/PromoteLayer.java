@@ -9,35 +9,46 @@ import java.util.LinkedList;
 
 public class PromoteLayer {
     private LinkedList<HelperNode> layering = new LinkedList<>();
-    private LinkedList<HelperNode> layeringBackUp = new LinkedList<>();
+    private LinkedList<HelperNode> layeringBackUp;
+    int counter = 0;
 
     public static void promoteLayerAlgo(Graph graph) {
         PromoteLayer p = new PromoteLayer(graph);
     }
 
-    public PromoteLayer(Graph graph) {
+    private PromoteLayer(Graph graph) {
 
         fillLayering(graph);
         layeringBackUp = copyLayering(layering);
 
+
         plAlgorithm();
 
         LinkedHashMap<Integer, LinkedList<GraphNode>> layersAndNodesNew = new LinkedHashMap<>();
-
         for (HelperNode helperNode : layering) {
-            LinkedList<GraphNode> tempList = layersAndNodesNew.get(helperNode.layer);
-            tempList.add(helperNode.reference);
-            layersAndNodesNew.put(helperNode.layer, tempList);
+            if (layersAndNodesNew.containsKey(helperNode.layer)) {
+                layersAndNodesNew.get(helperNode.layer).add(helperNode.reference);
+            }
+            else if(!layersAndNodesNew.containsKey(helperNode.layer)){
+                LinkedList<GraphNode> temp= new LinkedList<>();
+                temp.add(helperNode.reference);
+                layersAndNodesNew.put(helperNode.layer, temp);
+            }
+        }
+        for (Integer integer : layersAndNodesNew.keySet()) {
+            //System.out.println("integer = " + integer);
+            for (GraphNode graphNode : layersAndNodesNew.get(integer)) {
+              //  System.out.println("graphNode = " + graphNode);
+            }
         }
 
         graph.setLayerMap(layersAndNodesNew);
     }
 
-    public void fillLayering(Graph graph) {
+    private void fillLayering(Graph graph) {
         for (Integer integer : graph.getLayerMap().keySet()) {
             for (GraphNode g : graph.getLayerMap().get(integer)) {
                 HelperNode temp = new HelperNode(g);
-                layering.add(temp);
 
                 // pretendeing that all edges go from top to bottom, immer checken ob schon contains damit keine duplikate?
                 for (Edge edge : graph.getEdges()) {
@@ -73,6 +84,7 @@ public class PromoteLayer {
                         }
                     }
                 }
+                layering.add(temp);
             }
         }
         for (HelperNode h : layering) {
@@ -80,64 +92,63 @@ public class PromoteLayer {
         }
     }
 
-    public void plAlgorithm() {
+    private void plAlgorithm() {
         int promotions;
         do {
             promotions = 0;
+            counter++;
             for (HelperNode helperNode : layering) {
                 if (helperNode.inDegree > 0) {                // if d- von v   >0
                     if (promoteNode(helperNode) < 0) {         //if PromoteNode(v) < 0 then
                         promotions++;
                         //muss das zuerst gecleart werden oder hinfällig?
-                        layeringBackUp.clear();
                         layeringBackUp = copyLayering(layering);
                     } else {
-                        layering.clear();
                         layering = copyLayering(layeringBackUp);
                     }
                 }
             }
-        } while (promotions != 0);
+        } while (counter < 100);//(promotions != 0);
     }
 
 
     // evtl kompikationen, da hier graphen von unten nach oben, nicht von oben nach unten?
-    public int promoteNode(HelperNode v) {
+    private int promoteNode(HelperNode v) {
         v.dummyDiff = 0;
         for (HelperNode u : v.predecessors) {
             if (u.layer == (v.layer - 1)) {                     //eigentlich +1
                 v.dummyDiff += promoteNode(u);
-            }
+
             v.layer -= 1;                                       // eigentlich +1
             v.dummyDiff = v.dummyDiff - v.predecessors.size() + v.successors.size();
-        }
+        } }
         return v.dummyDiff;
     }
 
-    public LinkedList<HelperNode> copyLayering(LinkedList<HelperNode> layering) {
+    private LinkedList<HelperNode> copyLayering(LinkedList<HelperNode> layering) {
         LinkedList<HelperNode> copy = new LinkedList<>(layering);
+
         return copy;
     }
 
     // level beginnenn bei uns bei 1 nicht bei 0
     // aufpassen wenn suc / pre erstellen-- pre liegen drüber- level-1, suc drunter lev+1
-    // wie sind graphnodes eindeutig referenzierbar? über label und nodetype?
     public class HelperNode {
-        GraphNode reference;
+        public GraphNode reference;
         int layer;
-        boolean isDummyNode = false;
+        boolean isDummyNode;
         LinkedList<HelperNode> successors = new LinkedList<>();  //successors immediate successors,
         LinkedList<HelperNode> predecessors = new LinkedList<>();  // predecessors immediate predecessors : u1, u2...up1 ein layer drüber---vorgänger
         int inDegree = 0, outDegree = 0;
         int dummyDiff = 0;
 
-        public HelperNode(GraphNode node) {
+        HelperNode(GraphNode node) {
             this.reference = node;
             this.isDummyNode = node.isDummy();
             this.layer = node.getLayer();
         }
 
-        public int calcDummyDiff(HelperNode helperNode) {
+        int calcDummyDiff(HelperNode helperNode) {
             int sum = (helperNode.successors.size() - helperNode.predecessors.size());
 
             for (int i = 0; i < helperNode.predecessors.size(); i++) {
