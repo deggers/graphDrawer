@@ -51,7 +51,7 @@ public class Sugiyama {
             default                     : System.out.println(" mistake in AssignlayerSugyi"); break;
         }
 
-        PromoteLayer.promoteLayerAlgo(partialGraph);
+        //PromoteLayer.promoteLayerAlgo(partialGraph);
 
         System.out.println("Crossing Minimization");
         String  inputParams1    = GUIController.getInstance().getInputParams_1();
