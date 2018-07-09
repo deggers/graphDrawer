@@ -23,13 +23,13 @@ public class AssignHorizontalPosition {
         upward and downward alignment with leftmost and rightmost conflict resolution. */
 
         MarkTypeOneConflicts(inputGraph);
-//        verticalAlignment(inputGraph,"NW");
-//        verticalAlignment(inputGraph,"NE");
+        verticalAlignment(inputGraph,"NW");
+        verticalAlignment(inputGraph,"NE");
         verticalAlignment(inputGraph,"SW");
-//        verticalAlignment(inputGraph,"SE");
+        verticalAlignment(inputGraph,"SE");
 
         // step 2 -> Compaction(direction)
-//            graphSW = Compaction(graphSW, "SW");
+        inputGraph = Compaction(inputGraph, "NW");
 //        graphNW = Compaction(graphNW, "NW");
 //        graphNE = Compaction(graphNE, "NE");
 //        graphSE = Compaction(graphSE, "SE");
@@ -39,7 +39,7 @@ public class AssignHorizontalPosition {
         return inputGraph;
     }
 
-    private static void MarkTypeOneConflicts(Graph graph) {
+    private static void                     MarkTypeOneConflicts(Graph graph) {
         int graphDepth = graph.getLayerMap().keySet().size();
         if (VERBOSE) System.out.println("graphDepth = " + graphDepth);
         for (int layer1_int = 2; layer1_int < graphDepth; layer1_int++) {
@@ -65,8 +65,7 @@ public class AssignHorizontalPosition {
             }
             }
     }
-
-    private static void     verticalAlignment(Graph graph, String direction){
+    private static void                     verticalAlignment(Graph graph, String direction){
         LinkedHashMap<Integer,LinkedList<GraphNode>> layerMap   = graph.getLayerMap();
         LinkedHashMap<GraphNode,GraphNode> rootMap              = new LinkedHashMap<>();
         LinkedHashMap<GraphNode,GraphNode> alignMap             = new LinkedHashMap<>();
@@ -105,7 +104,7 @@ public class AssignHorizontalPosition {
                         if (VERBOSE & DEBUG) System.out.println("\nvk_i = " + vk_i);
                         ArrayList<GraphNode> neighbors  = getNeighbors(graph, vk_i,"predecessor");
                         LinkedList<GraphNode> layerAbove = graph.getLayerMap().get(layer + 1);
-                        System.out.println("neighbors = " + neighbors);
+                        if (VERBOSE & DEBUG) System.out.println("neighbors = " + neighbors);
                         if (neighbors != null) {
                             for (GraphNode neighbor_m : getUpperAndLowerMedian(neighbors, true))
                                 if (alignMap.get(vk_i) == vk_i){                                             // Zeile 14
@@ -203,12 +202,10 @@ public class AssignHorizontalPosition {
         graph.setRootBlock(direction,rootMap);
         graph.setAlignBlock(direction,alignMap);
     }
-
-    private static GraphNode nextNode(GraphNode key, LinkedHashMap<GraphNode,GraphNode> alignMap){
+    private static GraphNode                nextNode(GraphNode key, LinkedHashMap<GraphNode,GraphNode> alignMap){
         return alignMap.get(key);
     }
-
-    private static GraphNode findRoot(GraphNode key, LinkedHashMap<GraphNode,GraphNode> alignMap) {
+    private static GraphNode                findRoot(GraphNode key, LinkedHashMap<GraphNode,GraphNode> alignMap) {
         GraphNode value = alignMap.get(key);
         while (!value.equals(key)){
             key = findRoot(alignMap.get(key),alignMap);
@@ -216,11 +213,10 @@ public class AssignHorizontalPosition {
         }
         return key;
     }
-
-    private static boolean  isLastNode(LinkedList<GraphNode> nodesLayer, GraphNode node){
+    private static boolean                  isLastNode(LinkedList<GraphNode> nodesLayer, GraphNode node){
         return node == nodesLayer.getLast();
     }
-    private static ArrayList<GraphNode>    getUpperAndLowerMedian(ArrayList<GraphNode> neighbors, boolean rightToLeft){
+    private static ArrayList<GraphNode>     getUpperAndLowerMedian(ArrayList<GraphNode> neighbors, boolean rightToLeft){
         if (neighbors.size() == 1) return new ArrayList<>(Arrays.asList(neighbors.get(0),neighbors.get(0)));
         double d = neighbors.size();
         int upper = (int) Math.ceil(  (d+1)/2) -1;
@@ -229,17 +225,13 @@ public class AssignHorizontalPosition {
         if (rightToLeft) return new ArrayList<>(Arrays.asList(neighbors.get(upper), neighbors.get(lower)));
         else return new ArrayList<>(Arrays.asList(neighbors.get(lower),neighbors.get(upper)));
     }
-
-
-    private static boolean incidentToInnerSegment(Graph g, GraphNode u, int onLayer){
+    private static boolean                  incidentToInnerSegment(Graph g, GraphNode u, int onLayer){
         if (u.isDummy()) {
             ArrayList<GraphNode> neighbors = g.getAdjacentNodes(u, onLayer);
             for (GraphNode node : neighbors) if (node.isDummy()) return true;}
         return false;
     }
-
-    // coild probably much more easier, if inner segment, incident node must be unique ..
-    private static GraphNode    getUpperNodeFromInnerSegment(Graph g, GraphNode u, int layer_int){
+    private static GraphNode                getUpperNodeFromInnerSegment(Graph g, GraphNode u, int layer_int){
         ArrayList<GraphNode> neighbors = g.getAdjacentNodes(u, layer_int);
         for (GraphNode node : neighbors)
             if (node.isDummy()) {
@@ -248,25 +240,26 @@ public class AssignHorizontalPosition {
             }
         return null;
     }
+
     private static Graph        Compaction(Graph graph, String direction) {
         int graphDepth  = graph.getLayerMap().keySet().size();
         LinkedHashMap<Integer,LinkedList<GraphNode>> layerMap   = graph.getLayerMap();
-        LinkedHashMap<GraphNode, GraphNode> Align = graph.getAlignBlock().get(direction);
-        LinkedHashMap<GraphNode, GraphNode> Root = graph.getRootBlock().get(direction);
+        LinkedHashMap<GraphNode, GraphNode> alignMap = graph.getAlignBlock().get(direction);
+        LinkedHashMap<GraphNode, GraphNode> rootMap = graph.getRootBlock().get(direction);
         //initialize -----------------------------------------------------------
-        HashMap<GraphNode, GraphNode> Sink = new HashMap<>();
-        HashMap<GraphNode, Integer> Shift = new HashMap<>();
+        HashMap<GraphNode, GraphNode> sinkMap = new HashMap<>();
+        HashMap<GraphNode, Integer> shiftMap = new HashMap<>();
         for (GraphNode v : graph.getNodes().values()) {
-            Sink.put(v, v);
+            sinkMap.put(v,v);
             if (direction.contains("W")) {
-                Shift.put(v, Integer.MAX_VALUE); 
+                shiftMap.put(v, Integer.MAX_VALUE);
             } else {
-                Shift.put(v, Integer.MIN_VALUE); 
+                shiftMap.put(v, Integer.MIN_VALUE);
             }
-            v.x=-1; //-1 stands for undefined
+            v.x = -1; //-1 stands for undefined
         }
         //Holder for better readability
-        BKHolder holder = new BKHolder(direction, Align, Root, Sink, Shift, layerMap);
+        BKHolder holder = new BKHolder(direction, alignMap, rootMap, sinkMap, shiftMap, layerMap);
         //root coordinated relative to sink ------------------------------------
         if (direction.contains("S")){ //top-down
             for (int layer = 1; layer < graphDepth; layer++){
@@ -275,34 +268,34 @@ public class AssignHorizontalPosition {
                 if (direction.contains("W")) { //links->rechts
                     for (int k = 0; k < layerSize; k++) {
                         GraphNode v = layerList.get(k);
-                        if (Root.get(v).equals(v)){
+                        if (rootMap.get(v).equals(v)){
                             placeBlock(v, holder);
                         }
                     }
                 } else { //rechts->links
                     for (int k = layerSize - 1; k >= 0; k--){
                         GraphNode v = layerList.get(k);
-                        if (Root.get(v).equals(v)){
+                        if (rootMap.get(v).equals(v)){
                             placeBlock(v, holder);
                         }
                     }
                 }
             }
         } else { //bottom-up
-            for (int layer = graphDepth-1; layer >= 0; layer--){ //mögliches problem, Layer 0->depth-1?
+            for (int layer = graphDepth; layer > 0; layer--){ //mögliches problem, Layer 0->depth-1?
                 int layerSize   = layerMap.get(layer).size();
                 LinkedList<GraphNode>   layerList = layerMap.get(layer);
                 if (direction.contains("W")) { //links->rechts
                     for (int k = 0; k < layerSize; k++) {
                         GraphNode v = layerList.get(k);
-                        if (Root.get(v).equals(v)){
+                        if (rootMap.get(v).equals(v)){
                             placeBlock(v, holder);
                         }
                     }
                 } else { //rechts->links
                     for (int k = layerSize - 1; k >= 0; k--){
                         GraphNode v = layerList.get(k);
-                        if (Root.get(v).equals(v)){
+                        if (rootMap.get(v).equals(v)){
                             placeBlock(v, holder);
                         }
                     }
@@ -316,66 +309,56 @@ public class AssignHorizontalPosition {
                 if (direction.contains("W")) { //links->rechts
                     for (int k = 0; k < layerSize; k++) {
                         GraphNode v = layerList.get(k);
-                        v.x = Root.get(v).x;
-                        if (v.equals(Root.get(v)) && Shift.get(Sink.get(v))<Integer.MAX_VALUE){ //nach Erratum von Brandes
-                            v.x = v.x + Shift.get(Sink.get(v));
+                        v.x = rootMap.get(v).x;
+                        if (v.equals(rootMap.get(v)) && shiftMap.get(sinkMap.get(v))<Integer.MAX_VALUE){ //nach Erratum von Brandes
+                            v.x = v.x + shiftMap.get(sinkMap.get(v));
                         }
                     }
                 } else { //rechts->links
                     for (int k = layerSize - 1; k >= 0; k--){
                         GraphNode v = layerList.get(k);
-                        v.x = Root.get(v).x;
-                        if (v.equals(Root.get(v)) && Shift.get(Sink.get(v))>Integer.MIN_VALUE){ 
-                            v.x = v.x + Shift.get(Sink.get(v));
+                        v.x = rootMap.get(v).x;
+                        if (v.equals(rootMap.get(v)) && shiftMap.get(sinkMap.get(v))>Integer.MIN_VALUE){
+                            v.x = v.x + shiftMap.get(sinkMap.get(v));
                         }
                     }
                 }
             }
         } else { //bottom-up
-            for (int layer = graphDepth-1; layer >= 0; layer--){ //mögliches problem, Layer 0->depth-1?
+            for (int layer = graphDepth; layer > 0; layer--){ //mögliches problem, Layer 0->depth-1?
                 int layerSize   = layerMap.get(layer).size();
                 LinkedList<GraphNode>   layerList = layerMap.get(layer);
                 if (direction.contains("W")) { //links->rechts
                     for (int k = 0; k < layerSize; k++) {
                         GraphNode v = layerList.get(k);
-                        v.x = Root.get(v).x;
-                        if (v.equals(Root.get(v)) && Shift.get(Sink.get(v))<Integer.MAX_VALUE){ //nach Erratum von Brandes
-                            v.x = v.x + Shift.get(Sink.get(v));
+                        v.x = rootMap.get(v).x;
+                        if (v.equals(rootMap.get(v)) && shiftMap.get(sinkMap.get(v))<Integer.MAX_VALUE){ //nach Erratum von Brandes
+                            v.x = v.x + shiftMap.get(sinkMap.get(v));
                         }
                     }
                 } else { //rechts->links
                     for (int k = layerSize - 1; k >= 0; k--){
                         GraphNode v = layerList.get(k);
-                        v.x = Root.get(v).x;
-                        if (v.equals(Root.get(v)) && Shift.get(Sink.get(v))>Integer.MIN_VALUE){ 
-                            v.x = v.x + Shift.get(Sink.get(v));
+                        v.x = rootMap.get(v).x;
+                        if (v.equals(rootMap.get(v)) && shiftMap.get(sinkMap.get(v))>Integer.MIN_VALUE){
+                            v.x = v.x + shiftMap.get(sinkMap.get(v));
                         }
                     }
                 }
         }
+
+        for (GraphNode node : graph.getNodes().values())
+                node.y = node.getLayer();
         return graph;
     }
-    
-    private static class BKHolder {
-        final LinkedHashMap<GraphNode, GraphNode> Align;
-        final LinkedHashMap<GraphNode, GraphNode> Root;
-        final HashMap<GraphNode, GraphNode> Sink;
-        final HashMap<GraphNode, Integer> Shift;
-        final LinkedHashMap<Integer,LinkedList<GraphNode>> layerMap;
-        final String direction;
-        
-        private BKHolder (String direction, LinkedHashMap<GraphNode, GraphNode> Align,LinkedHashMap<GraphNode, GraphNode> Root, HashMap<GraphNode, GraphNode> Sink, HashMap<GraphNode, Integer> Shift, LinkedHashMap<Integer,LinkedList<GraphNode>> layerMap){
-            this.Align = Align;
-            this.Root = Root;
-            this.Sink = Sink;
-            this.Shift = Shift;
-            this.layerMap = layerMap;
-            this.direction = direction;
-        }
     }
+    return null;
+    }
+
+
     
     private static void         placeBlock(GraphNode v, BKHolder holder){
-        if (v.x==-1){ //undefined
+        if (v.x == -1){ //undefined
             v.x=0;
             GraphNode w = v;
             do {
@@ -446,4 +429,24 @@ public class AssignHorizontalPosition {
             return g.getAdjacentNodes(node,layer);
         return null;
     }
+
+    private static class BKHolder {
+        final LinkedHashMap<GraphNode, GraphNode> Align;
+        final LinkedHashMap<GraphNode, GraphNode> Root;
+        final HashMap<GraphNode, GraphNode> Sink;
+        final HashMap<GraphNode, Integer> Shift;
+        final LinkedHashMap<Integer,LinkedList<GraphNode>> layerMap;
+        final String direction;
+
+        private BKHolder (String direction, LinkedHashMap<GraphNode, GraphNode> Align,LinkedHashMap<GraphNode, GraphNode> Root, HashMap<GraphNode, GraphNode> Sink, HashMap<GraphNode, Integer> Shift, LinkedHashMap<Integer,LinkedList<GraphNode>> layerMap){
+            this.Align = Align;
+            this.Root = Root;
+            this.Sink = Sink;
+            this.Shift = Shift;
+            this.layerMap = layerMap;
+            this.direction = direction;
+        }
+    }
 }
+
+
