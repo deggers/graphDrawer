@@ -140,7 +140,7 @@ public class Main extends Application {
 
 //        System.out.println("myGraph = " + myGraph.getAlignBlock());
 //        System.out.println("my = " + myGraph.getRootBlock());
-        AssignHorizontalPosition.processBK(myGraph);
+//        AssignHorizontalPosition.processBK(myGraph);
 
         PaneController.getInstance().drawDAG(myGraph);
    launch(args);
