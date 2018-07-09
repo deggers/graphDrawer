@@ -83,23 +83,25 @@ public class PaneController {
     // DRAWFUNCTIONS
 
     public void drawDAG(Graph graph) {
+        int depth = graph.getLayerMap().keySet().size();
         drawDAGEdges(graph,8);
-        drawDAGNodes(graph);
+        drawDAGNodes(graph,depth);
     }
 
     private void drawDAGEdges(Graph graph, int ports){
-        graph.getEdges().forEach(edge -> pane.getChildren().add(new Connector(edge,ports)));
+        int depth = graph.getLayerMap().keySet().size();
+        graph.getEdges().forEach(edge -> pane.getChildren().add(new Connector(edge,ports,depth)));
     }
 
-    private void drawDAGNodes(Graph graph){
+    private void drawDAGNodes(Graph graph, int depth){
         for (GraphNode node: graph.getNodes().values()){
-            pane.getChildren().add(createGraphNode(node,"DAG"));
+            pane.getChildren().add(createGraphNode(node,"DAG",depth));
             }
     }
 
-    private Circle createGraphNode(GraphNode node, String type){
+    private Circle createGraphNode(GraphNode node, String type, int depth){
         Circle circle;
-        circle = new Circle(scaleGraphNode(node.x), scaleGraphNode(node.y), getNodeSize());
+        circle = new Circle(scaleGraphNodeX(node.x), scaleGraphNodeY(node.y, depth), getNodeSize());
         circle.setStroke(Color.BLACK);
         circle.setStrokeWidth(2);
         circle.setFill(Color.TRANSPARENT);
@@ -109,9 +111,14 @@ public class PaneController {
         if (node.isDummy()) circle.setStroke(Color.TRANSPARENT);
         return circle;
     }
-    public double scaleGraphNode(double number){
-        return (number * 3 * getNodeSize()) + OFFSET;
-//    return number;
+    public double scaleGraphNodeX(double number){
+        return (number * 3 * getNodeSize()) + OFFSET + getNodeSize();
+    }
+
+    public double scaleGraphNodeY(double number, int depth){
+        double height = scrollPane.getHeight();
+        double sep = height / depth;
+        return (sep * number)-100;
     }
 
 
