@@ -68,7 +68,7 @@ public class Bary {
                 }
             }
         }
-        if (stillProcessing && count < 101) {
+        if (stillProcessing && count < 3) {
             if (start < end) {                             // i am in p1 down
                 SugiyamaPhase2Sweep(start, end, step);  // goto p2 down
             }
@@ -91,7 +91,7 @@ public class Bary {
             }
         }
 
-        if (count < 101) {
+        if (count < 3) {
             SugiyamaPhase1Sweep(end, start, step * -1);
         }
     }

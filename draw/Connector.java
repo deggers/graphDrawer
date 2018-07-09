@@ -23,7 +23,7 @@ public class Connector extends Path {
     private static final Color defaultConnectorColor = Color.BLACK;
     private static final Color defaultReversedEdgeColor = Color.DARKGRAY;
 
-    public Connector(Edge edge, int ports) {
+    public Connector(Edge edge, int ports, int depth) {
         super();
         strokeProperty().bind(fillProperty());
         if (edge.isReversed()) setFill(defaultReversedEdgeColor);
@@ -35,37 +35,37 @@ public class Connector extends Path {
         double angle = Math.abs(Math.toDegrees(Math.atan2((targetNode.y - startNode.y), (targetNode.x - startNode.x)) - Math.PI / 2));
         double RealAngle = Math.toDegrees(Math.atan2((targetNode.y - startNode.y), (targetNode.x - startNode.x)) - Math.PI / 2.0);
         if (VERBOSE) System.out.println("Edge " + edge + " coming with degree: " + RealAngle);
-        if (ports == 8) connectWith8Ports(edge, RealAngle);
+        if (ports == 8) connectWith8Ports(edge, RealAngle,depth);
     }
 
-    private void connectWith8Ports(Edge edge, double angle) {
+    private void connectWith8Ports(Edge edge, double angle, int depth) {
 
         if (degreeBetween(330, 360, Math.abs(angle)) || degreeBetween(0, 30, Math.abs(angle)))
-            createLineWithAnchor(edge, 0.0);
+            createLineWithAnchor(edge, 0.0, depth);
 
         else if (degreeBetween(30, 60, Math.abs(angle)))
-            if (angle < 0)  createLineWithAnchor(edge, 45);
-            else            createLineWithAnchor(edge, 315);
+            if (angle < 0)  createLineWithAnchor(edge, 45,depth);
+            else            createLineWithAnchor(edge, 315,depth);
 
         else if (degreeBetween(60, 120, Math.abs(angle)))
-            if (angle < 0) createLineWithAnchor(edge, 90);
-            else createLineWithAnchor(edge, 270);
+            if (angle < 0) createLineWithAnchor(edge, 90,depth);
+            else createLineWithAnchor(edge, 270,depth);
         else {
             System.out.println("could'nt connect.. in Connector.java");
-            createLineWithAnchor(edge, 0);
+            createLineWithAnchor(edge, 0,depth);
         }
     }
 
-    private void createLineWithAnchor(Edge edge, double anchorAngle) {
+    private void createLineWithAnchor(Edge edge, double anchorAngle, int depth) {
         GraphNode startNode = edge.getStart();
         GraphNode targetNode = edge.getTarget();
         if (edge.isReversed()) startNode = edge.getTarget();
         if (edge.isReversed()) targetNode = edge.getStart();
         PaneController paneController = Objects.requireNonNull(PaneController.getInstance());
-        double startX = paneController.scaleGraphNode(startNode.x);
-        double startY = paneController.scaleGraphNode(startNode.y);
-        double targetX = paneController.scaleGraphNode(targetNode.x);
-        double targetY = paneController.scaleGraphNode(targetNode.y);
+        double startX = paneController.scaleGraphNodeX(startNode.x);
+        double startY = paneController.scaleGraphNodeY(startNode.y, depth);
+        double targetX = paneController.scaleGraphNodeX(targetNode.x);
+        double targetY = paneController.scaleGraphNodeY(targetNode.y, depth);
         double endX, endY;
         double radius = Objects.requireNonNull(GUIController.getInstance()).getNodeSize();
 

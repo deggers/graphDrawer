@@ -48,7 +48,7 @@ public class Main extends Application {
 //        Edge e6 = new Edge(node6,d3);       myGraph.addEdge(e6);
 //        Edge e7 = new Edge(d7,node3);       myGraph.addEdge(e7);
 //        Edge e8 = new Edge(d4,node3);       myGraph.addEdge(e8);
-
+//
 //        LinkedHashMap<Integer,LinkedList<GraphNode>> myModifiedLayerMap = new LinkedHashMap<>();
 //        LinkedList<GraphNode> layer1 = new LinkedList<>(Arrays.asList(node1,node2,d1,d2,d3,node3));
 //        LinkedList<GraphNode> layer2 = new LinkedList<>(Arrays.asList(node4,node5,d4,d5,d6,node6,d7));
@@ -137,13 +137,13 @@ public class Main extends Application {
         myModifiedLayerMap.put(5,layer5);
         myGraph.setLayerMap(myModifiedLayerMap);
 
-
+        AssignHorizontalPosition.processBK(myGraph);
 //        System.out.println("myGraph = " + myGraph.getAlignBlock());
 //        System.out.println("my = " + myGraph.getRootBlock());
-//        AssignHorizontalPosition.processBK(myGraph);
+
 
         PaneController.getInstance().drawDAG(myGraph);
-   launch(args);
+        launch(args);
 
    }
 
