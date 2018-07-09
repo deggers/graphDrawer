@@ -13,7 +13,7 @@ public class Sugiyama {
     public static Graph processGraph(Graph theGraph) {
         boolean bidirectional;
         int sweeps;
-
+// comment
         if (VERBOSE) System.out.println("Graph: \n Nodes: " + theGraph.getNodes().size() + ", Edges: " + theGraph.getEdges().size());
         String selectedEdgeType = Objects.requireNonNull(GUIController.getInstance()).getSelectedEdgeType();
         partialGraph = theGraph.copyWithRestrains(selectedEdgeType);
