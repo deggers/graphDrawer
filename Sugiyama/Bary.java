@@ -12,11 +12,11 @@ public class Bary {
     private Map<GraphNode, LinkedList<GraphNode>> nodesAreConnected = new HashMap<>();
     private int count = 0;
 
-    public static void barycenterAlgo(Graph graph) {
-        Bary b = new Bary(graph);
+    public static void barycenterAlgo(Graph graph, int sweeps) {
+        Bary b = new Bary(graph, sweeps);
     }
 
-    public Bary(Graph graph) {
+    public Bary(Graph graph, int sweeps) {
         nodesConnected(graph);
         g0.setLayerMap(graph.getLayerMap());
 
@@ -29,7 +29,7 @@ public class Bary {
         g0.calcCrossingsTotal();
         gTemp = g0.copy();
 
-        SugiyamaPhase1Sweep(1, g0.getLayerMap().size(), 1);         //layer beginnen bei 1
+        SugiyamaPhase1Sweep(1, g0.getLayerMap().size(), 1, sweeps);         //layer beginnen bei 1
 
         int graphDepth = gTemp.getLayerMap().size();
         for (int level = 1; level < graphDepth; level++) {    // zb lm size 6, geht von 1-5
@@ -50,7 +50,7 @@ public class Bary {
 
 
     // Down col : 1 bis n-1, Up row: n-1 bis 1
-    private void SugiyamaPhase1Sweep(int start, int end, int step) {
+    private void SugiyamaPhase1Sweep(int start, int end, int step, int sweeps) {
         boolean stillProcessing = false;
         count++;
 
@@ -68,19 +68,19 @@ public class Bary {
                 }
             }
         }
-        if (stillProcessing && count < 3) {
+        if (stillProcessing && count < sweeps) {
             if (start < end) {                             // i am in p1 down
-                SugiyamaPhase2Sweep(start, end, step);  // goto p2 down
+                SugiyamaPhase2Sweep(start, end, step, sweeps);  // goto p2 down
             }
             if (start > end) {                            // i am in p1 up
-                SugiyamaPhase1Sweep(end, start, step * -1);   // goto p1 down
+                SugiyamaPhase1Sweep(end, start, step * -1, sweeps);   // goto p1 down
             }
         }
     }
 
 
-    private void SugiyamaPhase2Sweep(int start, int end, int step) {
-        for (int i = start; i != end; i += step) {
+    private void SugiyamaPhase2Sweep(int start, int end, int step, int sweeps) {
+  /*      for (int i = start; i != end; i += step) {
             if (i < gTemp.getLayerMap().size()) {
                 gTemp.getBaryMatOnLevel(i).reverseRows(i);
             }
@@ -89,10 +89,10 @@ public class Bary {
             if (i < gTemp.getLayerMap().size()) {
                 gTemp.getBaryMatOnLevel(i).reverseColumns(i);
             }
-        }
+        }*/
 
-        if (count < 3) {
-            SugiyamaPhase1Sweep(end, start, step * -1);
+        if (count < sweeps) {
+            SugiyamaPhase1Sweep(end, start, step * -1, sweeps);
         }
     }
 

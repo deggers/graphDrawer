@@ -51,7 +51,8 @@ public class Sugiyama {
             default                     : System.out.println(" mistake in AssignlayerSugyi"); break;
         }
 
-        //PromoteLayer.promoteLayerAlgo(partialGraph);
+       /* PromoteLayer.promoteLayerAlgo(partialGraph);
+        partialGraph.addDummies();*/
 
         System.out.println("Crossing Minimization");
         String  inputParams1    = GUIController.getInstance().getInputParams_1();
@@ -66,7 +67,7 @@ public class Sugiyama {
         switch (GUIController.getInstance().getSelectedCrossingMinAlgo()) {
             case "Permutation"  :   CrossingMin.allPermutation(partialGraph, bidirectional,sweeps); break;
             case "BaryCenter_naive" : CrossingMin.baryCenter_naive(partialGraph, bidirectional,sweeps); break;
-            case "Bary_Viola" :     Bary.barycenterAlgo(partialGraph); break;
+            case "Bary_Viola" :     Bary.barycenterAlgo(partialGraph, sweeps); break;
             default             :   System.out.println(" mhm, missin something here! Sugiyama"); break;
         }
         GUIController.getInstance().setCrossingLabel("Crossings: " + partialGraph.getCrossings().toString());
