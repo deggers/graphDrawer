@@ -53,7 +53,7 @@ public class PaneController {
         }
     }
     private static double                      spaceBetweenRadii = 0;
-    private static double                      radialNodeSize = 8;
+    private static double                      radialNodeSize = 6;
     private static int                      centerY;
     private static int                      centerX;
     // FXML in Pane.fxml
@@ -104,7 +104,7 @@ public class PaneController {
         circle = new Circle(scaleGraphNodeX(node.x), scaleGraphNodeY(node.y, depth), getNodeSize());
         circle.setStroke(Color.BLACK);
         circle.setStrokeWidth(2);
-        circle.setFill(Color.TRANSPARENT);
+        circle.setFill(Color.WHITE);
         Tooltip tip = new Tooltip((node.getLabel() + ", " + node.getLayer()));
         Tooltip.install(circle,tip);
         if (node.isDummy()) circle.setFill(Color.TRANSPARENT);
@@ -112,13 +112,14 @@ public class PaneController {
         return circle;
     }
     public double scaleGraphNodeX(double number){
-        return (number * 3 * getNodeSize()) + OFFSET + getNodeSize();
+        return (number * 4 * getNodeSize()) + OFFSET + getNodeSize();
     }
 
     public double scaleGraphNodeY(double number, int depth){
         double height = scrollPane.getHeight();
         double sep = height / depth;
-        return (sep * number)-100;
+        return number * 4 * getNodeSize() + OFFSET + getNodeSize();
+//        return (sep * number)-100;
     }
 
 

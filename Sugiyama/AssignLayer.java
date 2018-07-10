@@ -18,6 +18,14 @@ public class AssignLayer {
     private static final boolean VERBOSE = false;
 
     public static void longestPath(Graph g) {
+        // maybe fixing problem with visualisation
+        for (GraphNode node : g.getNodes().values()) {
+            node.x = 0;
+            node.y = 0;
+            node.setLayer(0);
+        }
+
+
         final boolean OPTIONAL_CHECK = true;
 
         LinkedHashSet<GraphNode> U; // set of nodes that will get a layer in this step

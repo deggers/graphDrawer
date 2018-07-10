@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
 public class CrossingMin {
-    private static boolean VERBOSE = false;
+    private static boolean VERBOSE = true;
     private static boolean DEBUG = false;
     private static LinkedHashMap<Integer, LinkedList<GraphNode>> layerMap;
     private static int iterations = 0;
@@ -20,7 +20,7 @@ public class CrossingMin {
     public static void baryCenter_naive(Graph graph, boolean bidirectional, int sweeps) {
         layerMap = graph.getLayerMap();
         int numOfLayer = layerMap.keySet().size();
-
+        System.out.println("bidirectional = " + bidirectional);
         for (int i = 0; i < sweeps; i++) {
             if (bidirectional) {
                 for (int layer = 1; layer <= numOfLayer - 1; layer++)
@@ -46,7 +46,17 @@ public class CrossingMin {
             double sumOfIndices = sumUpIndices(fixedLayer, adjacentNodes);
             freeNode.x_Bary = ((1 / inDegree) * sumOfIndices);
         }
-        freeLayer.sort(Comparator.comparing(GraphNode::getX_Bary));
+
+        LinkedList<GraphNode> tmp = new LinkedList<>(freeLayer);
+        tmp.sort(Comparator.comparing(GraphNode::getX_Bary));
+        int crossingsNew = BLCC_naive(g, fixedLayer, tmp, direction);
+        int crossingsOld = BLCC_naive(g, fixedLayer, freeLayer, direction);
+        if (crossingsNew < crossingsOld) {
+            freeLayer.sort(Comparator.comparing(GraphNode::getX_Bary));
+        } else {
+
+        }
+
         // still open, check if ambigous position swap improve that situation
     }
 

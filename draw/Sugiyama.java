@@ -13,11 +13,9 @@ public class Sugiyama {
     public static Graph processGraph(Graph theGraph) {
         boolean bidirectional;
         int sweeps;
-// comment
         if (VERBOSE) System.out.println("Graph: \n Nodes: " + theGraph.getNodes().size() + ", Edges: " + theGraph.getEdges().size());
         String selectedEdgeType = Objects.requireNonNull(GUIController.getInstance()).getSelectedEdgeType();
         partialGraph = theGraph.copyWithRestrains(selectedEdgeType);
-        System.out.println("Working on Graph with EdgeType: " + selectedEdgeType);
         if (VERBOSE) System.out.println("Partial: \n Nodes: " + partialGraph.getNodes().size() + ", Edges: " + partialGraph.getEdges().size());
 
         GUIController.getInstance().setGraphInfo(String.format("Graph: %s Nodes, %s Edges || ", partialGraph.getNodes().size(), partialGraph.getEdges().size()));
@@ -81,9 +79,6 @@ public class Sugiyama {
 
         // simple algo to give nodes an coordinate to draw something :)
 
-        System.out.println("theGraph.getRootBlock() = " + theGraph.getRootBlock());
-        System.out.println("");
-        System.out.println("theGraph = " + theGraph.getAlignBlock());
 
         partialGraph.resetAllPorts();
         return partialGraph;

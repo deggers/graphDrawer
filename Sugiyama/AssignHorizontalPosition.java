@@ -294,15 +294,12 @@ public class AssignHorizontalPosition {
         //Holder for better readability
         BKHolder holder = new BKHolder(direction, alignMap, rootMap, sinkMap, shiftMap, layerMap);
 
-        System.out.println("holder.rootMap = " + holder.rootMap);
-        System.out.println("holder.alignMap = " + holder.alignMap);
 
         //root coordinated relative to sink ------------------------------------
         if (direction.contains("S")){ //top-down
             for (int layer = 1; layer < graphDepth; layer++){
                 int layerSize   = layerMap.get(layer).size();
                 LinkedList<GraphNode>   layerList = layerMap.get(layer);
-                System.out.println("layerList = " + layerList);
                 if (direction.contains("W")) { //links->rechts
                     for (int k = 0; k < layerSize ; k++) {
                         GraphNode v = layerList.get(k);
@@ -348,15 +345,8 @@ public class AssignHorizontalPosition {
                     for (int k = 0; k < layerSize; k++) {
                         GraphNode v = layerList.get(k);
                         v.x = rootMap.get(v).x;
-                        System.out.println("v = " + v);
-                        System.out.println("v.x = " + v.x);
-                        System.out.println("rootMap.get(v) = " + rootMap.get(v));
                         if (v.equals(rootMap.get(v)) && shiftMap.get(sinkMap.get(v)) < Double.MAX_VALUE){ //nach Erratum von Brandes
-                            
-                            System.out.println("sinkMap = " + sinkMap.get(v));
-                            System.out.println("shiftMap = " + shiftMap.get(sinkMap.get(v)));
                             v.x += shiftMap.get(sinkMap.get(v));
-                            System.out.println("v.x = " + v.x);
                         }
                     }
                 } else { //rechts->links
@@ -415,7 +405,6 @@ private static void         placeBlock(GraphNode v, BKHolder holder){
         if (v.x==-1){ //undefined
             v.x=0;
             GraphNode w = v;
-            System.out.println("v = " + v);
             do {
                 boolean test;
                 if (holder.direction.contains("W")) { //links->rechts
@@ -435,25 +424,19 @@ private static void         placeBlock(GraphNode v, BKHolder holder){
                     placeBlock(u, holder);
                     
                     if (holder.sinkMap.get(v).equals(v)) {
-                        System.out.println("update sinkMap v to holder.sinkMap.get(u)");
-                        System.out.println("holder.sinkMap.get(v) = " + holder.sinkMap.get(v));
-                        System.out.println("holder.sinkMap.get(u) = " + holder.sinkMap.get(u));
                         holder.sinkMap.put(v, holder.sinkMap.get(u));
                     }
 
 
                     if (holder.sinkMap.get(v).equals(holder.sinkMap.get(u))) {
-                        System.out.println("i am in the if-case!");
                         if (holder.direction.contains("W")) {
                             v.x=Math.max(v.x, u.x+MinimumSeparation);
                         } else {
                             v.x=Math.min(v.x, u.x-MinimumSeparation);
                         }
                     } else{ //aufpassen mit cast double->int
-                        System.out.println("i am in the else case! ");
                         double shiftMap_u = holder.shiftMap.get(holder.sinkMap.get(u));
                         if (holder.direction.contains("W")) {
-                            System.out.println("Integer.min(shiftMap_u, (int)v.x-(int)u.x-MinimumSeparation) = " + Math.min(shiftMap_u, v.x - u.x-MinimumSeparation));
                             holder.shiftMap.put(holder.sinkMap.get(u),Math.min(shiftMap_u, v.x - u.x-MinimumSeparation));
                         } else {
                             holder.shiftMap.put(holder.sinkMap.get(u),Math.max(shiftMap_u, v.x + u.x + MinimumSeparation));
@@ -464,7 +447,6 @@ private static void         placeBlock(GraphNode v, BKHolder holder){
             } while(!w.equals(v));
 
         }
-        System.out.println("holder = " + holder.sinkMap);
     }
 
     
@@ -488,29 +470,33 @@ private static void         placeBlock(GraphNode v, BKHolder holder){
             if (x_min > graphNW.get(node)) x_min = graphNW.get(node);
             if (x_max > graphNW.get(node)) x_max = graphNW.get(node);
         }
-        min.put("NW",x_min);max.put("NW",x_max);
-        height.put("NW",x_max-x_min);
+        min.put("NW",x_min);    max.put("NW",x_max);    height.put("NW",x_max-x_min);
+        x_min = Double.MAX_VALUE;   x_max = Double.MIN_VALUE;
+
         for (GraphNode node :graph.getNodes().keySet()){
             if (x_min > graphNE.get(node)) x_min = graphNE.get(node);
             if (x_max > graphNE.get(node)) x_max = graphNE.get(node);
         }
-        min.put("NE",x_min);max.put("NE",x_max);
-        height.put("NE",x_max-x_min);
+        min.put("NE",x_min);max.put("NE",x_max);    height.put("NE",x_max-x_min);
+        x_min = Double.MAX_VALUE;   x_max = Double.MIN_VALUE;
+
         for (GraphNode node :graph.getNodes().keySet()){
             if (x_min > graphSW.get(node)) x_min = graphSW.get(node);
             if (x_max > graphSW.get(node)) x_max = graphSW.get(node);
         }
-        min.put("SW",x_min);max.put("SW",x_max);
-        height.put("SW",x_max-x_min);
+        min.put("SW",x_min);    max.put("SW",x_max);    height.put("SW",x_max-x_min);
+        x_min = Double.MAX_VALUE;   x_max = Double.MIN_VALUE;
+
         for (GraphNode node :graph.getNodes().keySet()){
             if (x_min > graphSE.get(node)) x_min = graphSE.get(node);
             if (x_max > graphSE.get(node)) x_max = graphSE.get(node);
         }
-        min.put("SE",x_min);max.put("SE",x_max);
-        height.put("SE",x_max-x_min);
+        min.put("SE",x_min);    max.put("SE",x_max);    height.put("SE",x_max-x_min);
+        x_min = Double.MAX_VALUE;   x_max = Double.MIN_VALUE;
+
         ArrayList<Double> hi = new ArrayList<>(height.values());
         hi.sort(Double::compareTo);
-        String smallest=null;
+        String smallest = null;
         for (String e : height.keySet()){
             if (height.get(e).equals(hi.get(0))){
                 smallest=e;
@@ -525,7 +511,10 @@ private static void         placeBlock(GraphNode v, BKHolder holder){
 
         for (GraphNode node : graph.getNodes().keySet()){
             ArrayList<Double> lx = new ArrayList<>();
-            lx.add(graphNE.get(node)+shiftNE); lx.add(graphNW.get(node)+shiftNW); lx.add(graphSE.get(node)+shiftSE); lx.add(graphSW.get(node)+shiftSW);
+            lx.add(graphNE.get(node)+shiftNE);
+            lx.add(graphNW.get(node)+shiftNW);
+            lx.add(graphSE.get(node)+shiftSE);
+            lx.add(graphSW.get(node)+shiftSW);
             lx.sort(Double::compareTo);
             GraphNode gn = graph.getNodes().get(node);
             gn.x = (lx.get(1)+lx.get(2))/2;
@@ -541,6 +530,7 @@ private static void         placeBlock(GraphNode v, BKHolder holder){
             for (GraphNode node: g.getLayerMap().get(layer)){
                 node.x = x;
                 node.y = layer;
+                System.out.println("layer = " + layer);
                 x++;
             }
         }
