@@ -34,7 +34,7 @@ public class Bary {
         int graphDepth = gTemp.getLayerMap().size();
         for (int level = 1; level < graphDepth; level++) {    // zb lm size 6, geht von 1-5
             graph.getLayerMap().put(level, gTemp.getBaryMatOnLevel(level).rows);
-            graph.setCrossings("L" + level +"", gTemp.getBaryMatOnLevel(level).getMatCrossings());
+            graph.setCrossings("L" + level + "", gTemp.getBaryMatOnLevel(level).getMatCrossings());
         }
         graph.getLayerMap().put(graphDepth, gTemp.getBaryMatOnLevel(graphDepth - 1).columns);
 
@@ -52,7 +52,6 @@ public class Bary {
     // Down col : 1 bis n-1, Up row: n-1 bis 1
     private void SugiyamaPhase1Sweep(int start, int end, int step, int sweeps) {
         boolean stillProcessing = false;
-        count++;
 
         for (int i = start; i != end; i += step) {
             if (i < gTemp.getLayerMap().size()) {
@@ -68,7 +67,8 @@ public class Bary {
                 }
             }
         }
-        if (stillProcessing && count < sweeps) {
+        if (stillProcessing && count <= sweeps) {
+            count++;
             if (start < end) {                             // i am in p1 down
                 SugiyamaPhase2Sweep(start, end, step, sweeps);  // goto p2 down
             }
@@ -80,7 +80,7 @@ public class Bary {
 
 
     private void SugiyamaPhase2Sweep(int start, int end, int step, int sweeps) {
-  /*      for (int i = start; i != end; i += step) {
+        for (int i = start; i != end; i += step) {
             if (i < gTemp.getLayerMap().size()) {
                 gTemp.getBaryMatOnLevel(i).reverseRows(i);
             }
@@ -89,11 +89,14 @@ public class Bary {
             if (i < gTemp.getLayerMap().size()) {
                 gTemp.getBaryMatOnLevel(i).reverseColumns(i);
             }
-        }*/
-
-        if (count < sweeps) {
-            SugiyamaPhase1Sweep(end, start, step * -1, sweeps);
         }
+
+        if (start > end) {
+            SugiyamaPhase1Sweep(start, end, step , sweeps);
+        }else if(start<end){
+        SugiyamaPhase2Sweep(end,start, step*-1, sweeps);
+        }
+
     }
 
     private void nodesConnected(Graph graph) {
@@ -122,7 +125,7 @@ public class Bary {
     }
 
 
-     public class BaryMatrix {
+    public class BaryMatrix {
         private LinkedList<GraphNode> rows = new LinkedList<>();
         private LinkedList<GraphNode> columns = new LinkedList<>();
         private int[][] matrix;
