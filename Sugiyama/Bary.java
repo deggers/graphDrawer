@@ -34,6 +34,7 @@ public class Bary {
         int graphDepth = gTemp.getLayerMap().size();
         for (int level = 1; level < graphDepth; level++) {    // zb lm size 6, geht von 1-5
             graph.getLayerMap().put(level, gTemp.getBaryMatOnLevel(level).rows);
+            gTemp.getBaryMatOnLevel(level).calcMatBaryAndCross();
             graph.setCrossings("L" + level + "", gTemp.getBaryMatOnLevel(level).getMatCrossings());
         }
         graph.getLayerMap().put(graphDepth, gTemp.getBaryMatOnLevel(graphDepth - 1).columns);
@@ -67,12 +68,16 @@ public class Bary {
                 }
             }
         }
-        if (stillProcessing && count <= sweeps) {
-            count++;
+        if (start > end) {
+            count++;}// p1 up beendet einen sweep
+
+        if (stillProcessing && count <= sweeps+1) {
             if (start < end) {                             // i am in p1 down
+                System.out.println("did p1 down");
                 SugiyamaPhase2Sweep(start, end, step, sweeps);  // goto p2 down
             }
-            if (start > end) {                            // i am in p1 up
+            if (start > end) {// i am in p1 up
+                System.out.println("did p1 up");
                 SugiyamaPhase1Sweep(end, start, step * -1, sweeps);   // goto p1 down
             }
         }
@@ -92,9 +97,11 @@ public class Bary {
         }
 
         if (start > end) {
+            System.out.println("did p2 up");
             SugiyamaPhase1Sweep(start, end, step , sweeps);
         }else if(start<end){
-        SugiyamaPhase2Sweep(end,start, step*-1, sweeps);
+            System.out.println("did p2 down");
+            SugiyamaPhase2Sweep(end,start, step*-1, sweeps);
         }
 
     }
@@ -214,6 +221,8 @@ public class Bary {
                             calcMatBaryAndCross();
                             gTemp.setBaryMat(level, this);
                             gTemp.setLayerInMap(level + 1, columns);
+                            gTemp.calcCrossingsTotal();
+
 
                             if (level < gTemp.getLayerMap().size() - 1) {  // es gibt level 1-6 in layermap
                                 // wenn auf 1-4 dann muss in nächster mat rows gesetzt werden
@@ -237,8 +246,8 @@ public class Bary {
                     hasChanged = false;
                     for (int i = 1; i < rowBary.size(); i++) {
                         int prev = i - 1;
-                        if (improvementRows(level, i)) {
-                        }
+                       /* if (improvementRows(level, i)) {
+                        }*/
                         if (Double.compare(rowBary.get(i), rowBary.get(prev)) < 0) {
                             Collections.swap(rowBary, prev, i);
                             Collections.swap(rows, prev, i);
