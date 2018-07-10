@@ -223,14 +223,17 @@ public class GraphMLParser {
                     for (GraphNode parentalNode : nodes.values()) { //package parent von n.label suchen
                         try {
                             sb = new StringBuilder(parentalNode.getLabel());
-                            sb.delete(sb.lastIndexOf("."), sb.length());
-                            GraphNode childishNode = new GraphNode(sb.toString());
-                            if (DEBUG)
-                                System.out.printf("parent for %s is %s\n", parentalNode.getLabel(), childishNode);
-                            if (nodes.containsKey(new GraphNode(childishNode))) {
-                                Edge childParEdge = new Edge(nodes.get(childishNode), parentalNode, "package");
-                                graph.addEdge(childParEdge);
+                            if(sb.lastIndexOf(".") >= 0){
+                                sb.delete(sb.lastIndexOf("."), sb.length());
+                                GraphNode childishNode = new GraphNode(sb.toString());
+                                if (DEBUG)
+                                    System.out.printf("parent for %s is %s\n", parentalNode.getLabel(), childishNode);
+                                if (nodes.containsKey(new GraphNode(childishNode))) {
+                                    Edge childParEdge = new Edge(nodes.get(childishNode), parentalNode, "package");
+                                    graph.addEdge(childParEdge);
+                                }
                             }
+
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
