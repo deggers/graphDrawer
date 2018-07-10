@@ -72,8 +72,12 @@ public class Sugiyama {
 
         String HorizontalAlignment = GUIController.getInstance().getSelectedHorizontalAlgo();
         switch (GUIController.getInstance().getSelectedHorizontalAlgo()) {
-            case "BK"   : AssignHorizontalPosition.processBK(partialGraph); break;
             case "Naive": AssignHorizontalPosition.processNaive(partialGraph); break;
+            case "BK"   : AssignHorizontalPosition.processBK(partialGraph,"complete"); break;
+            case "BK_NW" : AssignHorizontalPosition.processBK(partialGraph,"NW"); break;
+            case "BK_NE" : AssignHorizontalPosition.processBK(partialGraph,"NE"); break;
+            case "BK_SW" : AssignHorizontalPosition.processBK(partialGraph,"SW"); break;
+            case "BK_SE" : AssignHorizontalPosition.processBK(partialGraph,"SE"); break;
             case "None" : break;
         }
 

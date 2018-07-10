@@ -27,7 +27,7 @@ public class GUIController {
     private static final LinkedList<String> CYCLEREMOVAL = new LinkedList<>(Arrays.asList("Greedy_Eades'90","BergerShor'87","DFS_Florian"));
     private static final LinkedList<String> LAYERASSIGNER = new LinkedList<>(Arrays.asList("TopoSort", "Longest Path"));
     private static final LinkedList<String> CROSSINGMINALGOS = new LinkedList<>(Arrays.asList("Bary_Viola","Permutation","BaryCenter_naive"));
-    private static final LinkedList<String> HORIZONTALLAYOUT = new LinkedList<>(Arrays.asList("Naive","BK","None"));
+    private static final LinkedList<String> HORIZONTALLAYOUT = new LinkedList<>(Arrays.asList("Naive","BK","BK_NW","BK_NE","BK_SW","BK_SE"));
 
 
     private PaneController              paneController              = null;

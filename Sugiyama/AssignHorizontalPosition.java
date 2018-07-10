@@ -19,38 +19,60 @@ public class AssignHorizontalPosition {
     private static Map<GraphNode,Double> x_SW = new HashMap<>();
     private static Map<GraphNode,Double> x_SE = new HashMap<>();
 
-    public static Graph processBK(Graph inputGraph) {
-        // step 1 -> verticalAlignment(direction)
+    public static Graph processBK(Graph inputGraph, String direction) {
+        System.out.println("direction = " + direction);        // step 1 -> verticalAlignment(direction)
         /* In the first step, referred to as vertical alignment, we try to align each vertex with either
         its median upper or its median lower neighbor, and we resolve alignment conflicts (of type 0) either
         in a leftmost or a rightmost fashion. We thus obtain one vertical alignment for each combination of
         upward and downward alignment with leftmost and rightmost conflict resolution. */
-
+        
         MarkTypeOneConflicts(inputGraph);
-        verticalAlignment(inputGraph,"NW");
-        verticalAlignment(inputGraph,"NE");
-        verticalAlignment(inputGraph,"SW");
-        verticalAlignment(inputGraph,"SE");
+        if (direction.equals("complete")){
+            verticalAlignment(inputGraph,"NW");
+            verticalAlignment(inputGraph,"NE");
+            verticalAlignment(inputGraph,"SW");
+            verticalAlignment(inputGraph,"SE");
+            
+            // step 2 -> Compaction(direction)
+            x_SW = Compaction(inputGraph, "SW");
+            x_NW = Compaction(inputGraph, "NW");
+            x_NE = Compaction(inputGraph,"NE");
+            x_SE = Compaction(inputGraph, "SE");
+            
+            Balancing(x_NW,x_NE,x_SE,x_SW,inputGraph);
+        }
+        
+        if (direction.equals("NW")){
+            verticalAlignment(inputGraph,"NW");
+            Compaction(inputGraph, "NW");
+            System.out.println("inputGraph.getAlignBlock() = " + inputGraph.getAlignBlock());
+            System.out.println("inputGraph.getRooBlock() = " + inputGraph.getRootBlock());
+        }
+        
+        if (direction.equals("NE")){
+            verticalAlignment(inputGraph,"NE");
+            Compaction(inputGraph, "NE");
+            System.out.println("inputGraph.getAlignBlock() = " + inputGraph.getAlignBlock());
+            System.out.println("inputGraph.getRooBlock() = " + inputGraph.getRootBlock());
+        }
+        
+        if (direction.equals("SE")){
+            verticalAlignment(inputGraph,"SE");
+            Compaction(inputGraph, "SE");
+                        System.out.println("inputGraph.getAlignBlock() = " + inputGraph.getAlignBlock());
+            System.out.println("inputGraph.getRooBlock() = " + inputGraph.getRootBlock());
+        }
+        
+        if (direction.equals("SW")){
+            verticalAlignment(inputGraph,"SW");
+            Compaction(inputGraph, "SW");
+                        System.out.println("inputGraph.getAlignBlock() = " + inputGraph.getAlignBlock());
+            System.out.println("inputGraph.getRooBlock() = " + inputGraph.getRootBlock());
+        }
 
-        // step 2 -> Compaction(direction)
-        x_SW = Compaction(inputGraph, "SW");
-        x_NW = Compaction(inputGraph, "NW");
-        x_NE = Compaction(inputGraph,"NE");
-        x_SE = Compaction(inputGraph, "SE");
-
-
-        // step 3
-        Balancing(x_NW,x_NE,x_SE,x_SW,inputGraph);
-
-
-
-//        for (GraphNode node : inputGraph.getNodes().values()) {
-//            node.y = node.getLayer();
-//            if (node.x == -1) System.out.println(node + "not correct x-Position");
-//        }
-
-
-
+        for (GraphNode node : inputGraph.getNodes().keySet()){
+            node.y = node.getLayer();
+        }
 
         return inputGraph;
     }
@@ -90,7 +112,7 @@ public class AssignHorizontalPosition {
 
         int graphDepth  = graph.getLayerMap().keySet().size();
         if (VERBOSE) System.out.println(direction);
-        if (direction.contains("S")) {
+        if (direction.contains("N")) {
 // TRAVERSING LAYERS FROM TOP TO BOTTOM-v-v-v-v-v-v-v-v-v-v-v-v-TOP TO BOTTOM-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-v-
             if (VERBOSE) System.out.println("TOP to BOTTOM");
             for (int layer = 1; layer < graphDepth; layer++){                                                 // Zeile 3
@@ -193,46 +215,80 @@ public class AssignHorizontalPosition {
                 else rootMap.put(node,alignMap.get(node));
             }
         } else {
-            ArrayList<GraphNode> done = new ArrayList<>();
-            ArrayList<GraphNode> addRoot = new ArrayList<>();
-            for (GraphNode key : alignMap.keySet()){
-                if (!done.contains(key)){
-                    done.add(key);
-                    GraphNode possibleRoot = key;
-                    if (key.equals(alignMap.get(key))){
-                        rootMap.put(possibleRoot,possibleRoot);
-                        }
-                    else {
-                        while (!key.equals(alignMap.get(key))){
-                            key = nextNode(key,alignMap);
-                            done.add(key);
-                            addRoot.add(key);
-                        }
-                        for (GraphNode doneKey : addRoot)
-                            rootMap.put(doneKey,possibleRoot);
-                        addRoot.clear();
-                        rootMap.put(possibleRoot,possibleRoot);
-                    }
-                }
-            }
+            ArrayList<GraphNode> realRoots = new ArrayList<>();
+            for(GraphNode key: alignMap.keySet())
+                if (key.equals(alignMap.get(key)))  realRoots.add(alignMap.get(key));
+            for (GraphNode node : alignMap.keySet()){
+                if (!realRoots.contains(alignMap.get(node)))
+                    rootMap.put(node,findRoot(node,alignMap));
+                else rootMap.put(node,alignMap.get(node));
+            }//--------------------------------------------------------------------
+//            ArrayList<GraphNode> done = new ArrayList<>();
+//            ArrayList<GraphNode> addRoot = new ArrayList<>();
+//            for (GraphNode key : alignMap.keySet()){
+//                if (!done.contains(key)){
+//                    done.add(key);
+//                    GraphNode possibleRoot = key;
+//                    if (key.equals(alignMap.get(key))){
+//                        rootMap.put(possibleRoot,possibleRoot);
+//                        }
+//                    else {
+//                        while (!key.equals(alignMap.get(key))){
+//                            key = nextNode(key,alignMap);
+//                            done.add(key);
+//                            addRoot.add(key);
+//                        }
+//                        for (GraphNode doneKey : addRoot)
+//                            rootMap.put(doneKey,possibleRoot);
+//                        addRoot.clear();
+//                        rootMap.put(possibleRoot,possibleRoot);
+//                    }
+//                }
+//            }
         }
 
 //        for (GraphNode key : alignMap.keySet())
 //            if (key.equals(alignMap.get(key)))
 //                alignMap.put(key,rootMap.get(key));
-
+//        System.out.println("alignMap = " + alignMap);
         LinkedHashMap<GraphNode,GraphNode> alignTmp = new LinkedHashMap<>();
         for (GraphNode key : alignMap.keySet()){
-            if (!key.equals(alignMap.get(key))){
-                alignTmp.put(key,alignMap.get(key));
-            } else {
-                alignTmp.put(key,rootMap.get(key));
+            //if (direction.contains("S")) {
+                if (!key.equals(alignMap.get(key)))
+                    alignTmp.put(key,alignMap.get(key));
+                else
+                    alignTmp.put(key,rootMap.get(key));
+//            } else { // North_case
+//                if (!key.equals(alignMap.get(key))){
+//                    alignTmp.put(key,alignMap.get(key));
+//                } else {
+////                    GraphNode parent = key;
+////                    while (getParent(key,alignMap) != null) {
+////                        parent = getParent(key,alignMap);
+////                    }
+////                    alignTmp.put(key,parent);
+//                }
+//            }
             }
-        }
 
         graph.setRootBlock(direction,rootMap);
         graph.setAlignBlock(direction,alignTmp);
     }
+
+    private static GraphNode getParent(GraphNode key, LinkedHashMap<GraphNode,GraphNode> alignMap){
+        // input: D1-5-8:2 = D1-5-8:2
+        //  5:3 = D1-5-8:2
+        for (GraphNode node : alignMap.keySet()){
+            if (alignMap.get(node).equals(key) && node != alignMap.get(node)){
+                System.out.println("child = " + key);
+                System.out.println("parent = " + node);
+                return node;
+            }
+        }
+        return null;
+    }
+
+
     private static GraphNode                nextNode(GraphNode key, LinkedHashMap<GraphNode,GraphNode> alignMap){
         return alignMap.get(key);
     }
@@ -295,8 +351,13 @@ public class AssignHorizontalPosition {
         BKHolder holder = new BKHolder(direction, alignMap, rootMap, sinkMap, shiftMap, layerMap);
 
 
+        System.out.println("holder.layerMap = " + holder.layerMap);
+        System.out.println("holder.alignMap = " + holder.alignMap);
+        System.out.println("holder.rootMap = " + holder.rootMap);
+        
+
         //root coordinated relative to sink ------------------------------------
-        if (direction.contains("S")){ //top-down
+        if (direction.contains("N")){ //top-down
             for (int layer = 1; layer < graphDepth; layer++){
                 int layerSize   = layerMap.get(layer).size();
                 LinkedList<GraphNode>   layerList = layerMap.get(layer);
@@ -337,7 +398,7 @@ public class AssignHorizontalPosition {
                 }
         }}
         //absolute coordinates -------------------------------------------------
-        if (direction.contains("S")){ //top-down
+        if (direction.contains("N")){ //top-down
             for (int layer = 1; layer <= graphDepth; layer++){
                 int layerSize   = layerMap.get(layer).size();
                 LinkedList<GraphNode>   layerList = layerMap.get(layer);
@@ -381,7 +442,6 @@ public class AssignHorizontalPosition {
                     }
                 }
             }
-
         }
 
         double min_x = Double.MAX_VALUE;
@@ -391,12 +451,16 @@ public class AssignHorizontalPosition {
         }
         for (GraphNode node: graph.getNodes().values()){
             node.x = node.x - min_x;
+            node.y = node.getLayer();
         }
 
         Map<GraphNode,Double> returnMe = new HashMap<>();
         for (GraphNode node: graph.getNodes().values()){
             returnMe.put(node,node.x);
         }
+
+        System.out.println("sinkMap = " + sinkMap);
+
         return returnMe;
     }
 
