@@ -70,6 +70,7 @@ public class AssignLayer {
         g.reverseLayerOrder();
         g.addDummies();
     }
+
     public static void topologicalPath(Graph g) {
         int level = DEFAULT_LAYER_STARTING;
         Graph copyG = new Graph(g);
@@ -85,15 +86,18 @@ public class AssignLayer {
             copyG.getNodes().keySet().removeAll(sinks);
             level += 1;
             if (VERBOSE && level == g.getNodes().size()) System.out.println("\n#Nodes = #Layer\n");
-        } sorted.put(level, copyG.getIsolatedNodes());
+        }
+        sorted.put(level, copyG.getIsolatedNodes());
 
         if (sorted.size() == 0) System.out.println("nothin in the layer ?!");
         g.insertLayer(sorted);
         g.reverseLayerOrder();
         g.addDummies();
 
-        if (VERBOSE) { System.out.println(g);
+        if (VERBOSE) {
+            System.out.println(g);
             System.out.println(g.getEdges());
-            System.out.println("g.getNodeSet() = " + g.getNodes());}
+            System.out.println("g.getNodeSet() = " + g.getNodes());
+        }
     }
 }

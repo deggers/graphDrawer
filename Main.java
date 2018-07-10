@@ -1,19 +1,11 @@
-import Sugiyama.AssignHorizontalPosition;
 import controller.GUIController;
-import controller.PaneController;
 import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import structure.Edge;
-import structure.Graph;
-import structure.GraphNode;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 
 //@formatter:off
 public class Main extends Application {
@@ -55,7 +47,7 @@ public class Main extends Application {
 //        myModifiedLayerMap.put(1,layer1);
 //        myModifiedLayerMap.put(2,layer2);
 //        myGraph.setLayerMap(myModifiedLayerMap);
-
+/*
         Graph myGraph =  new Graph();
 //------Layer1-----------------------------------------------------------
         GraphNode node11 = new GraphNode("11",false,1);
@@ -142,7 +134,7 @@ public class Main extends Application {
 //        System.out.println("my = " + myGraph.getRootBlock());
 
 
-        PaneController.getInstance().drawDAG(myGraph);
+        PaneController.getInstance().drawDAG(myGraph);*/
         launch(args);
 
    }

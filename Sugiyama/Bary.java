@@ -45,7 +45,6 @@ public class Bary {
             }
         }
         graph.setCrossings("total", gTemp.getCrossingsTotal());
-
         System.out.println("number of crossings total = " + gTemp.getCrossingsTotal());
     }
 
@@ -69,9 +68,10 @@ public class Bary {
             }
         }
         if (start > end) {
+            System.out.println("did p1 up");
             count++;}// p1 up beendet einen sweep
 
-        if (stillProcessing && count <= sweeps+1) {
+        if (stillProcessing && count < sweeps) {
             if (start < end) {                             // i am in p1 down
                 System.out.println("did p1 down");
                 SugiyamaPhase2Sweep(start, end, step, sweeps);  // goto p2 down
@@ -296,8 +296,6 @@ public class Bary {
                 for (int i = 1; i < columnBary.size(); i++) {
                     int prev = i - 1;
                     if (improvementCols(level, i)) {
-
-
                         if (Double.compare(columnBary.get(i), columnBary.get(prev)) == 0) {
                             Collections.swap(columnBary, i, prev);
                             Collections.swap(columns, i, prev);

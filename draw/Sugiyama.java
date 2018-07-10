@@ -81,6 +81,8 @@ public class Sugiyama {
 
 
         partialGraph.resetAllPorts();
+        //System.out.println(partialGraph.getLayerMap());
+
         return partialGraph;
     }
 }

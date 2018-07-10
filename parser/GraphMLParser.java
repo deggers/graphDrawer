@@ -215,7 +215,7 @@ public class GraphMLParser {
                                 }
                             }
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            //e.printStackTrace();
                         }
                     }
                     nodes.putAll(missing); //copy all missing nodes to nodes Map
@@ -235,7 +235,7 @@ public class GraphMLParser {
                             }
 
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            //e.printStackTrace();
                         }
                     }
 
